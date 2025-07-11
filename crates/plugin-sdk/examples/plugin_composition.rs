@@ -1,0 +1,174 @@
+// this_file: crates/plugin-sdk/examples/plugin_composition.rs
+
+//! Plugin composition example
+//!
+//! This example demonstrates how to use multiple plugins together
+//! with the new plugin registry system.
+
+use serde_json::json;
+use std::borrow::Cow;
+use vexy_svgo_core::ast::{Document, Element, Node};
+use vexy_svgo_core::plugin_registry::{PluginConfig, PluginRegistry};
+use vexy_svgo_plugin_sdk::{Plugin, plugins::{RemoveCommentsPlugin, RemoveEmptyAttrsPlugin}};
+
+fn main() -> anyhow::Result<()> {
+    println!("Plugin Composition Example");
+    println!("==========================");
+
+    // Create a test document with various elements to optimize
+    let mut doc = create_test_document();
+
+    println!("Original document state:");
+    print_document_stats(&doc);
+
+    // Create plugin registry and register plugins
+    let mut registry = PluginRegistry::new();
+    registry.register(RemoveCommentsPlugin::new());
+    registry.register(RemoveEmptyAttrsPlugin::new());
+
+    // Configure plugins
+    let plugin_configs = vec![
+        PluginConfig {
+            name: "removeComments".to_string(),
+            params: json!({"preservePatterns": true}),
+            enabled: true,
+        },
+        PluginConfig {
+            name: "removeEmptyAttrs".to_string(),
+            params: json!({"preserveClass": false, "preserveId": false}),
+            enabled: true,
+        },
+    ];
+
+    // Apply plugins in sequence
+    println!("\nApplying plugins...");
+    registry.apply_plugins(&mut doc, &plugin_configs)?;
+
+    println!("Optimized document state:");
+    print_document_stats(&doc);
+
+    // Demonstrate individual plugin application
+    println!("\n--- Individual Plugin Demonstration ---");
+    demonstrate_individual_plugins()?;
+
+    Ok(())
+}
+
+fn create_test_document() -> Document<'static> {
+    let mut doc = Document::new();
+
+    // Add various types of content to test plugins
+    doc.root.name = Cow::Borrowed("svg");
+    doc.root
+        .attributes
+        .insert("width".to_string(), "100".to_string());
+    doc.root
+        .attributes
+        .insert("height".to_string(), "100".to_string());
+    doc.root
+        .attributes
+        .insert("fill".to_string(), "".to_string()); // Empty attribute
+    doc.root
+        .attributes
+        .insert("stroke".to_string(), "  ".to_string()); // Whitespace-only
+    doc.root
+        .attributes
+        .insert("class".to_string(), "".to_string()); // Empty class
+
+    // Add children with comments and empty attributes
+    doc.root
+        .children
+        .push(Node::Comment("Regular comment to be removed".to_string()));
+    doc.root
+        .children
+        .push(Node::Comment("! Legal comment to be preserved".to_string()));
+
+    let mut rect = Element::new("rect");
+    rect.attributes.insert("x".to_string(), "10".to_string());
+    rect.attributes.insert("y".to_string(), "10".to_string());
+    rect.attributes
+        .insert("width".to_string(), "50".to_string());
+    rect.attributes
+        .insert("height".to_string(), "50".to_string());
+    rect.attributes
+        .insert("fill".to_string(), "blue".to_string());
+    rect.attributes.insert("stroke".to_string(), "".to_string()); // Empty
+    rect.attributes
+        .insert("opacity".to_string(), "".to_string()); // Empty
+
+    doc.root.children.push(Node::Element(rect));
+    doc.root
+        .children
+        .push(Node::Comment("Another comment".to_string()));
+
+    doc
+}
+
+fn print_document_stats(doc: &Document) {
+    let comment_count = count_comments(&doc.root);
+    let empty_attr_count = count_empty_attributes(&doc.root);
+    let total_attr_count = count_total_attributes(&doc.root);
+
+    println!("  Comments: {}", comment_count);
+    println!("  Empty attributes: {}", empty_attr_count);
+    println!("  Total attributes: {}", total_attr_count);
+}
+
+fn count_comments(element: &Element) -> usize {
+    let mut count = 0;
+    for child in &element.children {
+        match child {
+            Node::Comment(_) => count += 1,
+            Node::Element(elem) => count += count_comments(elem),
+            _ => {}
+        }
+    }
+    count
+}
+
+fn count_empty_attributes(element: &Element) -> usize {
+    let mut count = element
+        .attributes
+        .values()
+        .filter(|v| v.trim().is_empty())
+        .count();
+
+    for child in &element.children {
+        if let Node::Element(elem) = child {
+            count += count_empty_attributes(elem);
+        }
+    }
+    count
+}
+
+fn count_total_attributes(element: &Element) -> usize {
+    let mut count = element.attributes.len();
+    for child in &element.children {
+        if let Node::Element(elem) = child {
+            count += count_total_attributes(elem);
+        }
+    }
+    count
+}
+
+fn demonstrate_individual_plugins() -> anyhow::Result<()> {
+    println!("Testing RemoveCommentsPlugin in isolation...");
+    let mut doc1 = create_test_document();
+    let comment_plugin = RemoveCommentsPlugin::new();
+    comment_plugin.apply(&mut doc1)?;
+    print_document_stats(&doc1);
+
+    println!("\nTesting RemoveEmptyAttrsPlugin in isolation...");
+    let mut doc2 = create_test_document();
+    let attrs_plugin = RemoveEmptyAttrsPlugin::new();
+    attrs_plugin.apply(&mut doc2)?;
+    print_document_stats(&doc2);
+
+    println!("\nTesting plugins with different configurations...");
+    let mut doc3 = create_test_document();
+    let comment_plugin_no_preserve = RemoveCommentsPlugin::with_preserve_patterns(false);
+    comment_plugin_no_preserve.apply(&mut doc3)?;
+    print_document_stats(&doc3);
+
+    Ok(())
+}

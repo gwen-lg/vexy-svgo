@@ -1,0 +1,1029 @@
+.
+├── .cursorrules
+├── .github
+│   ├── .DS_Store
+│   └── workflows
+│       ├── ci-optimized.yml
+│       ├── ci-parallel.yml
+│       ├── ci.yml
+│       ├── dependency-cache.yml
+│       ├── docs.yml
+│       ├── release.yml
+│       ├── rust.yml
+│       └── test-build-scripts.yml
+├── .gitignore
+├── .specstory
+│   ├── .what-is-this.md
+│   └── history
+├── .vscode
+│   └── mcp.json
+├── AGENTS.md
+├── build_output.txt
+├── build-wasm-v2.sh
+├── build-wasm.sh
+├── build.err.txt
+├── build.log.txt
+├── build.sh
+├── Cargo.lock
+├── Cargo.toml
+├── CHANGELOG.md
+├── CLAUDE.md
+├── cleanup.sh
+├── CONTRIBUTING.md
+├── crates
+│   ├── .DS_Store
+│   ├── cli
+│   │   ├── .DS_Store
+│   │   ├── Cargo.toml
+│   │   ├── src
+│   │   │   ├── commands
+│   │   │   │   └── plugin
+│   │   │   │       ├── disable.rs
+│   │   │   │       ├── enable.rs
+│   │   │   │       ├── info.rs
+│   │   │   │       ├── install.rs
+│   │   │   │       ├── list.rs
+│   │   │   │       ├── mod.rs
+│   │   │   │       ├── remove.rs
+│   │   │   │       ├── search.rs
+│   │   │   │       └── update.rs
+│   │   │   ├── features_cmd.rs
+│   │   │   └── main.rs
+│   │   └── tests
+│   │       └── integration_test.rs
+│   ├── core
+│   │   ├── .DS_Store
+│   │   ├── Cargo.toml
+│   │   ├── src
+│   │   │   ├── ast.rs
+│   │   │   ├── collections.rs
+│   │   │   ├── features.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── optimizer
+│   │   │   │   ├── mod.rs
+│   │   │   │   └── parallel.rs
+│   │   │   ├── parser
+│   │   │   │   ├── attributes.rs
+│   │   │   │   ├── config.rs
+│   │   │   │   ├── elements.rs
+│   │   │   │   ├── entities.rs
+│   │   │   │   ├── error.rs
+│   │   │   │   ├── main.rs
+│   │   │   │   ├── mod.rs
+│   │   │   │   ├── streaming.rs
+│   │   │   │   ├── tests.rs
+│   │   │   │   ├── util.rs
+│   │   │   │   └── utils.rs
+│   │   │   ├── plugin_registry.rs
+│   │   │   ├── stringifier.rs
+│   │   │   ├── utils
+│   │   │   │   ├── attributes.rs
+│   │   │   │   ├── colors.rs
+│   │   │   │   ├── mod.rs
+│   │   │   │   ├── numbers.rs
+│   │   │   │   ├── paths.rs
+│   │   │   │   └── selectors.rs
+│   │   │   └── visitor.rs
+│   │   ├── test_ast.rs
+│   │   └── tests
+│   │       └── parallel_test.rs
+│   ├── ffi
+│   │   ├── Cargo.toml
+│   │   └── src
+│   │       └── lib.rs
+│   ├── plugin-sdk
+│   │   ├── .DS_Store
+│   │   ├── Cargo.toml
+│   │   ├── examples
+│   │   │   ├── .DS_Store
+│   │   │   └── plugin_composition.rs
+│   │   ├── PLUGIN_MIGRATION.md
+│   │   ├── README.md
+│   │   ├── src
+│   │   │   ├── enhanced_registry.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── plugins
+│   │   │   │   ├── add_attributes_to_svg_element.rs
+│   │   │   │   ├── add_classes_to_svg_element.rs
+│   │   │   │   ├── apply_transforms.rs
+│   │   │   │   ├── cleanup_attrs.rs
+│   │   │   │   ├── cleanup_enable_background.rs
+│   │   │   │   ├── cleanup_ids
+│   │   │   │   │   ├── collector.rs
+│   │   │   │   │   ├── mod.rs
+│   │   │   │   │   └── renamer.rs
+│   │   │   │   ├── cleanup_list_of_values.rs
+│   │   │   │   ├── cleanup_numeric_values.rs
+│   │   │   │   ├── collapse_groups.rs
+│   │   │   │   ├── convert_colors.rs
+│   │   │   │   ├── convert_ellipse_to_circle.rs
+│   │   │   │   ├── convert_one_stop_gradients.rs
+│   │   │   │   ├── convert_path_data
+│   │   │   │   │   ├── abs_to_rel.rs
+│   │   │   │   │   ├── mod.rs
+│   │   │   │   │   ├── normalize.rs
+│   │   │   │   │   ├── parser.rs
+│   │   │   │   │   ├── rel_to_abs.rs
+│   │   │   │   │   └── tests.rs
+│   │   │   │   ├── convert_shape_to_path.rs
+│   │   │   │   ├── convert_style_to_attrs.rs
+│   │   │   │   ├── convert_transform.rs
+│   │   │   │   ├── inline_styles.rs
+│   │   │   │   ├── merge_paths.rs
+│   │   │   │   ├── merge_styles.rs
+│   │   │   │   ├── minify_styles.rs
+│   │   │   │   ├── mod.rs
+│   │   │   │   ├── move_elems_attrs_to_group.rs
+│   │   │   │   ├── move_group_attrs_to_elems.rs
+│   │   │   │   ├── prefix_ids.rs
+│   │   │   │   ├── remove_attributes_by_selector.rs
+│   │   │   │   ├── remove_attrs.rs
+│   │   │   │   ├── remove_comments.rs
+│   │   │   │   ├── remove_deprecated_attrs.rs
+│   │   │   │   ├── remove_desc.rs
+│   │   │   │   ├── remove_dimensions.rs
+│   │   │   │   ├── remove_doctype.rs
+│   │   │   │   ├── remove_editors_ns_data.rs
+│   │   │   │   ├── remove_elements_by_attr.rs
+│   │   │   │   ├── remove_empty_attrs.rs
+│   │   │   │   ├── remove_empty_containers.rs
+│   │   │   │   ├── remove_empty_text.rs
+│   │   │   │   ├── remove_hidden_elems.rs
+│   │   │   │   ├── remove_metadata.rs
+│   │   │   │   ├── remove_non_inheritable_group_attrs.rs
+│   │   │   │   ├── remove_off_canvas_paths.rs
+│   │   │   │   ├── remove_raster_images.rs
+│   │   │   │   ├── remove_scripts.rs
+│   │   │   │   ├── remove_style_element.rs
+│   │   │   │   ├── remove_title.rs
+│   │   │   │   ├── remove_unknowns_and_defaults
+│   │   │   │   │   ├── default_attrs.rs
+│   │   │   │   │   ├── mod.rs
+│   │   │   │   │   ├── tests.rs
+│   │   │   │   │   └── unknown_elements.rs
+│   │   │   │   ├── remove_unused_ns.rs
+│   │   │   │   ├── remove_useless_defs.rs
+│   │   │   │   ├── remove_useless_stroke_and_fill.rs
+│   │   │   │   ├── remove_useless_transforms.rs
+│   │   │   │   ├── remove_view_box.rs
+│   │   │   │   ├── remove_xlink.rs
+│   │   │   │   ├── remove_xml_proc_inst.rs
+│   │   │   │   ├── remove_xmlns.rs
+│   │   │   │   ├── reuse_paths.rs
+│   │   │   │   ├── sort_attrs.rs
+│   │   │   │   └── sort_defs_children.rs
+│   │   │   ├── property_tests.rs
+│   │   │   ├── registry.rs
+│   │   │   ├── selector.rs
+│   │   │   ├── test_framework.rs
+│   │   │   └── test_utils.rs
+│   │   └── tests
+│   │       ├── integration_test.rs
+│   │       └── registry_test.rs
+│   ├── test-utils
+│   │   ├── .DS_Store
+│   │   ├── Cargo.toml
+│   │   ├── src
+│   │   │   └── lib.rs
+│   │   └── tests
+│   │       └── compat.rs
+│   └── wasm
+│       ├── .cargo
+│       │   └── config.toml
+│       ├── .DS_Store
+│       ├── Cargo.toml
+│       ├── package.json.template
+│       ├── src
+│       │   ├── enhanced.rs
+│       │   ├── lib.rs
+│       │   └── minimal.rs
+│       ├── vexy_svgo.d.ts
+│       └── wrapper.js
+├── debug_comment_issue
+├── debug_comment_issue.rs
+├── docs
+│   ├── _build.sh
+│   ├── _config.yml
+│   ├── _data
+│   │   ├── .DS_Store
+│   │   └── benchmarks.json
+│   ├── _layouts
+│   │   └── tool.html
+│   ├── _sass
+│   │   ├── .DS_Store
+│   │   └── custom
+│   │       ├── .DS_Store
+│   │       └── custom.scss
+│   ├── _serve.sh
+│   ├── _tools
+│   │   ├── index.md
+│   │   ├── optimizer.md
+│   │   ├── README.md
+│   │   └── svgo-optimizer.md
+│   ├── .DS_Store
+│   ├── architecture.md
+│   ├── assets
+│   │   ├── .DS_Store
+│   │   ├── css
+│   │   │   ├── input.css
+│   │   │   ├── main.css
+│   │   │   └── style.scss
+│   │   └── js
+│   │       ├── svg-optimizer.js
+│   │       ├── svgo-optimizer.js
+│   │       └── theme.js
+│   ├── benchmarks.md
+│   ├── bun.lock
+│   ├── comparison.md
+│   ├── DOCUMENTATION_UPDATE_SUMMARY.md
+│   ├── favicon.ico
+│   ├── Gemfile
+│   ├── index.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── plugin-development.md
+│   ├── plugin-marketplace.md
+│   ├── plugins.md
+│   ├── postcss.config.js
+│   ├── SVGO_PLUGINS_COMPREHENSIVE_LIST.md
+│   ├── tailwind.config.js
+│   ├── usage.md
+│   ├── vexy_svgo_PLUGIN_ANALYSIS_SUMMARY.md
+│   └── wasm-demo.html
+├── examples
+│   ├── .DS_Store
+│   ├── cli-usage.md
+│   ├── example-plugin
+│   │   ├── .DS_Store
+│   │   ├── benches
+│   │   │   └── plugin_bench.rs
+│   │   ├── Cargo.toml
+│   │   ├── README.md
+│   │   └── src
+│   │       └── lib.rs
+│   ├── rust-integration.rs
+│   ├── wasm-browser.html
+│   └── wasm-enhanced-demo.html
+├── full_test_output.txt
+├── full_test_run.txt
+├── GEMINI.md
+├── LICENSE
+├── llms.txt
+├── migrate.sh
+├── PLAN.md
+├── PLUGIN_PARAMS_LIMITATION.md
+├── README.md
+├── REFACTOR_PROMPT.md
+├── REFACTOR.md
+├── RELEASE_CANDIDATE.md
+├── release-v2.sh
+├── release.sh
+├── scripts
+│   ├── .DS_Store
+│   ├── build-all.sh
+│   ├── build-wasm-optimized.sh
+│   ├── build.sh
+│   ├── ci-cache-warmup.sh
+│   ├── marketplace-setup.sh
+│   ├── package-release.sh
+│   ├── README-benchmarks.md
+│   ├── scripts.md
+│   ├── set-cargo-version.sh
+│   └── track-bundle-size.sh
+├── test
+│   ├── .DS_Store
+│   ├── comparative
+│   │   ├── batch_test.sh
+│   │   ├── compare_outputs.sh
+│   │   ├── README.md
+│   │   └── test_plugins.sh
+│   ├── fixture_tests.rs
+│   ├── generated_plugin_tests.rs
+│   ├── generators
+│   │   ├── generate_compatibility_tests.py
+│   │   ├── generate_rust_plugin_tests.py
+│   │   └── parse_svgo_fixtures.py
+│   ├── integration_test.rs
+│   ├── plugins
+│   │   ├── .DS_Store
+│   │   ├── add_attributes_to_svg_element.rs
+│   │   ├── add_classes_to_svg_element.rs
+│   │   ├── apply_transforms.rs
+│   │   ├── cleanup_attrs.rs
+│   │   ├── cleanup_enable_background.rs
+│   │   ├── cleanup_ids.rs
+│   │   ├── cleanup_list_of_values.rs
+│   │   ├── cleanup_numeric_values.rs
+│   │   ├── collapse_groups.rs
+│   │   ├── convert_colors.rs
+│   │   ├── convert_ellipse_to_circle.rs
+│   │   ├── convert_one_stop_gradients.rs
+│   │   ├── convert_path_data_advanced.rs
+│   │   ├── convert_path_data.rs
+│   │   ├── convert_shape_to_path.rs
+│   │   ├── convert_style_to_attrs.rs
+│   │   ├── convert_transform.rs
+│   │   ├── inline_styles.rs
+│   │   ├── merge_paths.rs
+│   │   ├── merge_styles.rs
+│   │   ├── minify_styles.rs
+│   │   ├── move_elems_attrs_to_group.rs
+│   │   ├── move_group_attrs_to_elems.rs
+│   │   ├── prefix_ids.rs
+│   │   ├── remove_attributes_by_selector.rs
+│   │   ├── remove_attrs.rs
+│   │   ├── remove_comments.rs
+│   │   ├── remove_deprecated_attrs.rs
+│   │   ├── remove_desc.rs
+│   │   ├── remove_dimensions.rs
+│   │   ├── remove_doctype.rs
+│   │   ├── remove_editors_nsdata.rs
+│   │   ├── remove_elements_by_attr.rs
+│   │   ├── remove_empty_attrs.rs
+│   │   ├── remove_empty_containers.rs
+│   │   ├── remove_empty_text.rs
+│   │   ├── remove_hidden_elems.rs
+│   │   ├── remove_metadata.rs
+│   │   ├── remove_non_inheritable_group_attrs.rs
+│   │   ├── remove_off_canvas_paths.rs
+│   │   ├── remove_raster_images.rs
+│   │   ├── remove_scripts.rs
+│   │   ├── remove_style_element.rs
+│   │   ├── remove_title.rs
+│   │   ├── remove_unknowns_and_defaults.rs
+│   │   ├── remove_unused_ns.rs
+│   │   ├── remove_useless_defs.rs
+│   │   ├── remove_useless_stroke_and_fill.rs
+│   │   ├── remove_view_box.rs
+│   │   ├── remove_xlink.rs
+│   │   ├── remove_xmlns.rs
+│   │   ├── remove_xmlproc_inst.rs
+│   │   ├── reuse_paths.rs
+│   │   ├── sort_attrs.rs
+│   │   └── sort_defs_children.rs
+│   ├── svgo_compatibility_tests.rs
+│   ├── test_macro.rs
+│   └── utilities
+│       └── move_test_files.sh
+├── test_comment_parsing.rs
+├── test_convert_transform.svg
+├── test_output.svg
+├── test_output.txt
+├── test_output2.txt
+├── test_vexify_sample.rs
+├── testdata
+│   ├── .DS_Store
+│   ├── emoji
+│   │   ├── .DS_Store
+│   │   ├── emoji_u00a9.svg
+│   │   ├── emoji_u00ae.svg
+│   │   ├── emoji_u1f0cf.svg
+│   │   ├── emoji_u1f1e6.svg
+│   │   ├── emoji_u1f1e7.svg
+│   │   ├── emoji_u1f1e8.svg
+│   │   ├── emoji_u1f1e9.svg
+│   │   ├── emoji_u1f1ea.svg
+│   │   ├── emoji_u1f1eb.svg
+│   │   ├── emoji_u1f1ec.svg
+│   │   ├── emoji_u1f1ed.svg
+│   │   ├── emoji_u1f1ee.svg
+│   │   ├── emoji_u1f1ef.svg
+│   │   ├── emoji_u1f1f0.svg
+│   │   ├── emoji_u1f1f1.svg
+│   │   ├── emoji_u1f1f2.svg
+│   │   ├── emoji_u1f1f3.svg
+│   │   ├── emoji_u1f1f4.svg
+│   │   ├── emoji_u1f1f5.svg
+│   │   ├── emoji_u1f1f6.svg
+│   │   ├── emoji_u1f1f7.svg
+│   │   ├── emoji_u1f1f8.svg
+│   │   ├── emoji_u1f1f9.svg
+│   │   ├── emoji_u1f1fa.svg
+│   │   ├── emoji_u1f1fb.svg
+│   │   ├── emoji_u1f1fc.svg
+│   │   ├── emoji_u1f1fd.svg
+│   │   ├── emoji_u1f1fe.svg
+│   │   ├── emoji_u1f1ff.svg
+│   │   ├── emoji_u1f3a0.svg
+│   │   ├── emoji_u1f3a1.svg
+│   │   ├── emoji_u1f3a2.svg
+│   │   ├── emoji_u1f3a3.svg
+│   │   ├── emoji_u1f3a4.svg
+│   │   ├── emoji_u1f3a5.svg
+│   │   ├── emoji_u1f3a6.svg
+│   │   ├── emoji_u1f3a7.svg
+│   │   ├── emoji_u1f3a8.svg
+│   │   ├── emoji_u1f3a9.svg
+│   │   ├── emoji_u1f3aa.svg
+│   │   ├── emoji_u1f3ab.svg
+│   │   ├── emoji_u1f3ac.svg
+│   │   ├── emoji_u1f3ad.svg
+│   │   ├── emoji_u1f3ae.svg
+│   │   ├── emoji_u1f3af.svg
+│   │   ├── emoji_u1f3b0.svg
+│   │   ├── emoji_u1f3b1.svg
+│   │   ├── emoji_u1f3b2.svg
+│   │   ├── emoji_u1f3b3.svg
+│   │   ├── emoji_u1f3b4.svg
+│   │   ├── emoji_u1f3b5.svg
+│   │   ├── emoji_u1f3b6.svg
+│   │   ├── emoji_u1f3b7.svg
+│   │   ├── emoji_u1f3b8.svg
+│   │   ├── emoji_u1f3b9.svg
+│   │   ├── emoji_u1f3ba.svg
+│   │   ├── emoji_u1f3bb.svg
+│   │   ├── emoji_u1f3bc.svg
+│   │   ├── emoji_u1f3bd.svg
+│   │   ├── emoji_u1f3be.svg
+│   │   ├── emoji_u1f3bf.svg
+│   │   ├── emoji_u1f3c0.svg
+│   │   ├── emoji_u1f3c1.svg
+│   │   ├── emoji_u1f3c2_1f3fb.svg
+│   │   ├── emoji_u1f3c2_1f3fc.svg
+│   │   ├── emoji_u1f3c2_1f3fd.svg
+│   │   ├── emoji_u1f3c2_1f3fe.svg
+│   │   ├── emoji_u1f3c2_1f3ff.svg
+│   │   ├── emoji_u1f3c2.svg
+│   │   ├── emoji_u1f3c3_1f3fb_200d_2640_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fb_200d_2640.svg
+│   │   ├── emoji_u1f3c3_1f3fb_200d_2642_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fb_200d_2642.svg
+│   │   ├── emoji_u1f3c3_1f3fb_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fb.svg
+│   │   ├── emoji_u1f3c3_1f3fc_200d_2640_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fc_200d_2640.svg
+│   │   ├── emoji_u1f3c3_1f3fc_200d_2642_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fc_200d_2642.svg
+│   │   ├── emoji_u1f3c3_1f3fc_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fc.svg
+│   │   ├── emoji_u1f3c3_1f3fd_200d_2640_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fd_200d_2640.svg
+│   │   ├── emoji_u1f3c3_1f3fd_200d_2642_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fd_200d_2642.svg
+│   │   ├── emoji_u1f3c3_1f3fd_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fd.svg
+│   │   ├── emoji_u1f3c3_1f3fe_200d_2640_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fe_200d_2640.svg
+│   │   ├── emoji_u1f3c3_1f3fe_200d_2642_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fe_200d_2642.svg
+│   │   ├── emoji_u1f3c3_1f3fe_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3fe.svg
+│   │   ├── emoji_u1f3c3_1f3ff_200d_2640_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3ff_200d_2640.svg
+│   │   ├── emoji_u1f3c3_1f3ff_200d_2642_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3ff_200d_2642.svg
+│   │   ├── emoji_u1f3c3_1f3ff_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_1f3ff.svg
+│   │   ├── emoji_u1f3c3_200d_2640_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_200d_2640.svg
+│   │   ├── emoji_u1f3c3_200d_2642_200d_27a1.svg
+│   │   ├── emoji_u1f3c3_200d_2642.svg
+│   │   ├── emoji_u1f3c3_200d_27a1.svg
+│   │   ├── emoji_u1f3c3.svg
+│   │   ├── emoji_u1f3c4_1f3fb_200d_2640.svg
+│   │   ├── emoji_u1f3c4_1f3fb_200d_2642.svg
+│   │   ├── emoji_u1f3c4_1f3fb.svg
+│   │   ├── emoji_u1f3c4_1f3fc_200d_2640.svg
+│   │   ├── emoji_u1f3c4_1f3fc_200d_2642.svg
+│   │   ├── emoji_u1f3c4_1f3fc.svg
+│   │   ├── emoji_u1f3c4_1f3fd_200d_2640.svg
+│   │   ├── emoji_u1f3c4_1f3fd_200d_2642.svg
+│   │   ├── emoji_u1f3c4_1f3fd.svg
+│   │   ├── emoji_u1f3c4_1f3fe_200d_2640.svg
+│   │   ├── emoji_u1f3c4_1f3fe_200d_2642.svg
+│   │   ├── emoji_u1f3c4_1f3fe.svg
+│   │   ├── emoji_u1f3c4_1f3ff_200d_2640.svg
+│   │   ├── emoji_u1f3c4_1f3ff_200d_2642.svg
+│   │   ├── emoji_u1f3c4_1f3ff.svg
+│   │   ├── emoji_u1f3c4_200d_2640.svg
+│   │   ├── emoji_u1f3c4_200d_2642.svg
+│   │   ├── emoji_u1f3c4.svg
+│   │   ├── emoji_u1f3c5.svg
+│   │   ├── emoji_u1f3c6.svg
+│   │   ├── emoji_u1f3c7_1f3fb.svg
+│   │   ├── emoji_u1f3c7_1f3fc.svg
+│   │   ├── emoji_u1f3c7_1f3fd.svg
+│   │   ├── emoji_u1f3c7_1f3fe.svg
+│   │   ├── emoji_u1f3c7_1f3ff.svg
+│   │   ├── emoji_u1f3c7.svg
+│   │   ├── emoji_u1f3c8.svg
+│   │   ├── emoji_u1f3c9.svg
+│   │   ├── emoji_u1f3ca_1f3fb_200d_2640.svg
+│   │   ├── emoji_u1f3ca_1f3fb_200d_2642.svg
+│   │   ├── emoji_u1f3ca_1f3fb.svg
+│   │   ├── emoji_u1f3ca_1f3fc_200d_2640.svg
+│   │   ├── emoji_u1f3ca_1f3fc_200d_2642.svg
+│   │   ├── emoji_u1f3ca_1f3fc.svg
+│   │   ├── emoji_u1f3ca_1f3fd_200d_2640.svg
+│   │   ├── emoji_u1f3ca_1f3fd_200d_2642.svg
+│   │   ├── emoji_u1f3ca_1f3fd.svg
+│   │   ├── emoji_u1f3ca_1f3fe_200d_2640.svg
+│   │   ├── emoji_u1f3ca_1f3fe_200d_2642.svg
+│   │   ├── emoji_u1f3ca_1f3fe.svg
+│   │   ├── emoji_u1f3ca_1f3ff_200d_2640.svg
+│   │   ├── emoji_u1f3ca_1f3ff_200d_2642.svg
+│   │   ├── emoji_u1f3ca_1f3ff.svg
+│   │   ├── emoji_u1f3ca_200d_2640.svg
+│   │   ├── emoji_u1f3ca_200d_2642.svg
+│   │   ├── emoji_u1f3ca.svg
+│   │   ├── emoji_u1f3cb_1f3fb_200d_2640.svg
+│   │   ├── emoji_u1f3cb_1f3fb_200d_2642.svg
+│   │   ├── emoji_u1f3cb_1f3fb.svg
+│   │   ├── emoji_u1f3cb_1f3fc_200d_2640.svg
+│   │   ├── emoji_u1f3cb_1f3fc_200d_2642.svg
+│   │   ├── emoji_u1f3cb_1f3fc.svg
+│   │   ├── emoji_u1f3cb_1f3fd_200d_2640.svg
+│   │   ├── emoji_u1f3cb_1f3fd_200d_2642.svg
+│   │   ├── emoji_u1f3cb_1f3fd.svg
+│   │   ├── emoji_u1f3cb_1f3fe_200d_2640.svg
+│   │   ├── emoji_u1f3cb_1f3fe_200d_2642.svg
+│   │   ├── emoji_u1f3cb_1f3fe.svg
+│   │   ├── emoji_u1f3cb_1f3ff_200d_2640.svg
+│   │   ├── emoji_u1f3cb_1f3ff_200d_2642.svg
+│   │   ├── emoji_u1f3cb_1f3ff.svg
+│   │   ├── emoji_u1f3cb_200d_2640.svg
+│   │   ├── emoji_u1f3cb_200d_2642.svg
+│   │   ├── emoji_u1f3cb.svg
+│   │   ├── emoji_u1f3cc_1f3fb_200d_2640.svg
+│   │   ├── emoji_u1f3cc_1f3fb_200d_2642.svg
+│   │   ├── emoji_u1f3cc_1f3fb.svg
+│   │   ├── emoji_u1f3cc_1f3fc_200d_2640.svg
+│   │   ├── emoji_u1f3cc_1f3fc_200d_2642.svg
+│   │   ├── emoji_u1f3cc_1f3fc.svg
+│   │   ├── emoji_u1f3cc_1f3fd_200d_2640.svg
+│   │   ├── emoji_u1f3cc_1f3fd_200d_2642.svg
+│   │   ├── emoji_u1f3cc_1f3fd.svg
+│   │   ├── emoji_u1f3cc_1f3fe_200d_2640.svg
+│   │   ├── emoji_u1f3cc_1f3fe_200d_2642.svg
+│   │   ├── emoji_u1f3cc_1f3fe.svg
+│   │   ├── emoji_u1f3cc_1f3ff_200d_2640.svg
+│   │   ├── emoji_u1f3cc_1f3ff_200d_2642.svg
+│   │   ├── emoji_u1f3cc_1f3ff.svg
+│   │   ├── emoji_u1f3cc_200d_2640.svg
+│   │   ├── emoji_u1f3cc_200d_2642.svg
+│   │   ├── emoji_u1f3cc.svg
+│   │   ├── emoji_u1f3cd.svg
+│   │   ├── emoji_u1f3ce.svg
+│   │   ├── emoji_u1f3cf.svg
+│   │   ├── emoji_u1f3d0.svg
+│   │   ├── emoji_u1f3d1.svg
+│   │   ├── emoji_u1f3d2.svg
+│   │   ├── emoji_u1f3d3.svg
+│   │   ├── emoji_u1f3d4.svg
+│   │   ├── emoji_u1f3d5.svg
+│   │   └── emoji_u1f3d6.svg
+│   ├── integration
+│   │   ├── complex.svg
+│   │   ├── glass.svg
+│   │   └── simple.svg
+│   ├── plugins
+│   │   ├── .DS_Store
+│   │   ├── addAttributesToSVGElement
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   └── 04.txt
+│   │   ├── addClassesToSVGElement
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── cleanupAttrs
+│   │   │   ├── 01.txt
+│   │   │   └── 02.txt
+│   │   ├── cleanupEnableBackground
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── cleanupIds
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   ├── 15.txt
+│   │   │   ├── 16.txt
+│   │   │   ├── 17.txt
+│   │   │   ├── 18.txt
+│   │   │   ├── 19.txt
+│   │   │   ├── 20.txt
+│   │   │   ├── 21.txt
+│   │   │   ├── 22.txt
+│   │   │   ├── 23.txt
+│   │   │   ├── 24.txt
+│   │   │   ├── 25.txt
+│   │   │   └── 26.txt
+│   │   ├── cleanupListOfValues
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── cleanupNumericValues
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── collapseGroups
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   ├── 15.txt
+│   │   │   ├── 16.txt
+│   │   │   ├── 17.txt
+│   │   │   └── 18.txt
+│   │   ├── convertColors
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   └── 06.txt
+│   │   ├── convertEllipseToCircle
+│   │   │   └── 01.txt
+│   │   ├── convertOneStopGradients
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── convertPathData
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   ├── 15.txt
+│   │   │   ├── 16.txt
+│   │   │   ├── 17.txt
+│   │   │   ├── 18.txt
+│   │   │   ├── 19.txt
+│   │   │   ├── 20.txt
+│   │   │   ├── 21.txt
+│   │   │   ├── 22.txt
+│   │   │   ├── 23.txt
+│   │   │   ├── 24.txt
+│   │   │   ├── 25.txt
+│   │   │   ├── 26.txt
+│   │   │   ├── 27.txt
+│   │   │   ├── 28.txt
+│   │   │   ├── 29.txt
+│   │   │   ├── 30.txt
+│   │   │   ├── 31.txt
+│   │   │   ├── 32.txt
+│   │   │   ├── 33.txt
+│   │   │   ├── 34.txt
+│   │   │   ├── 35.txt
+│   │   │   ├── 36.txt
+│   │   │   └── 37.txt
+│   │   ├── convertShapeToPath
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── convertStyleToAttrs
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── convertTransform
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   └── 15.txt
+│   │   ├── inlineStyles
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   ├── 15.txt
+│   │   │   ├── 16.txt
+│   │   │   ├── 17.txt
+│   │   │   ├── 18.txt
+│   │   │   ├── 19.txt
+│   │   │   ├── 20.txt
+│   │   │   ├── 21.txt
+│   │   │   ├── 22.txt
+│   │   │   ├── 23.txt
+│   │   │   ├── 24.txt
+│   │   │   ├── 25.txt
+│   │   │   ├── 26.txt
+│   │   │   ├── 27.txt
+│   │   │   └── 28.txt
+│   │   ├── mergePaths
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   └── 12.txt
+│   │   ├── mergeStyles
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   └── 12.txt
+│   │   ├── minifyStyles
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   └── 11.txt
+│   │   ├── moveElemsAttrsToGroup
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   └── 08.txt
+│   │   ├── moveGroupAttrsToElems
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   └── 06.txt
+│   │   ├── prefixIds
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   └── 13.txt
+│   │   ├── removeAttributesBySelector
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── removeAttrs
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   └── 07.txt
+│   │   ├── removeComments
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── removeDeprecatedAttrs
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   └── 08.txt
+│   │   ├── removeDesc
+│   │   │   └── 01.txt
+│   │   ├── removeDimensions
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── removeDoctype
+│   │   │   └── 01.txt
+│   │   ├── removeEditorsNSData
+│   │   │   ├── 01.txt
+│   │   │   └── 02.txt
+│   │   ├── removeElementsByAttr
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   └── 07.txt
+│   │   ├── removeEmptyAttrs
+│   │   │   ├── 01.txt
+│   │   │   └── 02.txt
+│   │   ├── removeEmptyContainers
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   └── 07.txt
+│   │   ├── removeEmptyText
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   └── 03.txt
+│   │   ├── removeHiddenElems
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   ├── 15.txt
+│   │   │   ├── 16.txt
+│   │   │   ├── 17.txt
+│   │   │   ├── 18.txt
+│   │   │   └── 19.txt
+│   │   ├── removeMetadata
+│   │   │   └── 01.txt
+│   │   ├── removeNonInheritableGroupAttrs
+│   │   │   ├── 01.txt
+│   │   │   └── 02.txt
+│   │   ├── removeOffCanvasPaths
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   └── 06.txt
+│   │   ├── removeRasterImages
+│   │   │   ├── 01.txt
+│   │   │   └── 02.txt
+│   │   ├── removeScripts
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── removeStyleElement
+│   │   │   └── 01.txt
+│   │   ├── removeTitle
+│   │   │   └── 01.txt
+│   │   ├── removeUnknownsAndDefaults
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   ├── 07.txt
+│   │   │   ├── 08.txt
+│   │   │   ├── 09.txt
+│   │   │   ├── 10.txt
+│   │   │   ├── 11.txt
+│   │   │   ├── 12.txt
+│   │   │   ├── 13.txt
+│   │   │   ├── 14.txt
+│   │   │   ├── 15.txt
+│   │   │   ├── 16.txt
+│   │   │   └── 17.txt
+│   │   ├── removeUnusedNS
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   ├── 06.txt
+│   │   │   └── 07.txt
+│   │   ├── removeUselessDefs
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── removeUselessStrokeAndFill
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── removeViewBox
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   └── 05.txt
+│   │   ├── removeXlink
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   └── 04.txt
+│   │   ├── removeXMLNS
+│   │   │   └── 01.txt
+│   │   ├── removeXMLProcInst
+│   │   │   ├── 01.txt
+│   │   │   └── 02.txt
+│   │   ├── reusePaths
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   ├── 04.txt
+│   │   │   ├── 05.txt
+│   │   │   └── 06.txt
+│   │   ├── sortAttrs
+│   │   │   ├── 01.txt
+│   │   │   ├── 02.txt
+│   │   │   ├── 03.txt
+│   │   │   └── 04.txt
+│   │   └── sortDefsChildren
+│   │       └── 01.txt
+│   ├── samples
+│   │   ├── inline_styles
+│   │   │   ├── test_inline_simple_output.svg
+│   │   │   ├── test_inline_simple.svg
+│   │   │   ├── test_inline_styles_backup.svg
+│   │   │   ├── test_inline_styles_comprehensive_output.svg
+│   │   │   ├── test_inline_styles_comprehensive_output2.svg
+│   │   │   ├── test_inline_styles_comprehensive_output3.svg
+│   │   │   ├── test_inline_styles_comprehensive.svg
+│   │   │   ├── test_inline_styles_original.svg
+│   │   │   ├── test_inline_styles_output.svg
+│   │   │   └── test_inline_styles.svg
+│   │   └── simple_test.svg
+│   └── svgo_fixture_migration_report.md
+├── TODO.md
+├── tree_output.txt
+├── vexify_report.json
+├── vexify.py
+├── vexify.txt
+├── vexy_svgo
+│   ├── .DS_Store
+│   ├── build.rs
+│   ├── Cargo.lock
+│   ├── Cargo.toml
+│   └── src
+│       ├── .DS_Store
+│       ├── fixtures
+│       │   └── mod.rs
+│       ├── lib.rs
+│       └── test_comment_issue.rs
+├── wasm-pack.toml
+└── WORK.md
+
+115 directories, 912 files

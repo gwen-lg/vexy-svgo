@@ -1,0 +1,125 @@
+[package]
+name = "vexy_svgo-core"
+description = "Core SVG processing engine for vexy_svgo"
+
+
+[package.version]
+workspace = true
+
+
+[package.edition]
+workspace = true
+
+
+[package.authors]
+workspace = true
+
+
+[package.license]
+workspace = true
+
+
+[package.repository]
+workspace = true
+
+
+[package.homepage]
+workspace = true
+
+
+[dependencies]
+parking_lot = "0.12"
+
+
+[dependencies.roxmltree]
+workspace = true
+
+
+[dependencies.cssparser]
+workspace = true
+
+
+[dependencies.selectors]
+workspace = true
+
+
+[dependencies.lightningcss]
+workspace = true
+
+
+[dependencies.thiserror]
+workspace = true
+
+
+[dependencies.anyhow]
+workspace = true
+
+
+[dependencies.serde]
+workspace = true
+features = [ "derive" ]
+
+
+[dependencies.serde_json]
+workspace = true
+
+
+[dependencies.indexmap]
+workspace = true
+
+
+[dependencies.regex]
+workspace = true
+
+
+[dependencies.once_cell]
+workspace = true
+
+
+[dependencies.precomputed-hash]
+workspace = true
+
+
+[dependencies.quick-xml]
+workspace = true
+
+
+[dependencies.rayon]
+workspace = true
+optional = true
+
+
+[dependencies.base64]
+workspace = true
+optional = true
+
+
+[dependencies.urlencoding]
+workspace = true
+optional = true
+
+
+[dependencies.usvg]
+workspace = true
+optional = true
+
+
+[dependencies.lyon]
+workspace = true
+optional = true
+
+
+[features]
+default = [ "parallel", "streaming" ]
+parallel = [ "rayon" ]
+streaming = [ ]
+experimental = [ ]
+memory-profiling = [ ]
+data-uri = [ "base64", "urlencoding" ]
+usvg-utils = [ "dep:usvg" ]
+lyon = [ "dep:lyon" ]
+wasm = [ ]
+
+
+[dev-dependencies.tempfile]
+workspace = true

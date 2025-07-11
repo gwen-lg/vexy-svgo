@@ -1,0 +1,9 @@
+Analyze the codebase ( @llms.txt is the snapshot ) and especially analyze the Github Pages website in @docs 
+
+Into @PLAN.md develop a very detailed and specific plan so that we can have one end-user-suitable page that allows the end-user to drop an SVG file or paste SVG code, and have it converted: 
+
+- One page should do it with `svgo`
+- The other page should do it with `vexy_svgo` in WebAssembly
+
+The pages should have identical designs, and should use DaisyUI with design compatible to the rest of the website (which is Jekyll with `just-the-docs` theme )
+

@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+**/.DS_Store
+.idea/
+*.pdb
+**/*.rs.bk
+**/mutants.out*/
+debug
+ref/
+target/
+/testdata/emoji
+
+# Generated files
+llms.txt
+build.log.txt
+build_remove_scripts.log

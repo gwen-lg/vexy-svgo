@@ -1,0 +1,73 @@
+[package]
+name = "vexy_svgo-cli"
+description = "Command-line interface for vexy_svgo SVG optimizer"
+
+
+[package.version]
+workspace = true
+
+
+[package.edition]
+workspace = true
+
+
+[package.authors]
+workspace = true
+
+
+[package.license]
+workspace = true
+
+
+[package.repository]
+workspace = true
+
+
+[package.homepage]
+workspace = true
+
+
+[[bin]]
+name = "vexy-svgo"
+path = "src/main.rs"
+
+
+[dependencies.vexy_svgo-core]
+path = "../core"
+
+
+[dependencies.clap]
+workspace = true
+
+
+[dependencies.anyhow]
+workspace = true
+
+
+[dependencies.toml]
+workspace = true
+
+
+[dependencies.serde]
+workspace = true
+features = [ "derive" ]
+
+
+[dependencies.serde_json]
+workspace = true
+
+
+[dependencies.regex]
+workspace = true
+
+
+[dev-dependencies.assert_cmd]
+workspace = true
+
+
+[dev-dependencies.predicates]
+workspace = true
+
+
+[dev-dependencies.tempfile]
+workspace = true

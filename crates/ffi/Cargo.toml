@@ -1,0 +1,56 @@
+[package]
+name = "vexy_svgo-ffi"
+description = "C-compatible FFI bindings for vexy_svgo SVG optimizer"
+
+
+[package.version]
+workspace = true
+
+
+[package.edition]
+workspace = true
+
+
+[package.authors]
+workspace = true
+
+
+[package.license]
+workspace = true
+
+
+[package.repository]
+workspace = true
+
+
+[package.homepage]
+workspace = true
+
+
+[lib]
+crate-type = [ "cdylib", "staticlib" ]
+
+
+[dependencies]
+libc = "0.2"
+
+
+[dependencies.vexy_svgo-core]
+path = "../core"
+
+
+[dependencies.serde_json]
+workspace = true
+
+
+[dependencies.anyhow]
+workspace = true
+
+
+[features]
+default = [ ]
+cxx = [ ]
+
+
+[build-dependencies]
+cbindgen = "0.26"

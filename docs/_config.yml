@@ -1,0 +1,80 @@
+---
+# Site settings
+title: vexy_svgo
+description: SVG optimizer, API-compatible Rust port of svgo
+url: https://twardoch.github.io
+baseurl: /vexy_svgo
+
+# Theme configuration
+remote_theme: just-the-docs/just-the-docs
+color_scheme: light
+enable_copy_code_button: true
+
+# Collections
+collections:
+  benchmarks:
+    nav_order: 7
+    output: true
+  data:
+    output: true
+  tools:
+    output: true
+    permalink: /tools/:name/
+
+# Navigation
+nav_sort: case_insensitive
+nav_external_links:
+  - title: GitHub Repository
+    url: https://github.com/twardoch/vexy_svgo
+  - title: SVGO Reference
+    url: https://github.com/svg/svgo
+
+# Aux links
+aux_links:
+  View on GitHub:
+    - https://github.com/twardoch/vexy_svgo
+
+# Footer
+footer_content: Copyright &copy; 2024 Adam Twardoch. Distributed under the MIT License.
+
+# GitHub Pages plugins
+plugins:
+  - jekyll-remote-theme
+  - jekyll-sitemap
+  - jekyll-feed
+
+# Search settings
+search_enabled: true
+search:
+  button: false
+  heading_level: 2
+  preview_words_after: 10
+  preview_words_before: 5
+  previews: 3
+  rel_url: true
+  tokenizer_separator: /[\s/]+/
+
+# Assets
+include:
+  - assets/js/
+  - assets/css/main.css
+
+# Build settings
+sass:
+  sass_dir: _sass
+  style: compressed
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - package.json
+  - package-lock.json
+  - tailwind.config.js
+  - postcss.config.js
+  - assets/css/input.css
+  - _build.sh
+  - _serve.sh
+
+# PostCSS Integration Notes:
+# The build script (_build.sh) includes PostCSS processing before Jekyll
+# This processes assets/css/input.css -> assets/css/main.css via Tailwind/PostCSS
