@@ -109,8 +109,8 @@ fi
 
 # Update version in Cargo.toml
 log_info "Updating version in Cargo.toml"
-# Only update the workspace.package.version, not dependency versions
-sed -i.bak "/^\[workspace.package\]/,/^\[/ s/version = \"[^\"]*\"/version = \"$VERSION\"/" Cargo.toml
+# Only update the workspace.package.version line, not rust-version or dependency versions
+sed -i.bak "/^\[workspace.package\]/,/^\[/ s/^version = \"[^\"]*\"/version = \"$VERSION\"/" Cargo.toml
 rm Cargo.toml.bak
 
 # Run tests to ensure everything is working
