@@ -36,7 +36,6 @@ plugins:
   - awesome-nav               # auto-build nav tree
   - mkdocs-nav-weight:        # order by front-matter nav_weight
       section_renamed: false
-      index_renamed: false
 
 extra_css:
   - assets/css/main.css       # static assets copied verbatim

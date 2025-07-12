@@ -76,8 +76,8 @@ Structured JSON format with comprehensive metadata and detailed results.
 - Summary and detailed per-file results
 - Jekyll-compatible data structure
 
-### Jekyll Integration
-Automatically generates `docs/_data/benchmarks.json` for integration with Jekyll documentation site.
+### Documentation Integration
+Automatically generates `docs_src/data/benchmarks.json` for integration with MkDocs documentation site.
 
 **Generated Pages:**
 - Interactive charts using Chart.js
