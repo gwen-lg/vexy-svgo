@@ -35,7 +35,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/twardoch/vexy_svgo.git",
+    "url": "https://github.com/vexyart/vexy-svgo",
     "directory": "crates/wasm"
   },
   "engines": {

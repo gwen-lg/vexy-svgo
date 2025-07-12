@@ -1,9 +1,9 @@
 ---
 # Site settings
-title: vexy_svgo
+title: vexy-svgo
 description: SVG optimizer, API-compatible Rust port of svgo
 url: https://twardoch.github.io
-baseurl: /vexy_svgo
+baseurl: /vexy-svgo
 
 # Theme configuration
 remote_theme: just-the-docs/just-the-docs
@@ -25,14 +25,14 @@ collections:
 nav_sort: case_insensitive
 nav_external_links:
   - title: GitHub Repository
-    url: https://github.com/twardoch/vexy_svgo
+    url: https://github.com/vexyart/vexy-svgo
   - title: SVGO Reference
     url: https://github.com/svg/svgo
 
 # Aux links
 aux_links:
   View on GitHub:
-    - https://github.com/twardoch/vexy_svgo
+    - https://github.com/vexyart/vexy-svgo
 
 # Footer
 footer_content: Copyright &copy; 2024 Adam Twardoch. Distributed under the MIT License.

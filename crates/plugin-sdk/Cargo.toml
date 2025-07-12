@@ -1,6 +1,6 @@
 [package]
-name = "vexy_svgo-plugin-sdk"
-description = "Plugin development SDK for vexy_svgo SVG optimizer"
+name = "vexy-svgo-plugin-sdk"
+description = "Plugin development SDK for vexy-svgo SVG optimizer"
 
 
 [package.version]
@@ -27,7 +27,7 @@ workspace = true
 workspace = true
 
 
-[dependencies.vexy_svgo-core]
+[dependencies.vexy-svgo-core]
 path = "../core"
 
 

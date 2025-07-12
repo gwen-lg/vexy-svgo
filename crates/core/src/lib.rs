@@ -25,8 +25,11 @@ pub use ast::{Document, DocumentMetadata, Element, Node};
 
 pub use optimizer::{
     optimize, optimize_default, optimize_with_config, OptimizationInfo, OptimizationResult,
-    OptimizeOptions, parallel,
+    OptimizeOptions,
 };
+
+#[cfg(feature = "parallel")]
+pub use optimizer::parallel;
 pub use parser::{parse_svg, parse_svg_file, parse_svg_streaming, Parser, load_config_from_directory};
 pub use parser::error::ParseError;
 pub use error::VexySvgoError;

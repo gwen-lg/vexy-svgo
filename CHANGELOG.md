@@ -1,5 +1,96 @@
 # Vexy SVGO Development Changelog
 
+## 2025-07-12 - Project Cleanup and Documentation Organization
+
+### Documentation Consolidation
+- **Updated PLAN.md**: Removed completed naming unification tasks from Phase 0.5
+- **Rewritten TODO.md**: Created flat, linearized version of PLAN.md with clear action items
+- **Organized project structure**: Aligned TODO.md and PLAN.md for consistent tracking
+
+### Completed Naming Unification Tasks
+- ✅ Standardized `vexy_svgo` (snake_case) usage - verified consistency
+- ✅ Standardized `Vexy SVGO` (Title Case) usage - all VEXYSVGO references updated
+- ✅ Most `vexy-svgo` (kebab-case) standardization complete:
+  - ✅ CLI executable renamed to `vexy-svgo`
+  - ✅ CLI command examples updated in documentation
+  - ✅ Binary names in build scripts updated
+  - ✅ Repository URLs updated (pending actual GitHub rename)
+
+### Remaining Tasks Identified
+- Three naming tasks remain from Phase 0.5:
+  - Update package manager instructions in README.md
+  - Update project root check in release.sh
+  - Update docs/plugin-development.md commands
+
+## 2025-07-12 - Platform Deliverables and Dependency Fixes
+
+### Platform-Specific Deliverables Created
+- **Implemented issue #620 requirements** - Created platform-specific deliverables structure:
+  - `dist/macos/` - Contains .dmg and .tar.gz packages for macOS
+  - Created `vexy-svgo-2.1.0-macos.dmg` - macOS disk image with installer
+  - Created `vexy-svgo-2.1.0-macos.tar.gz` - macOS tarball with binary and install script
+  - Includes install.sh script for automated installation to /usr/local/bin
+  - Includes README.txt with installation instructions
+
+### Build System Enhancements
+- **Added `deliverables` command to build.sh** - Build platform-specific packages
+- **Created packaging scripts**:
+  - `scripts/package-deliverables.sh` - Full packaging for all platforms
+  - `scripts/build-all-platforms.sh` - Cross-platform build support
+  - `scripts/package-current-platform.sh` - Simplified packaging for current platform
+
+### Dependency Fixes
+- **Fixed cyclic dependency** - Removed incorrect `vexy-svgo-plugin-sdk` dependency from core
+- **Added missing dependencies**:
+  - `once_cell`, `indexmap`, `regex` to core crate
+  - `quick-xml` (0.31) and `parking_lot` (0.12) to workspace
+  - `colored` (2.1) and `indicatif` (0.17) for CLI enhancements
+- **Fixed parallel module** - Properly gated behind `parallel` feature flag
+- **Fixed imports** - Conditionally exported parallel module based on feature flag
+
+### Build Status
+- ✅ Native macOS universal binary builds successfully
+- ✅ Platform deliverables created for macOS (.dmg and .tar.gz)
+- ⚠️ WASM build still has issues (parse_svg_string import, web_sys missing)
+- ⚠️ Windows and Linux deliverables pending (require cross-compilation setup)
+
+### TODO List Updates
+- ✅ Created platform-specific build deliverables in dist/macos
+- ✅ Created macOS .dmg with installer
+- ✅ Fixed dependency issues in Cargo.toml
+- ⏳ Windows .zip and Linux .tar.gz pending
+
+## 2025-01-12 - Build System Improvements and Naming Fixes
+
+### Build System Enhancements
+- **Rewrote build.sh with subcommands**:
+  - `./build.sh llms` - Generate code snapshot
+  - `./build.sh clean` - Clean build artifacts
+  - `./build.sh release` - Build optimized release version
+  - `./build.sh debug` - Build debug version
+  - `./build.sh install` - Install CLI to /usr/local/bin (macOS)
+  - `./build.sh wasm` - Build WebAssembly modules
+  - `./build.sh` (no args) - Run complete build process
+
+### Binary Name Fixes
+- **Fixed integration test** - Changed binary name from `vexy_svgo` to `vexy-svgo`
+- **Updated build scripts** - All binary references now use `vexy-svgo` consistently
+- **Fixed build failures** - Integration tests now pass successfully
+
+### Naming Consistency Updates
+- **Changed VEXYSVGO to "Vexy SVGO"** in:
+  - `release.sh` - Release process messages
+  - `test/comparative/test_plugins.sh` - Test output
+  - `build-wasm.sh` - Build messages
+- **Updated binary paths** in:
+  - `scripts/build.sh` - All platform builds now use `vexy-svgo`
+  - Main `build.sh` - Help messages reference correct binary
+
+### Status
+- ✅ Main build succeeds (macOS universal binary builds correctly)
+- ✅ Integration tests pass
+- ⚠️ WASM build fails due to `getrandom` configuration (documented in PLAN.md)
+
 ## 2025-07-12 - Session 24: CLAUDE.md Update
 
 ### Updated CLAUDE.md to reflect codebase

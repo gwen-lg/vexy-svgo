@@ -1,81 +1,57 @@
 [package]
-name = "vexy_svgo-cli"
-description = "Command-line interface for vexy_svgo SVG optimizer"
-
+name = "vexy-svgo-cli"
+description = "CLI for vexy-svgo SVG optimizer"
 
 [package.version]
 workspace = true
 
+[package.authors]
+workspace = true
 
 [package.edition]
 workspace = true
 
-
-[package.authors]
-workspace = true
-
-
 [package.license]
 workspace = true
-
 
 [package.repository]
 workspace = true
 
-
 [package.homepage]
 workspace = true
 
+[package.documentation]
+workspace = true
+
+[package.keywords]
+workspace = true
+
+[package.categories]
+workspace = true
+
+[package.rust-version]
+workspace = true
 
 [[bin]]
 name = "vexy-svgo"
 path = "src/main.rs"
 
+[dependencies]
+vexy-svgo-core = { path = "../core", version = "2.1.0" }
+anyhow = { workspace = true }
+clap = { workspace = true }
+clap_complete = { workspace = true }
+env_logger = { workspace = true }
+fs-err = { workspace = true }
+log = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+toml = { workspace = true }
+colored = { workspace = true }
+indicatif = { workspace = true }
+regex = { workspace = true }
 
-[dependencies.vexy_svgo-core]
-path = "../core"
+[dev-dependencies]
+assert_cmd = { workspace = true }
+pretty_assertions = { workspace = true }
 
-
-[dependencies.clap]
-workspace = true
-
-
-[dependencies.anyhow]
-workspace = true
-
-
-[dependencies.toml]
-workspace = true
-
-
-[dependencies.serde]
-workspace = true
-features = [ "derive" ]
-
-
-[dependencies.serde_json]
-workspace = true
-
-
-[dependencies.regex]
-workspace = true
-
-
-[dependencies.indicatif]
-workspace = true
-
-
-[dependencies.colored]
-workspace = true
-
-
-[dev-dependencies.assert_cmd]
-workspace = true
-
-
-[dev-dependencies.predicates]
-workspace = true
-
-
-[dev-dependencies.tempfile]
-workspace = true

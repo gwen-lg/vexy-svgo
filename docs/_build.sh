@@ -1,10 +1,10 @@
 #!/bin/bash
-# Build script for VEXYSVGO documentation site
+# Build script for Vexy SVGO documentation site
 # Builds Jekyll site with Just the Docs theme and custom CSS
 
 set -e
 
-echo "🚀 Building VEXYSVGO Documentation Site"
+echo "🚀 Building Vexy SVGO Documentation Site"
 
 # Change to docs directory
 cd "$(dirname "$0")"

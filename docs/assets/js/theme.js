@@ -1,11 +1,11 @@
 /**
- * Theme Management for VexySVGO Documentation
+ * Theme Management for Vexy SVGO Documentation
  * Handles dark/light theme switching with system preference detection
  */
 
 class ThemeManager {
   constructor() {
-    this.STORAGE_KEY = 'vexy_svgo-theme';
+    this.STORAGE_KEY = 'vexy-svgo-theme';
     this.THEMES = {
       LIGHT: 'light',
       DARK: 'dark',

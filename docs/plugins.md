@@ -7,17 +7,17 @@ description: "Vexy SVGO plugin architecture and available plugins"
 
 # Vexy SVGO Plugins
 
-Plugins are the core of `vexy_svgo`'s optimization capabilities, just as they are for `svgo`. They perform specific transformations on the SVG's Abstract Syntax Tree (AST) to reduce file size and improve rendering efficiency. `vexy_svgo` aims to port all of `svgo`'s plugins, maintaining functional parity and API compatibility where it makes sense in a Rust context.
+Plugins are the core of `vexy-svgo`'s optimization capabilities, just as they are for `svgo`. They perform specific transformations on the SVG's Abstract Syntax Tree (AST) to reduce file size and improve rendering efficiency. `vexy-svgo` aims to port all of `svgo`'s plugins, maintaining functional parity and API compatibility where it makes sense in a Rust context.
 
 ## Plugin Architecture
 
-Similar to `svgo`, `vexy_svgo` utilizes a plugin-based architecture. Each plugin is a distinct module responsible for a specific optimization task. This modularity allows for flexible configuration and extensibility.
+Similar to `svgo`, `vexy-svgo` utilizes a plugin-based architecture. Each plugin is a distinct module responsible for a specific optimization task. This modularity allows for flexible configuration and extensibility.
 
-In `vexy_svgo`, plugins are implemented as Rust functions or structs that operate on the SVG's AST. The core optimizer iterates through the enabled plugins, applying their transformations sequentially.
+In `vexy-svgo`, plugins are implemented as Rust functions or structs that operate on the SVG's AST. The core optimizer iterates through the enabled plugins, applying their transformations sequentially.
 
 ## Default Preset
 
-`vexy_svgo`, like `svgo`, includes a default preset of plugins that are generally safe and provide good optimization results. This preset is applied by default when no custom plugin configuration is provided. 
+`vexy-svgo`, like `svgo`, includes a default preset of plugins that are generally safe and provide good optimization results. This preset is applied by default when no custom plugin configuration is provided. 
 
 The default preset currently includes most implemented plugins but is more conservative than SVGO's default preset. Vexy SVGO's default preset is being actively aligned with SVGO's. Currently, several complex plugins from SVGO's default preset (mergePaths, moveElemsAttrsToGroup, moveGroupAttrsToElems) are not yet implemented and are excluded from the default configuration.
 
@@ -64,7 +64,7 @@ The SVGO v4 default preset runs plugins in this specific order:
 
 ### Fully Implemented Plugins (55/53)
 
-The following `svgo` plugins have been successfully ported to `vexy_svgo`:
+The following `svgo` plugins have been successfully ported to `vexy-svgo`:
 
 #### Basic Optimization Plugins
 -   **`cleanupAttrs`**: Cleans up attributes from newlines, trailing, and repeating spaces
@@ -132,14 +132,14 @@ These complex plugins require additional work:
 
 ## Plugin Configuration
 
-Configuring plugins in `vexy_svgo` is similar to `svgo`. You can enable or disable plugins, and for some, provide specific parameters to control their behavior. This is done through the `VexySvgoConfig` structure, as shown in the [Usage documentation](./usage.md).
+Configuring plugins in `vexy-svgo` is similar to `svgo`. You can enable or disable plugins, and for some, provide specific parameters to control their behavior. This is done through the `VexySvgoConfig` structure, as shown in the [Usage documentation](./usage.md).
 
 ### Example: Disabling a Plugin
 
 To disable a plugin from the command line:
 
 ```bash
-vexy_svgo input.svg -o output.svg --disable removeComments
+vexy-svgo input.svg -o output.svg --disable removeComments
 ```
 
 Or in Rust code, omit it from your `plugins` list in the `VexySvgoConfig`.
@@ -147,7 +147,7 @@ Or in Rust code, omit it from your `plugins` list in the `VexySvgoConfig`.
 ### Example: Configuring a Plugin with Parameters
 
 ```rust
-use vexy_svgo::config::{VexySvgoConfig, PluginConfig};
+use vexy-svgo::config::{VexySvgoConfig, PluginConfig};
 use serde_json::json;
 
 let config = VexySvgoConfig {
@@ -171,7 +171,7 @@ This example demonstrates how to configure the `cleanupNumericValues` plugin to 
 To see all available plugins with their descriptions:
 
 ```bash
-vexy_svgo --show-plugins
+vexy-svgo --show-plugins
 ```
 
 This will list all 45 implemented plugins, making it easy to understand what optimizations are available.

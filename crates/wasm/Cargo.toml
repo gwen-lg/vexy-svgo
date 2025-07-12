@@ -2,8 +2,8 @@ dev-dependencies = { }
 
 
 [package]
-name = "vexy_svgo-wasm"
-description = "WebAssembly bindings for vexy_svgo SVG optimizer"
+name = "vexy-svgo-wasm"
+description = "WebAssembly bindings for vexy-svgo SVG optimizer"
 
 
 [package.version]
@@ -34,7 +34,7 @@ workspace = true
 crate-type = [ "cdylib" ]
 
 
-[dependencies.vexy_svgo-core]
+[dependencies.vexy-svgo-core]
 path = "../core"
 
 
@@ -62,7 +62,11 @@ optional = true
 
 [dependencies.getrandom]
 workspace = true
-features = ["wasm_js"]
+features = ["js"]
+
+[dependencies.web-sys]
+version = "0.3"
+features = ["Window", "Performance"]
 
 
 [features]
@@ -73,3 +77,4 @@ wasm-default = [ "size-optimization" ]
 wasm-js = [ "size-optimization" ]
 wasm-minimal = [ "size-optimization" ]
 wasm-full = [ "size-optimization" ]
+console_error_panic_hook = []

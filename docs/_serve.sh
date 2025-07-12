@@ -1,10 +1,10 @@
 #!/bin/bash
-# Development server script for VEXYSVGO documentation site
+# Development server script for Vexy SVGO documentation site
 # Watches CSS changes and serves Jekyll site
 
 set -e
 
-echo "🌐 Starting VEXYSVGO Documentation Development Server"
+echo "🌐 Starting Vexy SVGO Documentation Development Server"
 
 # Change to docs directory
 cd "$(dirname "$0")"

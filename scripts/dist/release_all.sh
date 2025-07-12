@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and package VEXYSVGO for all supported platforms (macOS, Windows, Linux)
+# Build and package Vexy SVGO for all supported platforms (macOS, Windows, Linux)
 # Usage: ./scripts/dist/release_all.sh
 #
 # This script runs all platform-specific build scripts and collects deliverables in dist/

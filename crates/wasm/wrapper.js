@@ -1,10 +1,10 @@
-// High-level JavaScript wrapper for VEXYSVGO WebAssembly
+// High-level JavaScript wrapper for Vexy SVGO WebAssembly
 // this_file: crates/wasm/wrapper.js
 
 /**
- * VexySVGO WebAssembly Wrapper
+ * Vexy SVGO WebAssembly Wrapper
  * 
- * Provides a user-friendly JavaScript API for the VexySVGO SVG optimizer.
+ * Provides a user-friendly JavaScript API for the Vexy SVGO SVG optimizer.
  * This wrapper handles common use cases and provides convenient methods
  * for working with SVG optimization in web applications.
  */
@@ -12,11 +12,11 @@
 let wasmModule = null;
 
 /**
- * Initialize the VexySVGO WebAssembly module
+ * Initialize the Vexy SVGO WebAssembly module
  * @param {string|ArrayBuffer} wasmSource - Path to WASM file or ArrayBuffer
- * @returns {Promise<object>} The initialized VexySVGO module
+ * @returns {Promise<object>} The initialized Vexy SVGO module
  */
-export async function initVEXYSVGO(wasmSource) {
+export async function initVexySVGO(wasmSource) {
     if (wasmModule) {
         return wasmModule;
     }
@@ -37,12 +37,12 @@ export async function initVEXYSVGO(wasmSource) {
 
         return wasmModule;
     } catch (error) {
-        throw new Error(`Failed to initialize VexySVGO WASM: ${error.message}`);
+        throw new Error(`Failed to initialize Vexy SVGO WASM: ${error.message}`);
     }
 }
 
 /**
- * Check if VexySVGO is initialized
+ * Check if Vexy SVGO is initialized
  * @returns {boolean}
  */
 export function isInitialized() {
@@ -55,7 +55,7 @@ export function isInitialized() {
 export class VexySVGO {
     constructor() {
         if (!isInitialized()) {
-            throw new Error('VEXYSVGO must be initialized before use. Call initVEXYSVGO() first.');
+            throw new Error('Vexy SVGO must be initialized before use. Call initVexySVGO() first.');
         }
         this.wasmModule = wasmModule;
     }
@@ -289,7 +289,7 @@ export class VexySVGO {
     }
 
     /**
-     * Get VexySVGO version
+     * Get Vexy SVGO version
      * @returns {string} Version string
      */
     getVersion() {
@@ -511,7 +511,7 @@ export const presets = {
 
 // Default export
 export default {
-    initVEXYSVGO,
+    initVexySVGO,
     isInitialized,
     VexySVGO,
     utils,

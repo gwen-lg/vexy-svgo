@@ -194,11 +194,11 @@ jobs:
             - **[Migration Guide](https://twardoch.github.io/vexy_svgo/migration.html)**
 
             ## 📝 Changelog
-            See [CHANGELOG.md](https://github.com/twardoch/vexy_svgo/blob/main/CHANGELOG.md) for complete release notes.
+            See [CHANGELOG.md](https://github.com/vexyart/vexy-svgo/blob/main/CHANGELOG.md) for complete release notes.
 
             ## 🙏 Support
-            - **Issues**: [GitHub Issues](https://github.com/twardoch/vexy_svgo/issues)
-            - **Discussions**: [GitHub Discussions](https://github.com/twardoch/vexy_svgo/discussions)
+            - **Issues**: [GitHub Issues](https://github.com/vexyart/vexy-svgo/issues)
+            - **Discussions**: [GitHub Discussions](https://github.com/vexyart/vexy-svgo/discussions)
           draft: false
           prerelease: false
           files: |

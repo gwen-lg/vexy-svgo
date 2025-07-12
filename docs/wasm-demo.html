@@ -53,11 +53,7 @@
         <ul class="menu menu-horizontal px-1">
           <li><a href="#features">Features</a></li>
           <li><a href="#demo">Demo</a></li>
-          <li>
-            <a href="https://github.com/twardoch/vexy_svgo" target="_blank"
-              >GitHub</a
-            >
-          </li>
+          <li><a href="https://github.com/vexyart/vexy-svgo" target="_blank">GitHub</a></li>
         </ul>
       </div>
       <div class="navbar-end">
@@ -417,7 +413,7 @@
     </footer>
 
     <script type="module">
-      let vexy_svgo = null;
+      let vexySvgo = null;
       let wasmModule = null;
 
       // Theme handling
@@ -437,7 +433,7 @@
       // Initialize WASM
       async function initWasm() {
         try {
-          const wasmResponse = await fetch('./vexy_svgo_wasm_bg.wasm');
+          const wasmResponse = await fetch('./vexy-svgo_bg.wasm');
           const wasmBytes = await wasmResponse.arrayBuffer();
 
           // Basic WASM instantiation
@@ -465,7 +461,7 @@
           }
 
           // Create wrapper API
-          vexy_svgo = {
+          vexySvgo = {
             optimize: (svg, config = {}) => {
               const svgPtr = allocString(svg);
               const configPtr = allocString(JSON.stringify(config));
@@ -509,7 +505,7 @@
           // Show success
           document.getElementById('loadingStatus').innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Vexy SVGO WebAssembly loaded successfully! Version: ${vexy_svgo.version()}</span>
+                    <span>Vexy SVGO WebAssembly loaded successfully! Version: ${vexySvgo.version()}</span>
                 `;
           document.getElementById('loadingStatus').className =
             'alert alert-success';
@@ -594,7 +590,7 @@
 
           // Measure time
           const startTime = performance.now();
-          const result = vexy_svgo.optimize(input, config);
+          const result = vexySvgo.optimize(input, config);
           const duration = performance.now() - startTime;
 
           // Display results

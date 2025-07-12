@@ -59,11 +59,50 @@ echo -e "\nChecking bundle sizes...\n"
 failed=0
 
 # Check each bundle
-check_size "Web target" "pkg-web/vexy_svgo_wasm_bg.wasm" $LIMIT_WEB || failed=1
-check_size "Node.js target" "pkg-node/vexy_svgo_wasm_bg.wasm" $LIMIT_NODE || failed=1
-check_size "Bundler target" "pkg-bundler/vexy_svgo_wasm_bg.wasm" $LIMIT_BUNDLER || failed=1
-check_size "Minimal build" "pkg-minimal/vexy_svgo_wasm_bg.wasm" $LIMIT_MINIMAL || failed=1
-check_size "Full build" "pkg-full/vexy_svgo_wasm_bg.wasm" $LIMIT_FULL || failed=1
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script tracks the bundle size of vexy-svgo WASM modules.
+
+# --- Configuration ---
+LIMIT_WEB=200
+LIMIT_NODE=200
+LIMIT_BUNDLER=200
+LIMIT_MINIMAL=150
+LIMIT_FULL=250
+
+# --- Helper Functions ---
+get_size_kb() {
+    stat -f%z "$1" | awk '{print int($1/1024)}'
+}
+
+check_size() {
+    local target_name=$1
+    local file_path=$2
+    local limit_kb=$3
+    local size_kb=$(get_size_kb "$file_path")
+
+    if [ $size_kb -gt $limit_kb ]; then
+        echo -e "[\033[31mFAIL\033[0m] $target_name size ($size_kb KB) exceeds limit ($limit_kb KB)"
+        return 1
+    else
+        echo -e "[\033[32mPASS\033[0m] $target_name size ($size_kb KB) is within limit ($limit_kb KB)"
+        return 0
+    fi
+}
+
+# --- Main Logic ---
+failed=0
+
+# Check each bundle
+check_size "Web target" "pkg-web/vexy-svgo_bg.wasm" $LIMIT_WEB || failed=1
+check_size "Node.js target" "pkg-node/vexy-svgo_bg.wasm" $LIMIT_NODE || failed=1
+check_size "Bundler target" "pkg-bundler/vexy-svgo_bg.wasm" $LIMIT_BUNDLER || failed=1
+check_size "Minimal build" "pkg-minimal/vexy-svgo_bg.wasm" $LIMIT_MINIMAL || failed=1
+check_size "Full build" "pkg-full/vexy-svgo_bg.wasm" $LIMIT_FULL || failed=1
+
+exit $failed
+
 
 echo -e "\nGzipped sizes:"
 for pkg in pkg-web pkg-node pkg-bundler pkg-minimal pkg-full; do

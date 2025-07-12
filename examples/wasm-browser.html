@@ -168,7 +168,7 @@
       let vexy_svgo;
 
       // Load Vexy SVGO WASM module
-      async function loadVEXYSVGO() {
+      async function loadVexySVGO() {
         try {
           // Import the WASM module
           const module = await import('./pkg-web/vexy_svgo_wasm.js');
@@ -335,7 +335,7 @@
       });
 
       // Load Vexy SVGO on page load
-      loadVEXYSVGO();
+      loadVexySVGO();
     </script>
   </body>
 </html>

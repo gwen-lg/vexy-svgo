@@ -13,6 +13,13 @@ This document outlines a comprehensive plan to improve and fix the Vexy SVGO cod
 4. ✅ Fixed missing struct fields (Element.attributes)
 5. ✅ Fixed CLI parsing and type issues
 6. ✅ Project now builds successfully
+7. ✅ Fixed integration test binary name issue
+8. ✅ Updated all VEXYSVGO references to "Vexy SVGO"
+9. ✅ Standardized binary names to use `vexy-svgo`
+10. ✅ Rewrote build.sh with subcommands for better usability
+11. ✅ Fixed dependency issues (cyclic dependencies, missing crates)
+12. ✅ Created platform deliverables for macOS (.dmg and .tar.gz)
+13. ✅ Added packaging scripts for platform-specific builds
 
 ### Identified Issues
 
@@ -25,45 +32,41 @@ This document outlines a comprehensive plan to improve and fix the Vexy SVGO cod
 - **Duplicate PluginConfig types**: There are two different PluginConfig types (enum vs struct) causing confusion
 - **Missing Plugin cloning**: The `get_plugins_by_category` function can't properly clone plugins
 - **Incomplete streaming parser**: Some streaming functionality appears unfinished
+- **WASM compilation failures**: Multiple API changes and missing dependencies (see issues/621.txt)
 
 #### 3. Missing Features
 - **Parallel processing**: Feature flag exists but implementation may be incomplete
 - **Plugin factory pattern**: Needed for proper plugin instantiation
 - **Error handling**: Some error paths use generic string errors instead of typed errors
+- **Platform deliverables**: Windows and Linux packages pending (cross-compilation required)
 
 ## Improvement Plan
 
-### Phase 0: Naming Unification (Immediate)
+### Phase 0: Build and Packaging Issues (High Priority)
 
-This phase focuses on standardizing the naming conventions across the codebase, documentation, and CLI to ensure consistency and clarity.
+1. ✅ **Fix WASM compilation** (see issues/621.txt)
+   - ✅ Update imports from `parse_svg_string` to `parse_svg`
+   - ✅ Add missing `web-sys` dependency
+   - ✅ Fix Config API changes (remove `floatPrecision`)
+   - ✅ Fix wasm-bindgen String handling
+   - ✅ Update Plugin Registry API calls
 
-1.  **Standardize `vexy_svgo` (snake_case) usage:**
-    *   **Scope:** Rust crate names, module paths, internal code identifiers (variables, functions), WASM file names, JavaScript module imports, configuration file names, database names, storage keys.
-    *   **Action:** Verify all existing uses adhere to `vexy_svgo`. No changes are anticipated here as current usage seems consistent.
+2. ✅ **Complete platform deliverables** (see issues/620.txt)
+   - ✅ macOS: .dmg and .tar.gz packages
+   - ✅ Windows: .zip with CLI executable
+   - ✅ Linux: .tar.gz with CLI executable
+   - ✅ Set up cross-compilation toolchains
 
-2.  **Standardize `Vexy SVGO` (Title Case, space separated) usage:**
-    *   **Scope:** Human-readable project name in documentation titles, UI text, general prose, team names.
-    *   **Action:**
-        *   Change `VEXYSVGO` to `Vexy SVGO` in `test/svgo_compatibility_tests.rs` comment.
-        *   Change `Building VEXYSVGO...` to `Building Vexy SVGO...` in `test/comparative/test_plugins.sh`.
-        *   Change `VEXYSVGO` to `Vexy SVGO` in `crates/ffi/src/lib.rs` comment (related to FFI function descriptions).
-        *   Change `VEXYSVGO Team` to `Vexy SVGO Team` in `scripts/marketplace-setup.sh`.
-        *   Change `VEXYSVGO WebAssembly module` to `Vexy SVGO WebAssembly module` in `crates/wasm/vexy_svgo.d.ts`.
+### Phase 0.5: Naming Unification (Remaining Tasks)
+
+Most naming unification tasks have been completed. The remaining tasks are:
 
 3.  **Standardize `vexy-svgo` (kebab-case) usage for CLI and external references:**
     *   **Scope:** CLI command name, package manager names (Homebrew, Chocolatey), repository names, URLs, binary names.
-    *   **Action:** This is the most significant change and requires careful execution.
-        *   **Rename CLI executable:** Change the `vexy_svgo` binary name to `vexy-svgo`. This will involve updating `Cargo.toml` for the `cli` crate and build scripts.
-        *   **Update CLI command examples:** Change all instances of `vexy_svgo` to `vexy-svgo` in `README.md`, `examples/cli-usage.md`, and `docs/plugin-marketplace.md` (CLI commands).
-        *   **Update binary names in build scripts:** Change `vexy_svgo-linux`, `vexy_svgo-macos-universal`, `vexy_svgo-windows` to `vexy-svgo-linux`, `vexy_svgo-macos-universal`, `vexy-svgo-windows` in `scripts/build.sh`.
-        *   **Update repository URLs:** Change `https://github.com/twardoch/vexy_svgo` to `https://github.com/twardoch/vexy-svgo` in `Cargo.toml`, `README.md`, `examples/wasm-enhanced-demo.html`, `docs/wasm-demo.html`, `docs/plugin-development.md`, `release.sh`, `issues/301.txt`. (Note: This might require an actual GitHub repository rename, which is outside the scope of direct file modification but should be noted).
-        *   **Update package manager instructions:** Ensure `brew install vexy-svgo` and `choco install vexy-svgo` are used in `README.md`. (Currently `vexy_svgo` is used, which is inconsistent with kebab-case for package managers).
-        *   **Update project root check in `release.sh`:** Change `vexy_svgo` to `vexy-svgo`.
-        *   **Update `docs/plugin-development.md`:** Change `vexy_svgo` in clone/build/mkdir commands to `vexy-svgo`.
-
-4.  **Remove `VEXYSVGO` (all caps) for general use:**
-    *   **Scope:** Any instance where it's not a specific FFI function prefix or a constant.
-    *   **Action:** All instances identified in step 2.2 will be changed to `Vexy SVGO` or `vexy_svgo` as appropriate.
+    *   **Remaining tasks:**
+        ✅ **Update package manager instructions:** Ensure `brew install vexy-svgo` and `choco install vexy-svgo` are used in `README.md`.
+        ✅ **Update project root check in `release.sh`:** Change `vexy_svgo` to `vexy-svgo`.
+        ✅ **Update `docs/plugin-development.md`:** Change `vexy_svgo` in clone/build/mkdir commands to `vexy-svgo`.
 
 ### Phase 1: Code Cleanup (Immediate)
 
@@ -148,9 +151,7 @@ This phase focuses on standardizing the naming conventions across the codebase, 
 
 ## Technical Debt Items
 
-1. **PROTECTED_ placeholder cleanup**
-   - While fixed, the root cause of these placeholders should be investigated
-   - Ensure no build scripts are introducing these corruptions
+1. **Build verification**
    - Add build verification steps
    - Create reproducible builds
 
@@ -215,11 +216,24 @@ This phase focuses on standardizing the naming conventions across the codebase, 
 
 The Vexy SVGO project has a solid foundation but needs systematic improvements to reach production quality. This plan prioritizes immediate fixes to get a working release, followed by feature completion and long-term optimizations. The focus should be on maintaining SVGO compatibility while leveraging Rust's performance advantages.
 
-### Build Log Analysis and Suggestions
+### Recent Progress
 
-The build log indicates that the main project builds successfully for macOS, but the WebAssembly (WASM) build fails due to issues with the `getrandom` crate.
+#### 2025-07-12 Session
+- ✅ Fixed cyclic dependency between core and plugin-sdk crates
+- ✅ Added missing dependencies (once_cell, indexmap, regex, quick-xml, parking_lot, colored, indicatif)
+- ✅ Fixed parallel module feature gating
+- ✅ Created macOS platform deliverables (.dmg and .tar.gz)
+- ✅ Updated getrandom to use "js" feature instead of "wasm_js"
+- ⚠️ WASM build still failing due to API changes (documented in issues/621.txt)
 
-**Problem:** The `getrandom` crate, a dependency, is not correctly configured for the `wasm32-unknown-unknown` target. It requires the `wasm_js` feature to be enabled for WASM builds.
+### Known Issues
 
-**Suggestion:**
-- **Modify `crates/wasm/Cargo.toml`:** Add `features = ["js"]` to the `getrandom` dependency under the `[dependencies]` section, specifically for the `wasm32-unknown-unknown` target. This will enable the necessary WASM-specific features for `getrandom`.
+1. **WASM Build Failures** (High Priority)
+   - Missing imports and changed APIs
+   - Missing web-sys dependency
+   - wasm-bindgen String handling issues
+   - See issues/621.txt for detailed analysis
+
+2. **Platform Deliverables** (Medium Priority)
+   - Windows and Linux packages require cross-compilation setup
+   - macOS packages successfully created

@@ -151,12 +151,12 @@ WebAssembly allows us to achieve near-native performance in the browser:
 
 All tools are open source and available on GitHub:
 
-- [Vexy SVGO Core](https://github.com/twardoch/vexy_svgo) - The Rust implementation
-- [Web Tools](https://github.com/twardoch/vexy_svgo/tree/main/docs) - Frontend code for these tools
+- [Vexy SVGO Core](https://github.com/vexyart/vexy-svgo) - The Rust implementation
+- [Web Tools](https://github.com/vexyart/vexy-svgo/tree/main/docs) - Frontend code for these tools
 
 ## Feedback
 
-Found a bug or have a feature request? Please [open an issue](https://github.com/twardoch/vexy_svgo/issues) on GitHub.
+Found a bug or have a feature request? Please [open an issue](https://github.com/vexyart/vexy-svgo/issues) on GitHub.
 
 ---
 

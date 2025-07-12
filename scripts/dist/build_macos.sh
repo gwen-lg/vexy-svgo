@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-# VEXYSVGO macOS Distribution Script
+# Vexy SVGO macOS Distribution Script
 # ==============================
 #
-# Build and package VEXYSVGO for macOS: creates a .dmg containing a .pkg installer for the CLI tool.
+# Build and package Vexy SVGO for macOS: creates a .dmg containing a .pkg installer for the CLI tool.
 #
 # Usage:
 #   ./scripts/dist/build_macos.sh
@@ -34,10 +34,10 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
 DIST_DIR="$PROJECT_ROOT/dist/macos"
-BIN_NAME="vexy_svgo"
-PKG_ID="com.twardoch.vexy_svgo"
+BIN_NAME="vexy-svgo"
+PKG_ID="com.twardoch.vexy-svgo"
 VERSION=$(grep '^version =' "$PROJECT_ROOT/Cargo.toml" | head -1 | cut -d'"' -f2)
 
 # Clean and prepare directories
@@ -76,7 +76,7 @@ if [ -f "$PROJECT_ROOT/LICENSE" ]; then
 fi
 
 DMG_PATH="$DIST_DIR/$BIN_NAME-$VERSION-macos.dmg"
-hdiutil create -volname "VEXYSVGO Installer" -srcfolder "$DMG_STAGING" -ov -format UDZO "$DMG_PATH"
+hdiutil create -volname "Vexy SVGO Installer" -srcfolder "$DMG_STAGING" -ov -format UDZO "$DMG_PATH"
 
 # Output result
 ls -lh "$PKG_PATH" "$DMG_PATH"

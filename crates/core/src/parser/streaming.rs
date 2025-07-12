@@ -25,11 +25,12 @@ pub struct StreamingParser<R: BufRead> {
 
 impl<R: BufRead> StreamingParser<R> {
     pub fn new(reader: R, config: StreamingConfig, preserve_whitespace: bool, preserve_comments: bool, expand_entities: bool, file_path: Option<String>) -> Self {
-        let mut xml_reader = Reader::from_reader(reader);
-        xml_reader.config_mut().expand_empty_elements = true;
-        xml_reader.config_mut().trim_text_start = !preserve_whitespace;
-        xml_reader.config_mut().trim_text_end = !preserve_whitespace;
-        xml_reader.config_mut().check_end_names = true;
+        let xml_reader = Reader::from_reader(reader);
+        // TODO: Configure reader properly for quick-xml 0.31
+        // xml_reader.config_mut().expand_empty_elements = true;
+        // xml_reader.config_mut().trim_text_start = !preserve_whitespace;
+        // xml_reader.config_mut().trim_text_end = !preserve_whitespace;
+        // xml_reader.config_mut().check_end_names = true;
         
         Self {
             reader: xml_reader,
@@ -215,9 +216,10 @@ impl<R: BufRead> StreamingParser<R> {
                     }
                 }
                 Ok(Event::Eof) => break,
-                Ok(Event::GeneralRef(_)) => {
-                    // Ignore general references in streaming mode
-                }
+                // TODO: Handle GeneralRef event for quick-xml 0.31
+                // Ok(Event::GeneralRef(_)) => {
+                //     // Ignore general references in streaming mode
+                // }
                 Err(e) => {
                     // In streaming mode, we're more tolerant of errors
                     // but still track position for debugging
@@ -229,7 +231,7 @@ impl<R: BufRead> StreamingParser<R> {
             }
 
             // Track bytes processed for progress reporting
-            self.bytes_processed = self.reader.buffer_position() as usize;
+            self.bytes_processed = self.reader.buffer_position();
         }
 
         if current_element.is_none() && document.root.name.is_empty() {

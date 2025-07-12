@@ -1,5 +1,5 @@
 #!/bin/bash
-# Package VEXYSVGO release artifacts
+# Package Vexy SVGO release artifacts
 set -euo pipefail
 
 # Colors for output
@@ -63,13 +63,13 @@ case "$PLATFORM" in
         ;;
 esac
 
-BINARY_NAME="vexy_svgo-$VERSION-$PLATFORM_NAME-$ARCH_NAME"
+BINARY_NAME="vexy-svgo-$VERSION-$PLATFORM_NAME-$ARCH_NAME"
 
 # Package CLI binary
 log_info "Packaging CLI binary"
-if [ -f "$DIST_DIR/vexy_svgo" ]; then
+if [ -f "$DIST_DIR/vexy-svgo" ]; then
     mkdir -p "$RELEASE_DIR/$BINARY_NAME"
-    cp "$DIST_DIR/vexy_svgo" "$RELEASE_DIR/$BINARY_NAME/"
+    cp "$DIST_DIR/vexy-svgo" "$RELEASE_DIR/$BINARY_NAME/"
     cp README.md "$RELEASE_DIR/$BINARY_NAME/"
     cp LICENSE "$RELEASE_DIR/$BINARY_NAME/"
     cp RELEASE_CANDIDATE.md "$RELEASE_DIR/$BINARY_NAME/"
@@ -92,7 +92,7 @@ fi
 # Package WASM modules
 log_info "Packaging WebAssembly modules"
 if [ -d "$DIST_DIR/wasm" ]; then
-    WASM_NAME="vexy_svgo-wasm-$VERSION"
+    WASM_NAME="vexy-svgo-wasm-$VERSION"
     mkdir -p "$RELEASE_DIR/$WASM_NAME"
     cp -r "$DIST_DIR/wasm/"* "$RELEASE_DIR/$WASM_NAME/"
     cp README.md "$RELEASE_DIR/$WASM_NAME/"
@@ -122,7 +122,7 @@ cd ..
 # Create release notes
 log_info "Creating release notes"
 cat > "$RELEASE_DIR/RELEASE_NOTES.md" << EOF
-# VEXYSVGO $VERSION Release Notes
+# Vexy SVGO $VERSION Release Notes
 
 ## Overview
 VexySVGO $VERSION is a high-performance SVG optimizer written in Rust, designed as a modern alternative to SVGO.
@@ -134,43 +134,43 @@ VexySVGO $VERSION is a high-performance SVG optimizer written in Rust, designed 
 - **$BINARY_NAME.tar.gz.sha256** - SHA256 checksum
 
 ### WebAssembly Modules  
-- **vexy_svgo-wasm-$VERSION.tar.gz** - WebAssembly modules for browser and Node.js
-- **vexy_svgo-wasm-$VERSION.tar.gz.sha256** - SHA256 checksum
+- **vexy-svgo-wasm-$VERSION.tar.gz** - WebAssembly modules for browser and Node.js
+- **vexy-svgo-wasm-$VERSION.tar.gz.sha256** - SHA256 checksum
 
 ## Installation
 
 ### CLI Binary
-\`\`\`bash
+```bash
 # Download and extract
-wget https://github.com/twardoch/vexy_svgo/releases/download/v$VERSION/$BINARY_NAME.tar.gz
+wget https://github.com/vexyart/vexy-svgo/releases/download/v$VERSION/$BINARY_NAME.tar.gz
 tar -xzf $BINARY_NAME.tar.gz
 cd $BINARY_NAME
 
 # Install to PATH
-sudo cp vexy_svgo /usr/local/bin/
-\`\`\`
+sudo cp vexy-svgo /usr/local/bin/
+```
 
 ### WebAssembly
-\`\`\`bash
+```bash
 # Download and extract
-wget https://github.com/twardoch/vexy_svgo/releases/download/v$VERSION/vexy_svgo-wasm-$VERSION.tar.gz
-tar -xzf vexy_svgo-wasm-$VERSION.tar.gz
-\`\`\`
+wget https://github.com/vexyart/vexy-svgo/releases/download/v$VERSION/vexy-svgo-wasm-$VERSION.tar.gz
+tar -xzf vexy-svgo-wasm-$VERSION.tar.gz
+```
 
 ## Verification
 Verify the integrity of downloaded files:
-\`\`\`bash
+```bash
 sha256sum -c $BINARY_NAME.tar.gz.sha256
-sha256sum -c vexy_svgo-wasm-$VERSION.tar.gz.sha256
-\`\`\`
+sha256sum -c vexy-svgo-wasm-$VERSION.tar.gz.sha256
+```
 
 ## What's New
 See [RELEASE_CANDIDATE.md](RELEASE_CANDIDATE.md) for comprehensive release notes.
 
 ## Support
-- **Documentation**: https://twardoch.github.io/vexy_svgo/
-- **Issues**: https://github.com/twardoch/vexy_svgo/issues
-- **Discussions**: https://github.com/twardoch/vexy_svgo/discussions
+- **Documentation**: https://twardoch.github.io/vexy-svgo/
+- **Issues**: https://github.com/vexyart/vexy-svgo/issues
+- **Discussions**: https://github.com/vexyart/vexy-svgo/discussions
 EOF
 
 log_success "Release packaging completed!"

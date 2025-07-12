@@ -1,0 +1,104 @@
+# Issue #621: WASM Compilation Failures
+
+## Problem Description
+
+The WASM build for vexy-svgo is failing with multiple compilation errors, preventing the creation of WebAssembly modules for browser and Node.js usage.
+
+## Root Causes
+
+### 1. Missing Import: `parse_svg_string`
+```
+error[E0432]: unresolved import `vexy_svgo_core::parse_svg_string`
+  --> crates/wasm/src/enhanced.rs:18:27
+```
+- The function `parse_svg_string` doesn't exist in vexy_svgo_core
+- Only `parse_svg`, `parse_svg_file`, and `parse_svg_streaming` are available
+- The WASM module needs to be updated to use the correct function name
+
+### 2. Missing Field: `floatPrecision`
+```
+error[E0609]: no field `floatPrecision` on type `vexy_svgo_core::Config`
+  --> crates/wasm/src/enhanced.rs:114:20
+```
+- The Config struct doesn't have a `floatPrecision` field
+- This appears to be from an older API that needs to be updated
+
+### 3. Missing Dependency: `web-sys`
+```
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `web_sys`
+  --> crates/wasm/src/enhanced.rs:295:22
+```
+- The `web-sys` crate is not included in dependencies
+- Required for browser timing functions (window.performance.now())
+- Needs to be added to Cargo.toml with appropriate features
+
+### 4. Type Mismatches
+```
+error[E0308]: mismatched types
+  --> crates/wasm/src/enhanced.rs:345:50
+  |
+  let result = match optimize_with_config(svg, &config.inner) {
+                                               ^^^^^^^^^^^^^ expected `Config`, found `&Config`
+```
+- The `optimize_with_config` function expects owned Config, not a reference
+- Multiple places pass `&Config` instead of `Config`
+
+### 5. wasm-bindgen Issues
+```
+error[E0277]: the trait bound `std::string::String: std::marker::Copy` is not satisfied
+```
+- String fields in wasm-bindgen structs need special handling
+- The `#[wasm_bindgen]` attribute has limitations with String types
+- Need to use getter/setter pattern instead of direct field access
+
+### 6. Missing Plugin Registry Method
+```
+error[E0599]: no method named `list_plugins` found for struct `PluginRegistry`
+```
+- The PluginRegistry API has changed
+- The `list_plugins` method doesn't exist or has a different name
+
+### 7. API Changes
+- `PluginConfig` uses a method `name()` instead of field `name`
+- Need to update method calls throughout WASM module
+
+## Required Fixes
+
+1. **Update Imports**
+   - Change `parse_svg_string` to `parse_svg`
+   - Remove unused imports
+
+2. **Add Missing Dependencies**
+   ```toml
+   [dependencies]
+   web-sys = { version = "0.3", features = ["Window", "Performance"] }
+   ```
+
+3. **Fix Config API**
+   - Remove references to `floatPrecision`
+   - Update to use current Config structure
+   - Change `&config` to `config` (move instead of borrow)
+
+4. **Update wasm-bindgen Structs**
+   - Use getter/setter methods for String fields
+   - Or restructure to avoid Copy trait requirements
+
+5. **Update Plugin Registry Calls**
+   - Find correct method name for listing plugins
+   - Update to match current PluginRegistry API
+
+6. **Fix Method vs Field Access**
+   - Change `p.name` to `p.name()`
+   - Update all PluginConfig usages
+
+## Impact
+
+Without these fixes:
+- Cannot build WASM version of vexy-svgo
+- Cannot use in browsers or Node.js via WASM
+- Cannot publish to npm as WASM package
+- Missing key deployment target for web applications
+
+## Priority
+
+High - WASM support is critical for web usage and was listed as a key feature of the project.

@@ -56,7 +56,7 @@ case "$OS_TYPE" in
         log_info "Building for Linux ($TARGET)..."
         rustup target add "$TARGET" || true # Add target if not already added
         cd "$CARGO_DIR"
-        cargo build --release --target "$TARGET" -p vexy_svgo-cli
+        cargo build --release --target "$TARGET" -p vexy-svgo-cli
         cp "target/$TARGET/release/vexy-svgo" "$DIST_DIR/vexy-svgo-linux-$ARCH_TYPE"
         chmod +x "$DIST_DIR/vexy-svgo-linux-$ARCH_TYPE"
         log_info "Stripping binary..."
@@ -67,8 +67,8 @@ case "$OS_TYPE" in
         rustup target add x86_64-apple-darwin || true
         rustup target add aarch64-apple-darwin || true
         cd "$CARGO_DIR"
-        cargo build --release --target x86_64-apple-darwin -p vexy_svgo-cli
-        cargo build --release --target aarch64-apple-darwin -p vexy_svgo-cli
+        cargo build --release --target x86_64-apple-darwin -p vexy-svgo-cli
+        cargo build --release --target aarch64-apple-darwin -p vexy-svgo-cli
         log_info "Creating universal binary..."
         lipo -create \
             "$PROJECT_ROOT/target/x86_64-apple-darwin/release/vexy-svgo" \
@@ -90,7 +90,7 @@ case "$OS_TYPE" in
         esac
         rustup target add "$TARGET" || true
         cd "$CARGO_DIR"
-        cargo build --release --target "$TARGET" -p vexy_svgo-cli
+        cargo build --release --target "$TARGET" -p vexy-svgo-cli
         cp "target/$TARGET/release/vexy-svgo.exe" "$DIST_DIR/vexy-svgo-windows-$ARCH_TYPE.exe"
         ;;
     *)

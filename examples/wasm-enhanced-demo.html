@@ -45,11 +45,7 @@
       </div>
       <div class="navbar-end">
         <a
-          href="https://github.com/twardoch/vexy_svgo"
-          target="_blank"
-          class="btn btn-ghost"
-          >GitHub</a
-        >
+          <a href="https://github.com/vexyart/vexy-svgo" target="_blank" class="btn btn-ghost">GitHub</a>
       </div>
     </div>
 
@@ -522,7 +518,7 @@
 
     <script type="module">
       // Mock WASM module for demonstration
-      const mockVEXYSVGO = {
+      const mockVexySVGO = {
         EnhancedConfig: class {
           constructor() {
             this.multipass = false;
@@ -618,7 +614,7 @@
             this.buffer += chunk;
           }
           finalize() {
-            return mockVEXYSVGO.optimizeEnhanced(this.buffer, this.config);
+            return mockVexySVGO.optimizeEnhanced(this.buffer, this.config);
           }
           getBufferSize() {
             return this.buffer.length;
@@ -660,13 +656,13 @@
             return;
           }
 
-          const config = new mockVEXYSVGO.EnhancedConfig();
+          const config = new mockVexySVGO.EnhancedConfig();
           config.multipass = document.getElementById('multipass').checked;
           config.pretty = document.getElementById('pretty').checked;
           config.setPerformanceMode(document.getElementById('perfMode').value);
           config.setErrorHandling(document.getElementById('errorMode').value);
 
-          const result = mockVEXYSVGO.optimizeEnhanced(svg, config);
+          const result = mockVexySVGO.optimizeEnhanced(svg, config);
           const metrics = result.getMetrics();
 
           // Display results
@@ -702,7 +698,7 @@
 
       // Populate plugins list
       function populatePlugins() {
-        const plugins = mockVEXYSVGO.getAllPlugins();
+        const plugins = mockVexySVGO.getAllPlugins();
         const list = document.getElementById('pluginList');
         const select = document.getElementById('configPlugin');
 
@@ -743,12 +739,12 @@
 
       // Populate features
       function populateFeatures() {
-        const features = mockVEXYSVGO.getAvailableFeatures();
+        const features = mockVexySVGO.getAvailableFeatures();
         const container = document.getElementById('featureToggles');
         container.innerHTML = '';
 
         features.forEach((feature) => {
-          const enabled = mockVEXYSVGO.isFeatureEnabled(feature);
+          const enabled = mockVexySVGO.isFeatureEnabled(feature);
           const toggle = document.createElement('div');
           toggle.className = 'form-control';
           toggle.innerHTML = `
@@ -772,7 +768,7 @@
           return;
         }
 
-        const result = mockVEXYSVGO.validateSvg(svg);
+        const result = mockVexySVGO.validateSvg(svg);
 
         document.getElementById('validStatus').textContent = result.valid
           ? 'Valid'
@@ -814,8 +810,8 @@
           for (let i = 0; i < iterations; i++) {
             const start = performance.now();
             const svg = generateTestSVG(size);
-            const config = new mockVEXYSVGO.EnhancedConfig();
-            mockVEXYSVGO.optimizeEnhanced(svg, config);
+            const config = new mockVexySVGO.EnhancedConfig();
+            mockVexySVGO.optimizeEnhanced(svg, config);
             const end = performance.now();
             times.push(end - start);
           }
@@ -837,7 +833,7 @@
       document
         .getElementById('btnCheckMemory')
         .addEventListener('click', () => {
-          const memory = mockVEXYSVGO.getMemoryUsage();
+          const memory = mockVexySVGO.getMemoryUsage();
           document.getElementById('memUsed').textContent = formatBytes(
             memory.usedKb * 1024
           );

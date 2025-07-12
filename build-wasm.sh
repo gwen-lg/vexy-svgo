@@ -35,9 +35,9 @@ build_and_optimize() {
             --strip-producers \
             --vacuum \
             --dce \
-            "$out_dir"/vexy_svgo_bg.wasm \
-            -o "$out_dir"/vexy_svgo_bg_opt.wasm
-        mv "$out_dir"/vexy_svgo_bg_opt.wasm "$out_dir"/vexy_svgo_bg.wasm
+            "$out_dir"/vexy-svgo_bg.wasm \
+            -o "$out_dir"/vexy-svgo_bg_opt.wasm
+        mv "$out_dir"/vexy-svgo_bg_opt.wasm "$out_dir"/vexy-svgo_bg.wasm
         echo "  wasm-opt optimization complete"
     else
         echo "  wasm-opt not found, skipping additional optimizations"
@@ -48,9 +48,9 @@ build_and_optimize() {
         echo "  Removing unused functions with wasm-snip..."
         wasm-snip --snip-rust-fmt-code \
             --snip-rust-panicking-code \
-            "$out_dir"/vexy_svgo_bg.wasm \
-            -o "$out_dir"/vexy_svgo_bg_snipped.wasm 2>/dev/null && \
-        mv "$out_dir"/vexy_svgo_bg_snipped.wasm "$out_dir"/vexy_svgo_bg.wasm && \
+            "$out_dir"/vexy-svgo_bg.wasm \
+            -o "$out_dir"/vexy-svgo_bg_snipped.wasm 2>/dev/null && \
+        mv "$out_dir"/vexy-svgo_bg_snipped.wasm "$out_dir"/vexy-svgo_bg.wasm && \
         echo "  wasm-snip optimization complete" || \
         echo "  wasm-snip optimization skipped (no unused functions found)"
     else
@@ -75,6 +75,6 @@ echo "  - pkg-minimal/  : Minimal build with critical plugins only"
 echo "  - pkg-full/     : Full build with all plugins"
 echo ""
 echo "To use in a web project:"
-echo "  import init, { optimize } from './pkg-web/vexy_svgo.js';"
+echo "  import init, { optimize } from './pkg-web/vexy-svgo.js';"
 echo "  await init();"
-echo "  const result = optimize(svgString);"
+echo "  const result = optimize(svgString);"}

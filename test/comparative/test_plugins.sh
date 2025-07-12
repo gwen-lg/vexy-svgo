@@ -86,7 +86,7 @@ usage() {
     echo "  -a, --all           Test all common plugins"
     echo "  -f, --file FILE     Test specific file (default: use test samples)"
     echo "  -v, --verbose       Verbose output"
-    echo "  --build             Build VEXYSVGO before running tests"
+    echo "  --build             Build Vexy SVGO before running tests"
     echo "  --quick             Quick test (first 5 plugins only)"
     echo ""
     echo "EXAMPLES:"

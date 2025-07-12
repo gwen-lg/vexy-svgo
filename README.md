@@ -1,10 +1,10 @@
 # Vexy SVGO - SVG Optimizer Next-generation
 
-[![CI Status](https://github.com/twardoch/vexy-svgo/workflows/CI/badge.svg)](https://github.com/twardoch/vexy-svgo/actions/workflows/ci.yml)
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://twardoch.github.io/vexy-svgo/)
+[![CI Status](https://github.com/vexyart/vexy-svgo/workflows/CI/badge.svg)](https://github.com/vexyart/vexy-svgo/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://vexyart.github.io/vexy-svgo/)
 [![Crates.io](https://img.shields.io/crates/v/vexy-svgo.svg)](https://crates.io/crates/vexy-svgo)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Coverage](https://codecov.io/gh/twardoch/vexy_svgo/branch/main/graph/badge.svg)](https://codecov.io/gh/twardoch/vexy_svgo)
+[![Coverage](https://codecov.io/gh/vexyart/vexy-svgo/branch/main/graph/badge.svg)](https://codecov.io/gh/vexyart/vexy-svgo)
 
 **Vexy SVGO** is a high-performance SVG optimizer written in Rust, designed as a modern, API-compatible alternative to the popular Node.js-based SVGO tool. Built for speed, reliability, and extensibility.
 
@@ -55,7 +55,7 @@ cargo install vexy-svgo-cli
 ```
 
 ### **Pre-built Binaries**
-Download the latest binaries from [GitHub Releases](https://github.com/twardoch/vexy_svgo/releases):
+Download the latest binaries from [GitHub Releases](https://github.com/vexyart/vexy-svgo/releases):
 - **macOS**: Universal binary (Apple Silicon + Intel)
 - **Windows**: x64 executable
 - **Linux**: x64 binary (statically linked)
@@ -113,20 +113,71 @@ console.log(result.data);
 
 ## 🏗️ Architecture
 
+Vexy SVGO is a Rust workspace composed of multiple crates, each with a specific responsibility. This modular design promotes code reuse, separation of concerns, and maintainability.
+
 ### **Workspace Structure**
+
+Here is a detailed breakdown of the project's structure:
+
 ```
-vexy_svgo/
+vexy-svgo/
+├── .cargo/               # Workspace-specific Cargo configuration
+├── .github/              # GitHub Actions workflows for CI/CD
 ├── crates/
-│   ├── core/           # Core optimization engine
-│   ├── cli/            # Command-line interface  
-│   ├── plugin-sdk/     # Plugin development kit
-│   ├── wasm/           # WebAssembly bindings
-│   ├── ffi/            # C FFI bindings
-│   └── test-utils/     # Testing utilities
-├── vexy_svgo/               # Main library crate
-├── docs/               # Documentation website
-└── examples/           # Usage examples
+│   ├── cli/              # Command-line interface
+│   │   ├── src/main.rs   # Main entry point for the CLI
+│   │   └── tests/        # Integration tests for the CLI
+│   ├── core/             # Core optimization engine
+│   │   ├── src/
+│   │   │   ├── ast.rs    # Abstract Syntax Tree definitions
+│   │   │   ├── parser.rs # SVG parser
+│   │   │   ├── optimizer.rs # Optimization pipeline
+│   │   │   └── stringifier.rs # SVG output generator
+│   │   └── tests/        # Unit tests for core components
+│   ├── ffi/              # Foreign Function Interface (C-compatible)
+│   ├── plugin-sdk/       # Plugin development kit and plugin implementations
+│   ├── test-utils/       # Shared utilities for testing
+│   └── wasm/             # WebAssembly bindings for browser/Node.js
+├── docs/                 # Documentation website (Jekyll)
+├── examples/             # Usage examples for CLI, Rust, and WASM
+├── ref/                  # Git submodules for svgo and svgn for reference
+├── scripts/              # Build, release, and utility scripts
+├── test/                 # End-to-end and compatibility tests
+├── testdata/             # SVG files for testing and benchmarks
+├── Cargo.toml            # Workspace Cargo manifest
+└── README.md             # This file
 ```
+
+### **Core Components**
+
+*   **`crates/core`**: The heart of Vexy SVGO. It contains:
+    *   **Parser**: A robust XML parser that builds an Abstract Syntax Tree (AST) from the input SVG.
+    *   **Optimizer**: A pipeline that applies a series of plugins to the AST.
+    *   **Stringifier**: A component that converts the optimized AST back into an SVG string.
+    *   **AST**: The data structures that represent the SVG document.
+
+*   **`crates/plugin-sdk`**: Defines the `Plugin` trait and provides the infrastructure for creating and managing plugins. It also contains the implementations of all the SVGO-compatible plugins.
+
+*   **`crates/cli`**: A lightweight crate that provides the command-line interface. It handles argument parsing, file I/O, and configuration loading.
+
+*   **`crates/wasm`**: Provides the necessary bindings to compile the core library to WebAssembly, allowing it to run in browsers and Node.js environments.
+
+*   **`crates/ffi`**: Exposes a C-compatible Foreign Function Interface, enabling Vexy SVGO to be used from other programming languages.
+
+### **Testing and Quality Assurance**
+
+*   **`test/`**: Contains a comprehensive suite of tests, including:
+    *   **Compatibility Tests**: Ensures that Vexy SVGO's output matches SVGO's output for a large number of test cases.
+    *   **Integration Tests**: Tests the CLI and its features.
+    *   **Plugin Tests**: Verifies the correctness of each individual plugin.
+*   **`testdata/`**: A collection of SVG files used in the tests, including fixtures from the original SVGO project.
+*   **`.github/workflows/`**: A set of GitHub Actions that automate the build, test, and release process on macOS, Windows, and Linux.
+
+### **Documentation and Examples**
+
+*   **`docs/`**: The source code for the official documentation website, built with Jekyll.
+*   **`examples/`**: A collection of examples demonstrating how to use Vexy SVGO as a CLI tool, a Rust library, and a WASM module.
+
 
 ### **Plugin System**
 Vexy SVGO implements all 53 SVGO plugins with identical functionality:
@@ -146,7 +197,7 @@ Vexy SVGO implements all 53 SVGO plugins with identical functionality:
 - `applyTransforms`, `inlineStyles`, `cleanupIds`
 - `removeViewBox`, `sortAttrs`, `reusePaths`
 
-[View complete plugin list](https://twardoch.github.io/vexy_svgo/plugins.html)
+[View complete plugin list](https://twardoch.github.io/vexy-svgo/plugins.html)
 
 ## 🚀 Performance
 
@@ -175,13 +226,13 @@ Vexy SVGO implements all 53 SVGO plugins with identical functionality:
 ### **Build Steps**
 ```bash
 # Clone repository
-git clone https://github.com/twardoch/vexy_svgo.git
-cd vexy_svgo
+https://github.com/vexyart/vexy-svgo
+cd vexy-svgo
 
 # Build release binary
 cargo build --release
 
-# The binary will be at target/release/vexy_svgo
+# The binary will be at target/release/vexy-svgo
 ```
 
 ### **Development Build**
@@ -190,8 +241,8 @@ cargo build --release
 ./build.sh
 
 # Run specific tests
-cargo test --package vexy_svgo-core
-cargo test --package vexy_svgo-plugin-sdk
+cargo test --package vexy-svgo-core
+cargo test --package vexy-svgo-plugin-sdk
 ```
 
 ### **WebAssembly Build**
@@ -205,10 +256,10 @@ cargo test --package vexy_svgo-plugin-sdk
 
 ## 📚 Documentation
 
-- **[API Documentation](https://twardoch.github.io/vexy_svgo/)**
-- **[Plugin Reference](https://twardoch.github.io/vexy_svgo/plugins.html)**
+- **[API Documentation](https://twardoch.github.io/vexy-svgo/)**
+- **[Plugin Reference](https://twardoch.github.io/vexy-svgo/plugins.html)**
 - **[Release Notes](RELEASE_CANDIDATE.md)**
-- **[Migration Guide](https://twardoch.github.io/vexy_svgo/migration.html)**
+- **[Migration Guide](https://vexyart.github.io/vexy-svgo/migration.html)**
 
 ## 🤝 Contributing
 
@@ -220,8 +271,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone and build
-git clone https://github.com/twardoch/vexy_svgo.git
-cd vexy_svgo
+https://github.com/vexyart/vexy-svgo
+cd vexy-svgo
 ./build.sh
 ```
 
@@ -231,8 +282,8 @@ cd vexy_svgo
 cargo test --workspace
 
 # Run specific test suite
-cargo test --package vexy_svgo-core
-cargo test --package vexy_svgo-plugin-sdk
+cargo test --package vexy-svgo-core
+cargo test --package vexy-svgo-plugin-sdk
 
 # Run benchmarks
 cargo bench
@@ -240,9 +291,9 @@ cargo bench
 
 ## 🐛 Issues & Support
 
-- **Bug Reports**: [GitHub Issues](https://github.com/twardoch/vexy_svgo/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/twardoch/vexy_svgo/discussions)
-- **Documentation**: [Project Wiki](https://github.com/twardoch/vexy_svgo/wiki)
+- **Bug Reports**: [GitHub Issues](https://github.com/vexyart/vexy-svgo/issues)
+- **Feature Requests**: [GitHub Discussions](https://github.com/vexyart/vexy-svgo/discussions)
+- **Documentation**: [Project Wiki](https://github.com/vexyart/vexy-svgo/wiki)
 
 ## 📈 Roadmap
 

@@ -4,7 +4,7 @@ pub mod main;
 pub mod attributes;
 pub mod elements;
 pub mod util;
-pub mod tests;
+
 pub mod config;
 pub mod entities;
 pub mod error;

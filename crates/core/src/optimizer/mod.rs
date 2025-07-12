@@ -5,6 +5,7 @@
 //! This module provides the main optimization functionality that orchestrates
 //! parsing, plugin application, and output generation.
 
+#[cfg(feature = "parallel")]
 pub mod parallel;
 
 use crate::parser::config::{Config, DataUriFormat};
@@ -23,6 +24,7 @@ pub struct OptimizeOptions {
     /// Plugin registry (if None, uses default)
     pub registry: Option<PluginRegistry>,
     /// Parallel processing configuration
+    #[cfg(feature = "parallel")]
     pub parallel: Option<parallel::ParallelConfig>,
 }
 
@@ -60,6 +62,7 @@ impl OptimizeOptions {
         Self {
             config,
             registry: None,
+            #[cfg(feature = "parallel")]
             parallel: None,
         }
     }
@@ -71,6 +74,7 @@ impl OptimizeOptions {
     }
     
     /// Enable parallel processing with the given configuration
+    #[cfg(feature = "parallel")]
     pub fn with_parallel(mut self, parallel_config: parallel::ParallelConfig) -> Self {
         self.parallel = Some(parallel_config);
         self
@@ -173,7 +177,7 @@ pub fn optimize(input: &str, options: OptimizeOptions) -> OptimizeResult<Optimiz
         {
             registry
                 .apply_plugins(&mut document, registry_plugins)
-                .map_err(|e| VexySvgoError::from(e))?;
+                .map_err(VexySvgoError::from)?;
         }
         plugins_applied += config.plugins.len();
 

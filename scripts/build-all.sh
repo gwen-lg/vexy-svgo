@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build all VEXYSVGO targets
+# Build all Vexy SVGO targets
 set -euo pipefail
 
 # Colors for output
@@ -33,7 +33,7 @@ mkdir -p "$DIST_DIR"
 
 # Build CLI for current platform
 log_info "Building CLI for current platform"
-if ! cargo build --release --package vexy_svgo-cli; then
+if ! cargo build --release --package vexy-svgo-cli; then
     log_error "CLI build failed"
     exit 1
 fi
@@ -54,7 +54,7 @@ fi
 
 # Copy CLI binary to dist
 log_info "Copying CLI binary to dist"
-cp "$TARGET_DIR/vexy_svgo" "$DIST_DIR/"
+cp "$TARGET_DIR/vexy-svgo" "$DIST_DIR/"
 
 # Copy WASM modules to dist
 log_info "Copying WASM modules to dist"

@@ -50,7 +50,7 @@ log_info "Starting Vexy SVGO release process for version $VERSION"
 
 # Check if we're in the right directory
 if [ ! -f "Cargo.toml" ] || [ ! -d "crates" ]; then
-    log_error "Must be run from the root of the vexy_svgo project"
+    log_error "Must be run from the root of the vexy-svgo project"
     exit 1
 fi
 
@@ -115,5 +115,5 @@ log_info "  - Upload to GitHub Releases"
 log_info "  - Publish to package managers"
 
 echo
-log_info "Monitor the release at: https://github.com/twardoch/vexy_svgo/actions"
-log_info "Release will be available at: https://github.com/twardoch/vexy_svgo/releases/tag/$VERSION_TAG"
+log_info "Monitor the release at: https://github.com/vexyart/vexy-svgo/actions"
+log_info "Release will be available at: https://github.com/vexyart/vexy-svgo/releases/tag/$VERSION_TAG"

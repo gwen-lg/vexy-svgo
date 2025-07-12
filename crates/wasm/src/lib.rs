@@ -16,7 +16,7 @@ pub mod wasm_impl {
     use serde::{Deserialize, Serialize};
     use wasm_bindgen::prelude::*;
 
-    use vexy_svgo_core::{optimize_with_config, Config, OptimizationResult};
+    use vexy_svgo_core::{optimize_with_config, Config};
 
     // When the `wasm` feature is enabled, use wee_alloc as the global allocator
     // to reduce WASM bundle size
@@ -45,7 +45,7 @@ pub mod wasm_impl {
     #[derive(Serialize, Deserialize)]
     pub struct JsConfig {
         /// Path to the SVG file (optional, used for error messages)
-        pub path: Option<String>,
+        path: Option<String>,
         /// Multipass optimization (run until no changes)
         pub multipass: bool,
         /// Pretty print output
@@ -54,6 +54,19 @@ pub mod wasm_impl {
         pub indent: u8,
         /// Plugins configuration as JSON string
         plugins_json: String,
+    }
+
+    #[wasm_bindgen]
+    impl JsConfig {
+        #[wasm_bindgen(getter)]
+        pub fn path(&self) -> Option<String> {
+            self.path.clone()
+        }
+
+        #[wasm_bindgen(setter)]
+        pub fn set_path(&mut self, path: Option<String>) {
+            self.path = path;
+        }
     }
 
     #[wasm_bindgen]
@@ -92,8 +105,8 @@ pub mod wasm_impl {
     /// JavaScript-friendly result object
     #[wasm_bindgen]
     pub struct JsOptimizationResult {
-        pub data: String,
-        pub error: Option<String>,
+        data: String,
+        error: Option<String>,
         pub original_size: usize,
         pub optimized_size: usize,
     }
@@ -151,7 +164,7 @@ pub mod wasm_impl {
         let mut native_config = Config::with_default_preset();
         native_config.multipass = config.multipass;
         native_config.js2svg.pretty = config.pretty;
-        native_config.js2svg.indent = config.indent;
+        native_config.js2svg.indent = config.indent.to_string();
 
         // Parse plugins configuration
         if !config.plugins_json.is_empty() && config.plugins_json != "{}" {
@@ -177,9 +190,9 @@ pub mod wasm_impl {
         }
 
         // Optimize the SVG
-        match optimize_with_config(svg, &native_config) {
+        match optimize_with_config(svg, native_config) {
             Ok(result) => Ok(JsOptimizationResult {
-                data: result.data,
+                data: result.data.clone(),
                 error: None,
                 original_size,
                 optimized_size: result.data.len(),
@@ -209,7 +222,7 @@ pub mod wasm_impl {
     #[wasm_bindgen(js_name = getPlugins)]
     pub fn get_plugins() -> Result<String, JsError> {
         let config = Config::with_default_preset();
-        let plugins: Vec<String> = config.plugins.iter().map(|p| p.name.clone()).collect();
+        let plugins: Vec<String> = config.plugins.iter().map(|p| p.name().to_string()).collect();
         serde_json::to_string(&plugins).map_err(|e| JsError::new(&e.to_string()))
     }
 
@@ -277,7 +290,7 @@ pub mod wasm_impl {
 
 // Re-export the WASM functionality when targeting WASM
 #[cfg(target_arch = "wasm32")]
-pub use wasm_impl::*;
+
 
 #[cfg(target_arch = "wasm32")]
 pub use enhanced::*;

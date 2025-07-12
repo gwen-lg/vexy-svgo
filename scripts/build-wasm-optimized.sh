@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}[INFO]${NC} Building optimized WASM bundle..."
 
 # Change to project root
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")"/..
 
 # Install wasm-pack if not available
 if ! command -v wasm-pack &> /dev/null; then
@@ -51,7 +51,7 @@ if command -v wasm-opt &> /dev/null; then
     echo -e "${GREEN}[INFO]${NC} Running wasm-opt for additional size reduction..."
     
     # Get the original size
-    ORIGINAL_SIZE=$(stat -f%z pkg/vexy_svgo_wasm_bg.wasm 2>/dev/null || stat -c%s pkg/vexy_svgo_wasm_bg.wasm)
+    ORIGINAL_SIZE=$(stat -f%z pkg/vexy-svgo_bg.wasm 2>/dev/null || stat -c%s pkg/vexy-svgo_bg.wasm)
     
     # Run wasm-opt with aggressive optimizations
     wasm-opt \
@@ -66,14 +66,14 @@ if command -v wasm-opt &> /dev/null; then
         --vacuum \
         --strip-debug \
         --strip-producers \
-        pkg/vexy_svgo_wasm_bg.wasm \
-        -o pkg/vexy_svgo_wasm_bg_opt.wasm
+        pkg/vexy-svgo_bg.wasm \
+        -o pkg/vexy-svgo_bg_opt.wasm
     
     # Replace original with optimized version
-    mv pkg/vexy_svgo_wasm_bg_opt.wasm pkg/vexy_svgo_wasm_bg.wasm
+    mv pkg/vexy-svgo_bg_opt.wasm pkg/vexy-svgo_bg.wasm
     
     # Get the optimized size
-    OPTIMIZED_SIZE=$(stat -f%z pkg/vexy_svgo_wasm_bg.wasm 2>/dev/null || stat -c%s pkg/vexy_svgo_wasm_bg.wasm)
+    OPTIMIZED_SIZE=$(stat -f%z pkg/vexy-svgo_bg.wasm 2>/dev/null || stat -c%s pkg/vexy-svgo_bg.wasm)
     
     # Calculate reduction
     REDUCTION=$((ORIGINAL_SIZE - OPTIMIZED_SIZE))
@@ -86,8 +86,8 @@ fi
 
 # Generate minimal glue code
 echo -e "${GREEN}[INFO]${NC} Generating minimal JavaScript glue code..."
-cat > pkg/vexy_svgo_wasm_minimal.js << 'EOF'
-// Minimal WASM loader for vexy_svgo
+cat > pkg/vexy-svgo_minimal.js << 'EOF'
+// Minimal WASM loader for vexy-svgo
 export async function initVexySvgo(wasmPath) {
     const response = await fetch(wasmPath);
     const bytes = await response.arrayBuffer();

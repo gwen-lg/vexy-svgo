@@ -455,8 +455,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'VEXYSVGO Plugin Marketplace',
-  description: 'Discover and install plugins for VEXYSVGO SVG optimizer',
+  title: 'Vexy SVGO Plugin Marketplace',
+  description: 'Discover and install plugins for Vexy SVGO SVG optimizer',
 }
 
 export default function RootLayout({
@@ -527,7 +527,7 @@ export default function Home() {
       {/* Header */}
       <div className="navbar bg-base-100 shadow-lg">
         <div className="navbar-start">
-          <h1 className="text-xl font-bold">VexySVGO Plugin Marketplace</h1>
+          <h1 className="text-xl font-bold">Vexy SVGO Plugin Marketplace</h1>
         </div>
         <div className="navbar-end">
           <button className="btn btn-ghost">Sign In</button>
@@ -539,7 +539,7 @@ export default function Home() {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h2 className="text-3xl font-bold">Discover SVG Optimization Plugins</h2>
-            <p className="py-6">Extend VexySVGO with community-built plugins for specialized SVG optimization tasks.</p>
+            <p className="py-6">Extend Vexy SVGO with community-built plugins for specialized SVG optimization tasks.</p>
             
             {/* Search */}
             <div className="join w-full max-w-md">
@@ -651,7 +651,7 @@ generate_database_init() {
     log "Generating database initialization scripts..."
     
     cat > ${MARKETPLACE_DIR}/database/init/01-create-tables.sql << 'EOF'
--- VexySVGO Plugin Marketplace Database Schema
+-- Vexy SVGO Plugin Marketplace Database Schema
 
 -- Users table
 CREATE TABLE users (
@@ -919,7 +919,7 @@ EOF
 
 set -e
 
-echo "Deploying VEXYSVGO Plugin Marketplace..."
+echo "Deploying Vexy SVGO Plugin Marketplace..."
 
 # Build and deploy with production settings
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
@@ -967,7 +967,7 @@ generate_readme() {
     cat > ${MARKETPLACE_DIR}/README.md << 'EOF'
 # Vexy SVGO Plugin Marketplace
 
-A comprehensive marketplace infrastructure for discovering, sharing, and managing VexySVGO SVG optimization plugins.
+A comprehensive marketplace infrastructure for discovering, sharing, and managing Vexy SVGO SVG optimization plugins.
 
 ## Quick Start
 
@@ -1100,7 +1100,7 @@ Automated security scanning for all submitted plugins:
 
 ## License
 
-This project is licensed under the same terms as VexySVGO: MIT OR Apache-2.0.
+This project is licensed under the same terms as Vexy SVGO: MIT OR Apache-2.0.
 EOF
 
     log "README created"

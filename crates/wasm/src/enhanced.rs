@@ -9,14 +9,12 @@
 //! - Performance metrics
 //! - Memory management utilities
 
-use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use std::collections::HashMap;
 
 use vexy_svgo_core::{
-    Config, OptimizationResult, PluginConfig,
-    optimize_with_config, parse_svg_string, stringify,
-    ast::Document,
+    Config, PluginConfig,
+    optimize_with_config, parse_svg,
     features::{Feature, enable_feature, is_feature_enabled},
     create_default_registry,
 };
@@ -108,17 +106,7 @@ impl EnhancedConfig {
         self.inner.js2svg.pretty
     }
 
-    /// Set precision for numbers
-    #[wasm_bindgen(setter)]
-    pub fn set_precision(&mut self, precision: u8) {
-        self.inner.floatPrecision = precision as i32;
-    }
-
-    /// Get precision setting
-    #[wasm_bindgen(getter)]
-    pub fn precision(&self) -> u8 {
-        self.inner.floatPrecision as u8
-    }
+    
 
     /// Enable or disable a specific plugin
     #[wasm_bindgen(js_name = setPluginEnabled)]
@@ -132,7 +120,7 @@ impl EnhancedConfig {
         let params: serde_json::Value = serde_json::from_str(params_json)
             .map_err(|e| JsError::new(&format!("Invalid plugin params: {}", e)))?;
         
-        self.plugin_params.insert(name.to_string(), params);
+        self.plugin_params.insert(name.to_string(), params.clone());
         
         // Update the plugin configuration
         self.inner.plugins.retain(|p| p.name() != name);
@@ -253,10 +241,10 @@ pub struct PerformanceMetrics {
 
 /// Plugin information
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct PluginInfo {
     name: String,
     description: String,
-    version: String,
     enabled: bool,
     configurable: bool,
 }
@@ -273,10 +261,7 @@ impl PluginInfo {
         self.description.clone()
     }
 
-    #[wasm_bindgen(getter)]
-    pub fn version(&self) -> String {
-        self.version.clone()
-    }
+    
 
     #[wasm_bindgen(getter)]
     pub fn enabled(&self) -> bool {
@@ -299,7 +284,7 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
     
     let original_size = svg.len();
     let mut errors = Vec::new();
-    let mut warnings = Vec::new();
+    let warnings = Vec::new();
     
     // Parse timing
     let parse_start = web_sys::window()
@@ -307,7 +292,7 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
         .map(|p| p.now())
         .unwrap_or(0.0);
     
-    let document = match parse_svg_string(svg) {
+    let _document = match parse_svg(svg) {
         Ok(doc) => doc,
         Err(e) => {
             errors.push(format!("Parse error: {}", e));
@@ -342,7 +327,7 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
         .map(|p| p.now())
         .unwrap_or(0.0);
     
-    let result = match optimize_with_config(svg, &config.inner) {
+    let result = match optimize_with_config(svg, config.inner.clone()) {
         Ok(res) => res,
         Err(e) => {
             errors.push(format!("Optimization error: {}", e));
@@ -377,7 +362,7 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
         .unwrap_or(0.0);
     
     Ok(EnhancedResult {
-        data: result.data,
+        data: result.data.clone(),
         original_size,
         optimized_size: result.data.len(),
         errors,
@@ -400,13 +385,14 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
 pub fn get_plugins() -> Result<Vec<JsValue>, JsError> {
     let registry = create_default_registry();
     let plugins: Vec<JsValue> = registry
-        .list_plugins()
+        .plugin_names()
         .into_iter()
-        .map(|metadata| {
+        .filter_map(|name| registry.create_plugin(name))
+        .map(|plugin| {
             let info = PluginInfo {
-                name: metadata.name.clone(),
-                description: metadata.description.clone(),
-                version: metadata.version.clone(),
+                name: plugin.name().to_string(),
+                description: plugin.description().to_string(),
+                
                 enabled: true, // Default enabled status
                 configurable: true, // Most plugins are configurable
             };
@@ -554,8 +540,8 @@ pub fn get_available_features() -> Vec<JsValue> {
 /// Validate SVG without optimization
 #[wasm_bindgen(js_name = validateSvg)]
 pub fn validate_svg(svg: &str) -> Result<ValidationResult, JsError> {
-    match parse_svg_string(svg) {
-        Ok(doc) => {
+    match parse_svg(svg) {
+        Ok(_doc) => {
             let mut issues = Vec::new();
             
             // Basic validation checks

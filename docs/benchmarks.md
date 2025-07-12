@@ -110,4 +110,4 @@ Vexy SVGO maintains full compatibility with SVGO:
 
 ---
 
-*Want to try Vexy SVGO? [Download the latest release](https://github.com/twardoch/vexy_svgo/releases) or build from source.*
+*Want to try Vexy SVGO? [Download the latest release](https://github.com/vexyart/vexy-svgo/releases) or build from source.*
