@@ -31,8 +31,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Clean docs directory
+        run: rm -rf docs/*
+
       - name: Build MkDocs site into /docs
         run: mkdocs build --config-file mkdocs.yml
+
+      - name: Add .nojekyll file
+        run: touch docs/.nojekyll
 
       - name: Commit & push generated docs
         uses: EndBug/add-and-commit@v9      # lightweight "commit back" action

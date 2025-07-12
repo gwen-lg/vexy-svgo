@@ -2,7 +2,7 @@
 
 //! Macro to generate plugin test cases from fixtures.
 //! This file is intended to be included directly in integration test files.
-extern crate svgn;
+extern crate vexy_svgo_core;
 // This file is intended to be included directly in integration test files.
 
 /// Macro to generate plugin test cases from fixtures.
@@ -20,12 +20,12 @@ macro_rules! generate_plugin_tests {
             #[test]
             fn [<test_ $plugin_name _fixtures>]() {
                 // The fixtures function expects just the plugin name, not the full path
-                let fixtures = svgn::fixtures::load_plugin_fixtures($plugin_name)
+                let fixtures = vexy_svgo_core::fixtures::load_plugin_fixtures($plugin_name)
                     .expect(&format!("Failed to load fixtures for {}", $plugin_name));
 
                 for fixture in fixtures {
                     println!("Running test for {}: {}", $plugin_name, fixture.name);
-                    svgn::test_utils::run_plugin_fixture_test($plugin_name, fixture);
+                    vexy_svgo_core::test_utils::run_plugin_fixture_test($plugin_name, fixture);
                 }
             }
         }

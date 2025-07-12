@@ -2,14 +2,33 @@
 
 PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.toml
 
+## 0. Critical Fixes (IMMEDIATE - Fix Before Next Build)
+
+### 0.1. Fix Test Build Failure
+
+- [ ] Fix `vexy-svgo-test-utils` compilation error: replace 'svgn' crate reference with 'vexy-svgo'
+- [ ] Search for any remaining 'svgn' references in the codebase
+
+### 0.2. Fix Version Inconsistency
+
+- [ ] Align version numbers across all crates (currently 1.5.1 vs 1.0.x mismatch)
+- [ ] Update release script to use consistent versioning
+
+### 0.3. Add Missing LICENSE File
+
+- [ ] Create LICENSE file in repository root (Apache-2.0 as specified in Cargo.toml)
+
 ## 1. Phase 1: Code Cleanup (Immediate)
 
 ### 1.1. Remove unused code
 
-- [ ] Clean up all unused imports
+- [ ] Clean up all unused imports (49 warnings in plugin-sdk)
 - [ ] Remove or implement unused functions
 - [ ] Fix all compiler warnings
 - [ ] Fix unused variable warnings (e.g., `file_path` is never read)
+- [ ] Fix dead code warnings (unused struct fields, methods)
+- [ ] Remove or use `StreamingState::Error` variant in WASM enhanced.rs
+- [ ] Fix unexpected cfg condition for "dynamic-loading" feature
 
 ### 1.2. Fix structural issues
 
