@@ -237,4 +237,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests!(RemoveEmptyAttrsPlugin, "removeEmptyAttrs");
+crate::plugin_fixture_tests!(RemoveEmptyAttrsPlugin, "removeEmptyAttrs");

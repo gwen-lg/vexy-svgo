@@ -675,4 +675,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests!(RemoveHiddenElemsPlugin, "removeHiddenElems");
+crate::plugin_fixture_tests!(RemoveHiddenElemsPlugin, "removeHiddenElems");

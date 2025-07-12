@@ -386,4 +386,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests!(RemoveViewBoxPlugin, "removeViewBox");
+crate::plugin_fixture_tests!(RemoveViewBoxPlugin, "removeViewBox");

@@ -373,4 +373,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests_with_params!(AddAttributesToSVGElementPlugin, "addAttributesToSVGElement");
+crate::plugin_fixture_tests_with_params!(AddAttributesToSVGElementPlugin, "addAttributesToSVGElement");

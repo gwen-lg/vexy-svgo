@@ -628,4 +628,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests!(MinifyStylesPlugin, "minifyStyles");
+crate::plugin_fixture_tests!(MinifyStylesPlugin, "minifyStyles");

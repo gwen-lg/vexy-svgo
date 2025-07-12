@@ -377,4 +377,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests!(RemoveStyleElementPlugin, "removeStyleElement");
+crate::plugin_fixture_tests!(RemoveStyleElementPlugin, "removeStyleElement");

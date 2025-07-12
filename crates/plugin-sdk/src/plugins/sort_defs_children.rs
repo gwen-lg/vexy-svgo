@@ -478,4 +478,4 @@ mod tests {
 
 // Use parameterized testing framework for SVGO fixture tests
 // TODO: Re-enable after fixing XML parsing and text content handling
-// plugin_fixture_tests!(SortDefsChildrenPlugin, "sortDefsChildren");
+// crate::plugin_fixture_tests!(SortDefsChildrenPlugin, "sortDefsChildren");

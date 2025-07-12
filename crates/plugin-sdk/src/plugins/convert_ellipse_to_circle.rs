@@ -417,4 +417,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-plugin_fixture_tests!(ConvertEllipseToCirclePlugin, "convertEllipseToCircle");
+crate::plugin_fixture_tests!(ConvertEllipseToCirclePlugin, "convertEllipseToCircle");
