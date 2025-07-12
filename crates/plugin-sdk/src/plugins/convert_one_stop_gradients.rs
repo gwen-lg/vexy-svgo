@@ -252,7 +252,7 @@ impl ConvertOneStopGradientsPlugin {
 
         // Remove xmlns:xlink if no xlink:href attributes remain
         if !has_xlink {
-            document.root.namespaces.remove("xlink");
+            document.root.namespaces.shift_remove("xlink");
             document.root.remove_attr("xmlns:xlink");
         }
     }

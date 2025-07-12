@@ -219,7 +219,7 @@ impl ConvertShapeToPathPlugin {
             element.attributes.clear();
             element.children.clear();
             // Mark for removal by parent
-            element.name = "".to_string().into();
+            element.name = "".into();
             return;
         }
 
@@ -307,7 +307,7 @@ impl ConvertShapeToPathPlugin {
             Some(r) => r,
             None => return,
         };
-        let ry = match Self::parse_coord(element.attr("ry").map(|s| s.as_str()).unwrap_or("0")) {
+        let ry = match Self::parse_coord(element.attr("ry").map(|s| s.as_ref()).unwrap_or("0")) {
             Some(r) => r,
             None => return,
         };
