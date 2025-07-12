@@ -1,7 +1,6 @@
 // this_file: crates/ffi/src/lib.rs
 
 //! C-compatible FFI bindings for Vexy SVGO
-//!
 //! This module provides a C-compatible API for the Vexy SVGO SVG optimizer,
 //! allowing integration with C, C++, and other languages that can call C functions.
 

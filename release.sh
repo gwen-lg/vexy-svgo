@@ -1,5 +1,5 @@
 #!/bin/bash
-# VEXYSVGO Release Script
+# Vexy SVGO Release Script
 # Usage: ./release.sh [version]
 # Example: ./release.sh 2.1.0
 
@@ -46,7 +46,7 @@ if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
-log_info "Starting VEXYSVGO release process for version $VERSION"
+log_info "Starting Vexy SVGO release process for version $VERSION"
 
 # Check if we're in the right directory
 if [ ! -f "Cargo.toml" ] || [ ! -d "crates" ]; then

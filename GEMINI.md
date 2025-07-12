@@ -1,5 +1,5 @@
 
-After every iteration, /report and mark completed items as done in @PLAN.md and @TODO.md. Then run `./build.sh` and then check the `./build_logs`. If needed read the @llms.txt code snapshot. Then /work on items from @TODO.md consulting on @PLAN.md. Then review reflect refine revise, and then continue to /work on @PLAN.md and @TODO.md until every single item and issue has been fixed. Iterate iterate iterate! Do not stop, do not ask for confirmation. Work! When you're finishing one task or item, say "Wait, but..." and go on to the next task/item. It’s CRUCIAL that we get to a solution that BUILDS everything correctly!
+After every iteration, /report and mark completed items as done in @PLAN.md and @TODO.md. Then run `./build.sh` and then check the `./build_logs`. If needed read the `./llms.txt` code snapshot. Then /work on items from @TODO.md consulting on @PLAN.md. Then review reflect refine revise, and then continue to /work on @PLAN.md and @TODO.md until every single item and issue has been fixed. Iterate iterate iterate! Do not stop, do not ask for confirmation. Work! When you're finishing one task or item, say "Wait, but..." and go on to the next task/item. It’s CRUCIAL that we get to a solution that BUILDS everything correctly!
 
 # Claude Development Guide for vexy_svgo
 
@@ -284,7 +284,7 @@ Collaborate step-by-step, sharing thoughts and adapting. If errors are found, st
 - Work tirelessly without constant updates when in continuous work mode
 - Only notify when you've completed all `PLAN.md` and `TODO.md` items
 
-## 17. Custom commands: 
+## 17. Custom commands:
 
 When I say "/report", you must: Read all `./TODO.md` and `./PLAN.md` files and analyze recent changes. Document all changes in `./CHANGELOG.md`. From `./TODO.md` and `./PLAN.md` remove things that are done. Make sure that `./PLAN.md` contains a detailed, clear plan that discusses specifics, while `./TODO.md` is its flat simplified itemized `- [ ]`-prefixed representation. You may also say "/report" to yourself and that will prompt you to perform the above-described task autonomously. 
 

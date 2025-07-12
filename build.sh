@@ -24,9 +24,9 @@ echo "Building the vexy_svgo project..."
     cargo fmt --check
 
     echo "Build and verification complete."
-    echo "To run the optimized binary, use: ./target/release/vexy_svgo"
+    echo "To run the optimized binary, use: ./target/release/vexy-svgo"
 
-    # ./target/release/vexy_svgo --help # This will be handled by the new build script
+    # ./target/release/vexy-svgo --help # This will be handled by the new build script
 } >build.log.txt 2>&1
 
 echo "build log created in: build.log.txt"

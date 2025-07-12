@@ -57,10 +57,10 @@ case "$OS_TYPE" in
         rustup target add "$TARGET" || true # Add target if not already added
         cd "$CARGO_DIR"
         cargo build --release --target "$TARGET" -p vexy_svgo-cli
-        cp "target/$TARGET/release/vexy_svgo" "$DIST_DIR/vexy_svgo-linux-$ARCH_TYPE"
-        chmod +x "$DIST_DIR/vexy_svgo-linux-$ARCH_TYPE"
+        cp "target/$TARGET/release/vexy-svgo" "$DIST_DIR/vexy-svgo-linux-$ARCH_TYPE"
+        chmod +x "$DIST_DIR/vexy-svgo-linux-$ARCH_TYPE"
         log_info "Stripping binary..."
-        strip "$DIST_DIR/vexy_svgo-linux-$ARCH_TYPE" || log_warn "strip command not found, skipping binary stripping."
+        strip "$DIST_DIR/vexy-svgo-linux-$ARCH_TYPE" || log_warn "strip command not found, skipping binary stripping."
         ;;
     Darwin*)
         log_info "Building for macOS (universal binary)..."
@@ -71,13 +71,13 @@ case "$OS_TYPE" in
         cargo build --release --target aarch64-apple-darwin -p vexy_svgo-cli
         log_info "Creating universal binary..."
         lipo -create \
-            "$PROJECT_ROOT/target/x86_64-apple-darwin/release/vexy_svgo" \
-            "$PROJECT_ROOT/target/aarch64-apple-darwin/release/vexy_svgo" \
-            -output "$DIST_DIR/vexy_svgo-macos-universal"
-        chmod +x "$DIST_DIR/vexy_svgo-macos-universal"
+            "$PROJECT_ROOT/target/x86_64-apple-darwin/release/vexy-svgo" \
+            "$PROJECT_ROOT/target/aarch64-apple-darwin/release/vexy-svgo" \
+            -output "$DIST_DIR/vexy-svgo-macos-universal"
+        chmod +x "$DIST_DIR/vexy-svgo-macos-universal"
         log_info "Verifying universal binary..."
-        file "$DIST_DIR/vexy_svgo-macos-universal"
-        lipo -info "$DIST_DIR/vexy_svgo-macos-universal"
+        file "$DIST_DIR/vexy-svgo-macos-universal"
+        lipo -info "$DIST_DIR/vexy-svgo-macos-universal"
         ;;
     CYGWIN*|MINGW32*|MSYS*|MINGW64*)
         log_info "Building for Windows..."
@@ -91,7 +91,7 @@ case "$OS_TYPE" in
         rustup target add "$TARGET" || true
         cd "$CARGO_DIR"
         cargo build --release --target "$TARGET" -p vexy_svgo-cli
-        cp "target/$TARGET/release/vexy_svgo.exe" "$DIST_DIR/vexy_svgo-windows-$ARCH_TYPE.exe"
+        cp "target/$TARGET/release/vexy-svgo.exe" "$DIST_DIR/vexy-svgo-windows-$ARCH_TYPE.exe"
         ;;
     *)
         log_error "Unsupported operating system: $OS_TYPE"
@@ -106,11 +106,11 @@ log_info "Built version: $VERSION"
 log_info "Creating archives..."
 cd "$DIST_DIR"
 if [[ "$OS_TYPE" == "Linux"* ]]; then
-    tar -czf "vexy_svgo-$VERSION-linux-$ARCH_TYPE.tar.gz" "vexy_svgo-linux-$ARCH_TYPE"
+    tar -czf "vexy-svgo-$VERSION-linux-$ARCH_TYPE.tar.gz" "vexy-svgo-linux-$ARCH_TYPE"
 elif [[ "$OS_TYPE" == "Darwin"* ]]; then
-    tar -czf "vexy_svgo-$VERSION-macos-universal.tar.gz" "vexy_svgo-macos-universal"
+    tar -czf "vexy-svgo-$VERSION-macos-universal.tar.gz" "vexy-svgo-macos-universal"
 elif [[ "$OS_TYPE" == "CYGWIN"* || "$OS_TYPE" == "MINGW32"* || "$OS_TYPE" == "MSYS"* || "$OS_TYPE" == "MINGW64"* ]]; then
-    zip "vexy_svgo-$VERSION-windows-$ARCH_TYPE.zip" "vexy_svgo-$ARCH_TYPE.exe"
+    zip "vexy-svgo-$VERSION-windows-$ARCH_TYPE.zip" "vexy-svgo-windows-$ARCH_TYPE.exe"
 fi
 cd "$PROJECT_ROOT"
 

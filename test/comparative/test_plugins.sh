@@ -1,5 +1,5 @@
 #!/bin/bash
-# Plugin-specific test runner for SVGO vs VEXYSVGO comparison
+# Plugin-specific test runner for SVGO vs Vexy SVGO comparison
 # Tests individual plugins against specific test cases
 
 set -e
@@ -78,7 +78,7 @@ info() {
 usage() {
     echo "Usage: $0 [OPTIONS] [PLUGIN]"
     echo ""
-    echo "Test individual SVGO/VEXYSVGO plugins"
+    echo "Test individual SVGO/Vexy SVGO plugins"
     echo ""
     echo "OPTIONS:"
     echo "  -h, --help          Show this help message"
@@ -205,9 +205,9 @@ test_plugin() {
                 ((passed++))
                 ((different++))
                 
-                # Check if VEXYSVGO is better
-                if grep -q "VEXYSVGO output is.*bytes smaller" "$test_output"; then
-                    info "      → VEXYSVGO improvement detected"
+                # Check if Vexy SVGO is better
+                if grep -q "Vexy SVGO output is.*bytes smaller" "$test_output"; then
+                    info "      → Vexy SVGO improvement detected"
                 fi
             else
                 error "    ✗ Test failed"
