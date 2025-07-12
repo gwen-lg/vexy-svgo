@@ -3,7 +3,7 @@
 
 set -e
 
-echo "Building VEXYSVGO WebAssembly module..."
+echo "Building Vexy SVGO WebAssembly module..."
 
 # Ensure wasm-pack is installed
 if ! command -v wasm-pack &> /dev/null; then
