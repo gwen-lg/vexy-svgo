@@ -2,7 +2,7 @@
 # this_file: docs/developer/index.md
 layout: default
 title: Developer Guide
-nav_order: 4
+nav_order: 5
 description: "APIs, architecture, and contributing to Vexy SVGO"
 has_children: true
 permalink: /developer/

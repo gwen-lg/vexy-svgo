@@ -1,11 +1,11 @@
 ---
-# this_file: docs/guide/index.md
+# this_file: docs/user/index.md
 layout: default
 title: User Guide
-nav_order: 2
-description: "Complete guide to using Vexy SVGO"
+nav_order: 3
+description: "Complete guide to using Vexy SVGO for end users"
 has_children: true
-permalink: /guide/
+permalink: /user/
 ---
 
 # User Guide

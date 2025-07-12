@@ -1,3 +1,12 @@
+---
+# this_file: docs/developer/plugin-migration.md
+layout: default
+title: Plugin Migration Guide
+parent: Developer Guide
+nav_order: 3
+description: "Migrate SVGO plugins to Vexy SVGO Rust implementation"
+---
+
 # Plugin Migration Guide
 
 This guide explains how to migrate existing SVGO plugins to the new vexy_svgo plugin architecture.

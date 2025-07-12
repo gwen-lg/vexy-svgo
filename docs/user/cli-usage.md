@@ -1,5 +1,5 @@
 ---
-# this_file: docs/guide/cli-usage.md
+# this_file: docs/user/cli-usage.md
 layout: default
 title: CLI Usage
 parent: User Guide
@@ -377,8 +377,8 @@ time vexy-svgo input.svg
 
 ## Next Steps
 
-- [Configuration](/guide/configuration/) - Learn about configuration options
-- [Plugins](/guide/plugins/) - Understand available optimizations
+- [Configuration](/user/configuration/) - Learn about configuration options
+- [Plugins](/plugins/) - Understand available optimizations
 - [Interactive Demo](/demo/) - Try optimizations in your browser
 
 ---

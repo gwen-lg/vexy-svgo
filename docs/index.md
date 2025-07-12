@@ -13,7 +13,7 @@ permalink: /
 High-performance SVG optimizer - Native Rust port of SVGO
 {: .fs-6 .fw-300 }
 
-[Get Started Now](/guide/){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Get Started Now](/user/){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
 [Try Demo](/demo/){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
 [View on GitHub](https://github.com/vexyart/vexy-svgo){: .btn .fs-5 .mb-4 .mb-md-0 }
 
@@ -88,10 +88,10 @@ println!("Optimized: {}", result.data);
       <div class="Box-body">
         <p class="mb-3">Getting started with Vexy SVGO CLI and basic usage.</p>
         <nav class="menu">
-          <a href="/guide/" class="menu-item">📖 User Guide</a>
-          <a href="/guide/installation/" class="menu-item">📦 Installation</a>
-          <a href="/guide/cli-usage/" class="menu-item">💻 CLI Usage</a>
-          <a href="/guide/configuration/" class="menu-item">⚙️ Configuration</a>
+          <a href="/user/" class="menu-item">📖 User Guide</a>
+          <a href="/user/installation/" class="menu-item">📦 Installation</a>
+          <a href="/user/cli-usage/" class="menu-item">💻 CLI Usage</a>
+          <a href="/user/configuration/" class="menu-item">⚙️ Configuration</a>
           <a href="/demo/" class="menu-item">🎮 Interactive Demo</a>
         </nav>
       </div>

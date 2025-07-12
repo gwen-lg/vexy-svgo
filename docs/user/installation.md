@@ -1,5 +1,5 @@
 ---
-# this_file: docs/guide/installation.md
+# this_file: docs/user/installation.md
 layout: default
 title: Installation
 parent: User Guide
@@ -254,8 +254,8 @@ rustc --version  # Should be 1.70 or newer
 
 Once installed, continue to:
 
-- [CLI Usage](/guide/cli-usage/) - Learn command-line usage
-- [Configuration](/guide/configuration/) - Set up custom configurations
+- [CLI Usage](/user/cli-usage/) - Learn command-line usage
+- [Configuration](/user/configuration/) - Set up custom configurations
 - [Interactive Demo](/demo/) - Try optimization in your browser
 
 ---
