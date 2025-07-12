@@ -448,7 +448,7 @@ impl ConvertColorsPlugin {
         // Convert color name keyword to long hex
         if self.config.names2hex {
             let color_name = val.to_lowercase();
-            if let Some(hex_value) = Self::color_names().get(color_name.as_str()) {
+            if let Some(hex_value) = Self::color_names().get(color_name.as_ref()) {
                 val = hex_value.to_string();
             }
         }
