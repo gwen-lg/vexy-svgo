@@ -1,12 +1,15 @@
 // this_file: crates/core/tests/parallel_test.rs
 
+#[cfg(feature = "parallel")]
 use vexy_svgo_core::{
     ast::{Document, Element, Node},
     parallel::{ParallelConfig, process_independent_groups, should_parallelize},
     OptimizeOptions,
 };
+#[cfg(feature = "parallel")]
 use std::sync::Arc;
 
+#[cfg(feature = "parallel")]
 #[test]
 fn test_parallel_detection() {
     let mut doc = Document::new();
@@ -27,6 +30,7 @@ fn test_parallel_detection() {
     assert!(should_parallelize(&doc, large_size, &config));
 }
 
+#[cfg(feature = "parallel")]
 #[test]
 fn test_parallel_processing() {
     let mut parent = Element::new("g");
@@ -66,6 +70,7 @@ fn test_parallel_processing() {
     }
 }
 
+#[cfg(feature = "parallel")]
 #[test]
 fn test_parallel_with_dependencies() {
     let mut parent = Element::new("g");
@@ -94,6 +99,7 @@ fn test_parallel_with_dependencies() {
     assert!(result > 0);
 }
 
+#[cfg(feature = "parallel")]
 #[test]
 fn test_parallel_config_in_options() {
     let config = vexy_svgo_core::Config::default();

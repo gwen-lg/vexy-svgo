@@ -2,8 +2,8 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::main::Parser;
-    use crate::ast::Node;
+    use vexy_svgo_core::parser::main::Parser;
+    use vexy_svgo_core::ast::Node;
 
     #[test]
     fn test_parse_simple_svg() {

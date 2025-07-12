@@ -381,7 +381,7 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
 }
 
 /// Get list of available plugins with metadata
-#[wasm_bindgen(js_name = getPlugins)]
+#[wasm_bindgen(js_name = getPluginsWithMetadata)]
 pub fn get_plugins() -> Result<Vec<JsValue>, JsError> {
     let registry = create_default_registry();
     let plugins: Vec<JsValue> = registry

@@ -1,28 +1,6 @@
 # Vexy SVGO TODO List - Linearized Action Items
 
-## Phase 0: Build and Packaging Issues (High Priority)
-
-### 0.1. Fix WASM compilation
-
-- [X] Update imports from `parse_svg_string` to `parse_svg`
-- [X] Add missing `web-sys` dependency
-- [X] Fix Config API changes (remove `floatPrecision`)
-- [X] Fix wasm-bindgen String handling
-- [X] Update Plugin Registry API calls
-
-### 0.2. Complete platform deliverables
-
-- [X] Windows: .zip with CLI executable
-- [X] Linux: .tar.gz with CLI executable
-- [X] Set up cross-compilation toolchains
-
-## Phase 0.5: Naming Unification (Remaining Tasks)
-
-- [X] Update package manager instructions: Ensure `brew install vexy-svgo` and `choco install vexy-svgo` are used in `README.md`
-- [X] Update project root check in `release.sh`: Change `vexy_svgo` to `vexy-svgo`
-- [X] Update `docs/plugin-development.md`: Change `vexy_svgo` in clone/build/mkdir commands to `vexy-svgo`
-
-## Phase 1: Code Cleanup (Immediate)
+## 1. Phase 1: Code Cleanup (Immediate)
 
 ### 1.1. Remove unused code
 
@@ -44,7 +22,7 @@
 - [ ] Add context to errors for better debugging
 - [ ] Implement `std::error::Error` trait for all error types
 
-## Phase 2: Feature Completion (Short-term)
+## 2. Phase 2: Feature Completion (Short-term)
 
 ### 2.1. Complete parallel processing
 
@@ -68,7 +46,7 @@
 - [ ] Add verbose logging options
 - [ ] Add `--dry-run` option
 
-## Phase 3: Testing & Documentation (Medium-term)
+## 3. Phase 3: Testing & Documentation (Medium-term)
 
 ### 3.1. Comprehensive testing
 
@@ -92,7 +70,7 @@
 - [ ] Integration examples (Node.js, Python, etc.)
 - [ ] Create WebAssembly usage examples
 
-## Phase 4: Performance Optimization (Long-term)
+## 4. Phase 4: Performance Optimization (Long-term)
 
 ### 4.1. Memory optimization
 
@@ -115,44 +93,44 @@
 - [ ] Implement incremental optimization
 - [ ] Add chunked processing for large files
 
-## Technical Debt Items
+## 5. Technical Debt Items
 
-### Build verification
+### 5.1. Build verification
 
 - [ ] Add build verification steps
 - [ ] Create reproducible builds
 
-### Import/Export organization
+### 5.2. Import/Export organization
 
 - [ ] Review and reorganize public API exports
 - [ ] Ensure consistent naming conventions
 - [ ] Clean up module structure
 - [ ] Remove duplicate code
 
-### Configuration system
+### 5.3. Configuration system
 
 - [ ] Validate configuration loading and merging
 - [ ] Add configuration schema validation
 - [ ] Support for .svgo.config.js compatibility
 - [ ] Add configuration migration tool
 
-## Quality Assurance
+## 6. Quality Assurance
 
-### Continuous Integration
+### 6.1. Continuous Integration
 
 - [ ] Set up GitHub Actions for automated testing
 - [ ] Add coverage reporting (with codecov/coveralls)
 - [ ] Implement automated benchmarking
 - [ ] Add cross-platform testing
 
-### Code quality tools
+### 6.2. Code quality tools
 
 - [ ] Configure clippy with strict lints
 - [ ] Add rustfmt configuration (with project style)
 - [ ] Set up pre-commit hooks
 - [ ] Add commit message linting
 
-### Release process
+### 6.3. Release process
 
 - [ ] Automated version bumping
 - [ ] Changelog generation
@@ -161,7 +139,7 @@
 - [ ] Create Homebrew formula
 - [ ] Create npm package wrapper
 
-## Nice-to-Have Features
+## 7. Nice-to-Have Features
 
 - [ ] Add SVG validation before optimization
 - [ ] Implement SVG diff tool
