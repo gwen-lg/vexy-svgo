@@ -1,6 +1,6 @@
 // this_file: crates/plugin-sdk/src/test_framework.rs
 
-//! Comprehensive testing framework for Vexy SVGO plugins
+//! Comprehensive testing framework for SVGN plugins
 //!
 //! This module provides utilities for testing plugins including:
 //! - Unit testing helpers
@@ -253,54 +253,54 @@ impl PluginTestFramework {
                     durations.push(start_time.elapsed());
                 }
                 Err(_) => {
-                    // Record failed execution but donPROTECTED_34_ PROTECTED_35_static str {
-            "testPlugin"
-        }
-
-        fn description(&self) -> &'static str {
-            PROTECTED_25_
-        }
-
-        fn apply(&self, _document: &mut Document) -> anyhow::Result<()> {
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_framework_basic() {
-        let framework = PluginTestFramework::new();
-        let mut plugin = TestPlugin::default();
-        // Use self-closing tag as expected output since that's what the stringifier produces
-        let test_case = TestCase::new("basic", "<svg></svg>", "<svg/>");
-        
-        let result = framework.test_plugin(&mut plugin, &test_case);
-        if !result.passed {
-            if let Some(actual) = &result.actual_output {
-                println!("Expected: '<svg/>'");
-                println!("Actual: '{}'", actual);
+                    // Record failed execution but don't include timing
+                }
             }
         }
-        assert!(result.passed);
+
+        if durations.is_empty() {
+            return BenchmarkResult {
+                iterations,
+                successful_runs: 0,
+                average_duration: Duration::ZERO,
+                min_duration: Duration::ZERO,
+                max_duration: Duration::ZERO,
+                std_deviation: Duration::ZERO,
+            };
+        }
+
+        let total_time: Duration = durations.iter().sum();
+        let average_duration = total_time / durations.len() as u32;
+        let min_duration = *durations.iter().min().unwrap();
+        let max_duration = *durations.iter().max().unwrap();
+
+        // Calculate standard deviation
+        let variance: f64 = durations
+            .iter()
+            .map(|d| {
+                let diff = d.as_nanos() as f64 - average_duration.as_nanos() as f64;
+                diff * diff
+            })
+            .sum::<f64>() / durations.len() as f64;
+        
+        let std_deviation = Duration::from_nanos(variance.sqrt() as u64);
+
+        BenchmarkResult {
+            iterations,
+            successful_runs,
+            average_duration,
+            min_duration,
+            max_duration,
+            std_deviation,
+        }
     }
 
-    #[test]
-    fn test_svg_normalization() {
-        let svg1 = "<svg>\n  <rect x=\"0\" y=\"0\"/>\n</svg>";
-        let svg2 = "<svg><rect x=\"0\" y=\"0\"/></svg>";
-        
-        assert_eq!(normalize_svg(svg1), normalize_svg(svg2));
-    }
-
-    #[test]
-    fn test_benchmark() {
-        let framework = PluginTestFramework::new();
-        let plugin = TestPlugin::default();
-        let test_svg = "<svg><rect/></svg>";
-        
-        let result = framework.benchmark_plugin(plugin, test_svg, 10);
-        assert_eq!(result.iterations, 10);
-    }
-}
+    /// Test plugin compatibility with SVGO
+    pub fn test_svgo_compatibility<P: Plugin>(&self, mut plugin: P, svgo_test_data: &SvgoTestData) -> TestSuiteResult {
+        let test_cases: Vec<TestCase> = svgo_test_data.cases
+            .iter()
+            .map(|case| TestCase {
+                name: case.name.clone(),
                 input: case.input.clone(),
                 expected: case.output.clone(),
                 config: case.config.clone(),
@@ -566,7 +566,7 @@ mod tests {
 
     impl Plugin for TestPlugin {
         fn name(&self) -> &'static str {
-            PROTECTED_33_
+            "testPlugin"
         }
 
         fn description(&self) -> &'static str {

@@ -104,7 +104,7 @@ pub(crate) fn find_references(attr_name: &str, attr_value: &str) -> Vec<String> 
                 ids.push(id.as_str().to_string());
             }
         }
-        // Check url(PROTECTED_18_) and url(PROTECTED_76_) patterns
+        // Check url("#id") and url('#id') patterns
         for captures in REG_REFERENCES_URL_QUOTED.captures_iter(attr_value) {
             if let Some(id) = captures.get(1) {
                 ids.push(id.as_str().to_string());
@@ -143,14 +143,14 @@ pub(crate) fn update_reference_value(value: &str, id_mappings: &HashMap<String, 
         })
         .to_string();
 
-    // Update url(PROTECTED_21_) and url(PROTECTED_77_) patterns
+    // Update url("#id") and url('#id') patterns
     result = REG_REFERENCES_URL_QUOTED
         .replace_all(&result, |caps: &regex::Captures| {
             if let Some(id) = caps.get(1) {
                 if let Some(new_id) = id_mappings.get(id.as_str()) {
                     // Preserve the quote style
                     let full_match = &caps[0];
-                    let quote = if full_match.contains('PROTECTED_22_' } else { '\'' };
+                    let quote = if full_match.contains('"') { '"' } else { '\'' };
                     return format!("url({}#{}{})", quote, new_id, quote);
                 }
             }

@@ -3,23 +3,57 @@
 //! Remove empty attributes plugin implementation
 //!
 //! This plugin demonstrates the new visitor-based architecture for removing
-//! empty attributes from SVG elements, following the same pattern as svgoPROTECTED_55_static str {
+//! empty attributes from SVG elements, following the same pattern as svgo's
+//! removeEmptyAttrs plugin.
+
+use crate::Plugin;
+use anyhow::Result;
+use vexy_svgo_core::ast::{Document, Element};
+use vexy_svgo_core::visitor::Visitor;
+
+/// Plugin that removes empty attributes from SVG elements
+#[derive(Default)]
+pub struct RemoveEmptyAttrsPlugin {
+    preserve_class: bool,
+    preserve_id: bool,
+}
+
+impl RemoveEmptyAttrsPlugin {
+    /// Create a new RemoveEmptyAttrsPlugin with default settings
+    pub fn new() -> Self {
+        Self {
+            preserve_class: false,
+            preserve_id: false,
+        }
+    }
+
+    /// Create plugin with specific preservation settings
+    pub fn with_preserve_settings(preserve_class: bool, preserve_id: bool) -> Self {
+        Self {
+            preserve_class,
+            preserve_id,
+        }
+    }
+}
+
+impl Plugin for RemoveEmptyAttrsPlugin {
+    fn name(&self) -> &'static str {
         "removeEmptyAttrs"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_1_
+        "Remove empty attributes from SVG elements"
     }
 
     fn validate_params(&self, params: &serde_json::Value) -> anyhow::Result<()> {
-        if let Some(preserve_class) = params.get(PROTECTED_2_) {
+        if let Some(preserve_class) = params.get("preserveClass") {
             if !preserve_class.is_boolean() {
-                return Err(anyhow::anyhow!(PROTECTED_3_));
+                return Err(anyhow::anyhow!("preserveClass must be a boolean"));
             }
         }
-        if let Some(preserve_id) = params.get(PROTECTED_4_) {
+        if let Some(preserve_id) = params.get("preserveId") {
             if !preserve_id.is_boolean() {
-                return Err(anyhow::anyhow!(PROTECTED_5_));
+                return Err(anyhow::anyhow!("preserveId must be a boolean"));
             }
         }
         Ok(())
@@ -48,11 +82,11 @@ impl EmptyAttrRemovalVisitor {
 
     fn should_preserve_attribute(&self, name: &str) -> bool {
         match name {
-            PROTECTED_6_ => self.preserve_class,
-            PROTECTED_7_ => self.preserve_id,
+            "class" => self.preserve_class,
+            "id" => self.preserve_id,
             // Conditional processing attributes should always be preserved when empty
             // as they have semantic meaning (empty = false, missing = true)
-            PROTECTED_8_ | PROTECTED_9_ | PROTECTED_10_ => true,
+            "requiredExtensions" | "requiredFeatures" | "systemLanguage" => true,
             _ => false,
         }
     }
@@ -170,40 +204,6 @@ mod tests {
         assert!(doc.root.attributes.contains_key("fill")); // Non-empty, should remain
         assert!(!doc.root.attributes.contains_key("stroke")); // Empty, should be removed
         assert!(!doc.root.attributes.contains_key("opacity")); // Whitespace only, should be removed
-        assert!(!doc.root.attributes.contains_key("class")); // Empty and not preserved, should be removed
-    }
-
-    #[test]
-    fn test_plugin_apply_with_preservation() {
-        let plugin = RemoveEmptyAttrsPlugin::with_preserve_settings(true, true);
-        let mut doc = Document::new();
-
-        // Add attributes to root element for testing
-        doc.root
-            .attributes
-            .insert("fill".to_string(), "red".to_string());
-        doc.root
-            .attributes
-            .insert("stroke".to_string(), "".to_string());
-        doc.root
-            .attributes
-            .insert("class".to_string(), "".to_string());
-        doc.root.attributes.insert("id".to_string(), "".to_string());
-
-        // Apply the plugin
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_ok());
-
-        // Check preservation behavior
-        assert!(doc.root.attributes.contains_key("fill")); // Non-empty, should remain
-        assert!(!doc.root.attributes.contains_key("stroke")); // Empty and not preserved, should be removed
-        assert!(doc.root.attributes.contains_key("class")); // Empty but preserved, should remain
-        assert!(doc.root.attributes.contains_key("id")); // Empty but preserved, should remain
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveEmptyAttrsPlugin, "removeEmptyAttrs");
         assert!(!doc.root.attributes.contains_key("class")); // Empty and not preserved, should be removed
     }
 

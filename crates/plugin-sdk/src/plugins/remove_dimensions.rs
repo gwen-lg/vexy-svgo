@@ -3,7 +3,10 @@
 //! Removes width and height in presence of viewBox (opposite to removeViewBox)
 //!
 //! This plugin removes the width and height attributes from the top-level <svg> element
-//! and ensures a viewBox attribute is present. If viewBox doesnPROTECTED_102_s removeDimensions plugin
+//! and ensures a viewBox attribute is present. If viewBox doesn't exist, it creates one
+//! from the width and height values before removing them.
+//!
+//! Reference: SVGO's removeDimensions plugin
 
 use crate::Plugin;
 use anyhow::Result;
@@ -80,12 +83,33 @@ impl RemoveDimensionsPlugin {
     }
 
     fn process_element(&self, element: &mut Element) {
-        // Process this element if itPROTECTED_103_static str {
+        // Process this element if it's an SVG element
+        self.process_svg_element(element);
+
+        // Process children recursively
+        let mut i = 0;
+        while i < element.children.len() {
+            if let Node::Element(child) = &mut element.children[i] {
+                self.process_element(child);
+            }
+            i += 1;
+        }
+    }
+}
+
+impl Default for RemoveDimensionsPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveDimensionsPlugin {
+    fn name(&self) -> &'static str {
         "removeDimensions"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_13_
+        "removes width and height in presence of viewBox (opposite to removeViewBox)"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -324,30 +348,6 @@ mod tests {
         let result = plugin.apply(&mut doc);
         assert!(result.is_ok());
 
-        // Should still create viewBox even with zero dimensions
-        assert!(!doc.root.has_attr("width"));
-        assert!(!doc.root.has_attr("height"));
-        assert_eq!(doc.root.attr("viewBox").map(|s| s.as_str()), Some("0 0 0 0"));
-    }
-
-    #[test]
-    fn test_no_dimensions_no_change() {
-        let plugin = RemoveDimensionsPlugin::new();
-        let mut doc = create_test_document();
-
-        // SVG with no width, height, or viewBox
-        let original_count = doc.root.attributes.len();
-
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_ok());
-
-        // Should not add any attributes
-        assert_eq!(doc.root.attributes.len(), original_count);
-        assert!(!doc.root.has_attr("width"));
-        assert!(!doc.root.has_attr("height"));
-        assert!(!doc.root.has_attr("viewBox"));
-    }
-}
         // Should still create viewBox even with zero dimensions
         assert!(!doc.root.has_attr("width"));
         assert!(!doc.root.has_attr("height"));

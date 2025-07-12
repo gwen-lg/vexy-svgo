@@ -166,7 +166,7 @@ impl Default for ConvertStyleToAttrsPlugin {
 
 impl Plugin for ConvertStyleToAttrsPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_62_
+        "convertStyleToAttrs"
     }
 
     fn description(&self) -> &'static str {
@@ -237,7 +237,9 @@ impl ConvertStyleToAttrsVisitor {
                                 // Keep in style if it has !important and keepImportant is true
                                 remaining_styles.push(format!("{}: {} !important", property, value));
                             }
-                            // Otherwise drop it entirely (donPROTECTED_153_t already exist
+                            // Otherwise drop it entirely (don't convert to attribute)
+                        } else {
+                            // No !important, convert to attribute if doesn't already exist
                             if !element.attributes.contains_key(property) {
                                 new_attributes.push((property.to_string(), value.to_string()));
                             } else {
@@ -515,7 +517,5 @@ mod tests {
     }
 }
 
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(ConvertStyleToAttrsPlugin, "convertStyleToAttrs");
 // Use parameterized testing framework for SVGO fixture tests
 crate::plugin_fixture_tests!(ConvertStyleToAttrsPlugin, "convertStyleToAttrs");

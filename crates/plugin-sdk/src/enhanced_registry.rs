@@ -25,7 +25,7 @@ pub struct PluginMetadata {
     pub name: String,
     /// Human-readable description
     pub description: String,
-    /// Semantic version (e.g., PROTECTED_0_)
+    /// Semantic version (e.g., "1.2.3")
     pub version: String,
     /// Plugin author
     pub author: Option<String>,
@@ -33,8 +33,8 @@ pub struct PluginMetadata {
     pub tags: Vec<String>,
     /// Whether this is an experimental plugin
     pub experimental: bool,
-    /// Minimum Vexy SVGO version required
-    pub min_svgn_version: Option<String>,
+    /// Minimum SVGN version required
+    pub min_vexy_svgo_version: Option<String>,
     /// Plugin dependencies
     pub dependencies: Vec<PluginDependency>,
     /// Plugin capabilities
@@ -266,7 +266,44 @@ impl EnhancedPluginRegistry {
             let cache = self.cache.read().unwrap();
             if let Some(cached_plugin) = cache.get(&resolved_name) {
                 // Clone the plugin (assuming plugins implement Clone or provide a clone method)
-                // For now, wePROTECTED_14_t have a configure method
+                // For now, we'll create a new instance since cloning plugins is complex
+            }
+        }
+        
+        // Get factory and create plugin
+        let factory = {
+            let factories = self.factories.read().unwrap();
+            factories.get(&resolved_name)
+                .ok_or_else(|| anyhow!("Plugin '{}' not found", name))?
+                .clone()
+        };
+        
+        let start_time = Instant::now();
+        let plugin_result = factory.create();
+        let creation_time = start_time.elapsed();
+        
+        // Record statistics
+        if self.config.collect_stats {
+            let mut stats = self.stats.write().unwrap();
+            if let Some(plugin_stats) = stats.get_mut(&resolved_name) {
+                plugin_stats.record_execution(creation_time, plugin_result.is_ok());
+            }
+        }
+        
+        let plugin = plugin_result?;
+        
+        // Add to cache if enabled
+        if self.config.enable_caching {
+            self.add_to_cache(resolved_name.to_string(), plugin.as_ref());
+        }
+        
+        Ok(plugin)
+    }
+
+    /// Create a configured plugin instance
+    pub fn create_configured_plugin(&self, name: &str, _config: Value) -> Result<Box<dyn Plugin>> {
+        // For now, just create the plugin without configuration
+        // since the Plugin trait doesn't have a configure method
         self.create_plugin(name)
     }
 
@@ -512,43 +549,6 @@ impl EnhancedRegistryBuilder {
     pub fn with_caching(mut self, enabled: bool) -> Self {
         self.config.enable_caching = enabled;
         self
-    }
-
-    /// Enable statistics collection
-    pub fn with_stats(mut self, enabled: bool) -> Self {
-        self.config.collect_stats = enabled;
-        self
-    }
-
-    /// Allow experimental plugins
-    pub fn allow_experimental(mut self, allowed: bool) -> Self {
-        self.config.allow_experimental = allowed;
-        self
-    }
-
-    /// Build the registry
-    pub fn build(self) -> Result<EnhancedPluginRegistry> {
-        let registry = EnhancedPluginRegistry::new(self.config);
-        
-        // Register all factories
-        for factory in self.factories {
-            registry.register_factory(factory)?;
-        }
-        
-        // Register all aliases
-        for (alias, plugin_name) in self.aliases {
-            registry.register_alias(&alias, &plugin_name)?;
-        }
-        
-        Ok(registry)
-    }
-}
-
-impl Default for EnhancedRegistryBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
     }
 
     /// Enable statistics collection

@@ -64,7 +64,7 @@ impl Default for MergeStylesPlugin {
 
 impl Plugin for MergeStylesPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_2_
+        "mergeStyles"
     }
 
     fn description(&self) -> &'static str {

@@ -3,14 +3,127 @@
 //! Remove comments plugin implementation
 //!
 //! This plugin removes comments from SVG documents while optionally preserving
-//! legal comments (those starting with PROTECTED_67_) if configured.
+//! legal comments (those starting with '!') if configured.
 //!
-//! Reference: SVGOPROTECTED_68_!PROTECTED_69_!PROTECTED_70_!PROTECTED_71_static str {
+//! Reference: SVGO's removeComments plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration for the remove comments plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveCommentsConfig {
+    /// Whether to preserve legal comments (those starting with '!')
+    #[serde(default = "default_preserve_patterns")]
+    pub preserve_patterns: bool,
+}
+
+fn default_preserve_patterns() -> bool {
+    true
+}
+
+impl Default for RemoveCommentsConfig {
+    fn default() -> Self {
+        Self {
+            preserve_patterns: default_preserve_patterns(),
+        }
+    }
+}
+
+/// Plugin that removes comments from SVG documents
+#[derive(Clone)]
+pub struct RemoveCommentsPlugin {
+    config: RemoveCommentsConfig,
+}
+
+impl RemoveCommentsPlugin {
+    /// Create a new RemoveCommentsPlugin
+    pub fn new() -> Self {
+        Self {
+            config: RemoveCommentsConfig::default(),
+        }
+    }
+
+    /// Create plugin with specific configuration
+    pub fn with_config(config: RemoveCommentsConfig) -> Self {
+        Self { config }
+    }
+
+    /// Create plugin with preserve_patterns setting
+    pub fn with_preserve_patterns(preserve_patterns: bool) -> Self {
+        Self {
+            config: RemoveCommentsConfig { preserve_patterns },
+        }
+    }
+
+    /// Parse configuration from JSON
+    fn parse_config(params: &Value) -> Result<RemoveCommentsConfig> {
+        if params.is_null() {
+            Ok(RemoveCommentsConfig::default())
+        } else {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
+        }
+    }
+
+    /// Check if a comment should be preserved (legal comments start with '!')
+    fn should_keep_comment(&self, comment: &str) -> bool {
+        self.config.preserve_patterns && comment.trim_start().starts_with('!')
+    }
+
+    /// Remove comments from a list of nodes
+    fn remove_comments_from_nodes(&self, nodes: &mut Vec<Node>) {
+        nodes.retain(|node| match node {
+            Node::Comment(comment) => self.should_keep_comment(comment),
+            _ => true,
+        });
+    }
+
+    /// Recursively remove comments from an element and its children
+    fn remove_comments_recursive(&self, element: &mut Element) {
+        // Remove comment nodes from children
+        self.remove_comments_from_nodes(&mut element.children);
+
+        // Clean up whitespace-only text nodes if element now only has element children
+        let has_element_children = element.children.iter().any(|c| c.is_element());
+        let has_meaningful_text = element
+            .children
+            .iter()
+            .any(|c| matches!(c, Node::Text(text) if !text.trim().is_empty()));
+
+        if has_element_children && !has_meaningful_text {
+            // Remove whitespace-only text nodes
+            element
+                .children
+                .retain(|child| !matches!(child, Node::Text(text) if text.trim().is_empty()));
+        }
+
+        // Recursively process child elements
+        for child in &mut element.children {
+            if let Node::Element(elem) = child {
+                self.remove_comments_recursive(elem);
+            }
+        }
+    }
+}
+
+impl Default for RemoveCommentsPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveCommentsPlugin {
+    fn name(&self) -> &'static str {
         "removeComments"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_4_
+        "removes comments"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -228,119 +341,6 @@ mod tests {
             }
         }
     }
-
-    #[test]
-    fn test_removes_prologue_and_epilogue_comments() {
-        let plugin = RemoveCommentsPlugin::new();
-        let mut doc = Document::new();
-
-        // Add comments to prologue and epilogue
-        doc.prologue
-            .push(Node::Comment("Prologue comment".to_string()));
-        doc.prologue
-            .push(Node::Comment("! Legal prologue".to_string()));
-
-        doc.epilogue
-            .push(Node::Comment("Epilogue comment".to_string()));
-        doc.epilogue
-            .push(Node::Comment("! Legal epilogue".to_string()));
-
-        let svg = create_element("svg");
-        doc.root = svg;
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that only legal comments remain
-        assert_eq!(doc.prologue.len(), 1);
-        if let Node::Comment(comment) = &doc.prologue[0] {
-            assert_eq!(comment, "! Legal prologue");
-        }
-
-        assert_eq!(doc.epilogue.len(), 1);
-        if let Node::Comment(comment) = &doc.epilogue[0] {
-            assert_eq!(comment, "! Legal epilogue");
-        }
-    }
-
-    #[test]
-    fn test_cleans_whitespace_only_text() {
-        let plugin = RemoveCommentsPlugin::new();
-        let mut doc = Document::new();
-
-        // Create SVG with comments and whitespace
-        let mut svg = create_element("svg");
-        svg.children.push(Node::Text("\n    ".to_string()));
-        svg.children.push(Node::Comment("Comment".to_string()));
-        svg.children.push(Node::Text("\n    ".to_string()));
-        svg.children.push(Node::Element(create_element("rect")));
-        svg.children.push(Node::Text("\n".to_string()));
-
-        doc.root = svg;
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that whitespace-only text nodes were cleaned up
-        assert_eq!(doc.root.children.len(), 1);
-        if let Node::Element(elem) = &doc.root.children[0] {
-            assert_eq!(elem.name, "rect");
-        }
-    }
-
-    #[test]
-    fn test_preserves_meaningful_text() {
-        let plugin = RemoveCommentsPlugin::new();
-        let mut doc = Document::new();
-
-        // Create SVG with meaningful text
-        let mut svg = create_element("svg");
-        let mut text_elem = create_element("text");
-        text_elem.children.push(Node::Text("Hello".to_string()));
-        text_elem
-            .children
-            .push(Node::Comment("Comment".to_string()));
-        text_elem.children.push(Node::Text(" World".to_string()));
-
-        svg.children.push(Node::Element(text_elem));
-
-        doc.root = svg;
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that meaningful text was preserved
-        if let Node::Element(text_elem) = &doc.root.children[0] {
-            assert_eq!(text_elem.name, "text");
-            assert_eq!(text_elem.children.len(), 2);
-            if let Node::Text(text) = &text_elem.children[0] {
-                assert_eq!(text, "Hello");
-            }
-            if let Node::Text(text) = &text_elem.children[1] {
-                assert_eq!(text, " World");
-            }
-        }
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        // Default config
-        let config = RemoveCommentsPlugin::parse_config(&json!(null)).unwrap();
-        assert!(config.preserve_patterns);
-
-        // Explicit config
-        let config =
-            RemoveCommentsPlugin::parse_config(&json!({"preservePatterns": false})).unwrap();
-        assert!(!config.preserve_patterns);
-
-        let config =
-            RemoveCommentsPlugin::parse_config(&json!({"preservePatterns": true})).unwrap();
-        assert!(config.preserve_patterns);
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveCommentsPlugin, "removeComments");
 
     #[test]
     fn test_removes_prologue_and_epilogue_comments() {

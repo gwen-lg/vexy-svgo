@@ -82,7 +82,7 @@ pub enum PluginAction {
         /// Update all plugins
         #[arg(long)]
         all: bool,
-        /// DonPROTECTED_65_t prompt for confirmation
+        /// Don't prompt for confirmation
         #[arg(long)]
         yes: bool,
     },
@@ -159,7 +159,7 @@ pub struct PluginInfo {
     pub repository: Option<String>,
     pub keywords: Vec<String>,
     pub categories: Vec<String>,
-    pub svgn_version: String,
+    pub vexy_svgo_version: String,
     pub dependencies: HashMap<String, String>,
     pub published_at: String,
     pub downloads: u64,
@@ -204,7 +204,7 @@ impl PluginMarketplace {
     pub fn new(config: CliConfig) -> Self {
         let client = Client::builder()
             .timeout(Duration::from_secs(30))
-            .user_agent(format!("svgn-cli/{}", env!("CARGO_PKG_VERSION")))
+            .user_agent(format!("vexy_svgo-cli/{}", env!("CARGO_PKG_VERSION")))
             .build()
             .expect("Failed to create HTTP client");
 
@@ -450,7 +450,7 @@ impl PluginMarketplace {
     fn get_default_registry_url(&self) -> Result<String> {
         // For now, use the default registry URL
         // In the future, this would check the config for configured registries
-        Ok("https://plugins.svgn.org".to_string())
+        Ok("https://plugins.vexy_svgo.org".to_string())
     }
 
     fn get_plugins_directory(&self) -> Result<PathBuf> {
@@ -470,7 +470,7 @@ impl PluginMarketplace {
 
     fn load_installed_plugin_info(&self, name: &str) -> Result<InstalledPlugin> {
         let plugin_dir = self.get_plugin_directory(name)?;
-        let metadata_file = plugin_dir.join(".svgn-plugin.json");
+        let metadata_file = plugin_dir.join(".vexy_svgo-plugin.json");
         
         if !metadata_file.exists() {
             return Err(anyhow!("Plugin metadata not found"));
@@ -491,7 +491,7 @@ impl PluginMarketplace {
         F: FnOnce(InstalledPlugin) -> Option<InstalledPlugin>,
     {
         let plugin_dir = self.get_plugin_directory(name)?;
-        let metadata_file = plugin_dir.join(".svgn-plugin.json");
+        let metadata_file = plugin_dir.join(".vexy_svgo-plugin.json");
         
         if let Ok(current_plugin) = self.load_installed_plugin_info(name) {
             if let Some(updated_plugin) = updater(current_plugin) {
@@ -534,7 +534,7 @@ impl PluginMarketplace {
             config: None,
         };
 
-        let metadata_file = plugin_dir.join(".svgn-plugin.json");
+        let metadata_file = plugin_dir.join(".vexy_svgo-plugin.json");
         let metadata_content = serde_json::to_string_pretty(&installed_plugin)?;
         fs::write(metadata_file, metadata_content)?;
 
@@ -583,7 +583,7 @@ pub async fn execute_plugin_command(command: PluginCommand, config: CliConfig) -
             let token = if let Some(token) = token {
                 token
             } else {
-                return Err(anyhow!("API token required for publishing. Use --token or run 'svgn plugin login' first."));
+                return Err(anyhow!("API token required for publishing. Use --token or run 'vexy_svgo plugin login' first."));
             };
 
             marketplace.publish_plugin(&path, &token, dry_run).await?;
@@ -611,7 +611,7 @@ pub async fn execute_plugin_command(command: PluginCommand, config: CliConfig) -
                 }
                 RegistryAction::List => {
                     println!("Configured registries:");
-                    println!("  default: https://plugins.svgn.org");
+                    println!("  default: https://plugins.vexy_svgo.org");
                     // TODO: List registries from config
                 }
                 RegistryAction::Default { name } => {

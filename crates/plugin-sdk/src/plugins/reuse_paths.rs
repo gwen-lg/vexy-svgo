@@ -5,7 +5,83 @@
 //! This plugin optimizes SVG files by deduplicating identical path elements. It creates a single
 //! path definition in <defs> and references it multiple times using <use> elements.
 //!
-//! Reference: SVGOPROTECTED_71_#PROTECTED_72_a>(
+//! Reference: SVGO's reusePaths plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::{HashMap, HashSet};
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration for the reusePaths plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ReusePathsConfig {}
+
+impl Default for ReusePathsConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin that deduplicates path elements by converting identical paths to <use> elements
+pub struct ReusePathsPlugin {
+    config: ReusePathsConfig,
+}
+
+impl ReusePathsPlugin {
+    pub fn new() -> Self {
+        Self {
+            config: ReusePathsConfig::default(),
+        }
+    }
+
+    pub fn with_config(config: ReusePathsConfig) -> Self {
+        Self { config }
+    }
+
+    fn parse_config(params: &Value) -> Result<ReusePathsConfig> {
+        if params.is_null() {
+            Ok(ReusePathsConfig::default())
+        } else {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
+        }
+    }
+
+    /// Generates a unique key for grouping paths with identical attributes
+    fn generate_path_key(element: &Element) -> Option<String> {
+        let d = element.attr("d")?;
+        let fill = element.attr("fill").map(|s| s.as_str()).unwrap_or("");
+        let stroke = element.attr("stroke").map(|s| s.as_str()).unwrap_or("");
+
+        Some(format!("{};s:{};f:{}", d, stroke, fill))
+    }
+
+    /// Collects all existing href references to avoid ID conflicts
+    fn collect_hrefs(&self, element: &Element, hrefs: &mut HashSet<String>) {
+        if element.name == "use" {
+            // Check both href and xlink:href attributes
+            for attr_name in &["href", "xlink:href"] {
+                if let Some(href) = element.attr(attr_name) {
+                    if href.starts_with('#') && href.len() > 1 {
+                        hrefs.insert(href[1..].to_string());
+                    }
+                }
+            }
+        }
+
+        // Recursively check children
+        for child in &element.children {
+            if let Node::Element(child_elem) = child {
+                self.collect_hrefs(child_elem, hrefs);
+            }
+        }
+    }
+
+    /// Collects all path elements and groups them by their key
+    fn collect_paths<'a>(
         &self,
         element: &Element<'a>,
         path_groups: &mut HashMap<String, Vec<(String, Element<'a>)>>,
@@ -108,7 +184,7 @@ impl Default for ReusePathsPlugin {
 
 impl Plugin for ReusePathsPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_26_
+        "reusePaths"
     }
 
     fn description(&self) -> &'static str {
@@ -339,82 +415,6 @@ mod tests {
         let path_count = count_elements(&document.root, "path");
         assert_eq!(path_count, 2);
     }
-
-    #[test]
-    fn test_path_key_generation() {
-        let mut element = Element::new("path");
-        element.set_attr("d", "M10,10 L20,20");
-        element.set_attr("fill", "red");
-        element.set_attr("stroke", "blue");
-
-        let key = ReusePathsPlugin::generate_path_key(&element);
-        assert_eq!(key, Some("M10,10 L20,20;s:blue;f:red".to_string()));
-    }
-
-    #[test]
-    fn test_path_without_d_attribute() {
-        let mut element = Element::new("path");
-        element.set_attr("fill", "red");
-
-        let key = ReusePathsPlugin::generate_path_key(&element);
-        assert_eq!(key, None);
-    }
-
-    #[test]
-    fn test_existing_defs_reused() {
-        let svg = r#"<svg xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <circle id="myCircle" r="5"/>
-            </defs>
-            <path d="M10,10 L20,20" fill="red"/>
-            <path d="M10,10 L20,20" fill="red"/>
-        </svg>"#;
-
-        let mut document = vexy_svgo_core::parse_svg(svg).unwrap();
-        let plugin = ReusePathsPlugin::new();
-
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // Check that existing defs was reused (should still have only one defs)
-        let defs_count = count_elements(&document.root, "defs");
-        assert_eq!(defs_count, 1);
-
-        // Check that the original circle is still there
-        let circle_exists = document.root.children.iter().any(|child| {
-            if let Node::Element(elem) = child {
-                if elem.name == "defs" {
-                    elem.children.iter().any(|defs_child| {
-                        if let Node::Element(defs_elem) = defs_child {
-                            defs_elem.name == "circle"
-                                && defs_elem.attr("id").map(|s| s.as_str()) == Some("myCircle")
-                        } else {
-                            false
-                        }
-                    })
-                } else {
-                    false
-                }
-            } else {
-                false
-            }
-        });
-        assert!(circle_exists);
-    }
-
-    fn count_elements(element: &Element, name: &str) -> usize {
-        let mut count = 0;
-        if element.name == name {
-            count += 1;
-        }
-        for child in &element.children {
-            if let Node::Element(child_elem) = child {
-                count += count_elements(child_elem, name);
-            }
-        }
-        count
-    }
-}
 
     #[test]
     fn test_path_key_generation() {

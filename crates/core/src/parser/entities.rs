@@ -7,7 +7,7 @@ pub fn parse_entities_from_doctype(doctype: &str, entities: &mut HashMap<String,
     // Security check: limit the number of entities to prevent DoS attacks
     const MAX_ENTITIES: usize = 1000;
     let mut entity_count = 0;
-    // Handle double-quoted entity declarations: <!ENTITY name PROTECTED_5_>
+    // Handle double-quoted entity declarations: <!ENTITY name "value">
     let entity_pattern = regex::Regex::new(r#"<!ENTITY\s+(\w+)\s+"([^"]*?)"\s*>"#).unwrap();
     for capture in entity_pattern.captures_iter(doctype) {
         if entity_count >= MAX_ENTITIES {
@@ -20,7 +20,7 @@ pub fn parse_entities_from_doctype(doctype: &str, entities: &mut HashMap<String,
         }
     }
 
-    // Handle single-quoted entity declarations: <!ENTITY name PROTECTED_26_>
+    // Handle single-quoted entity declarations: <!ENTITY name 'value'>
     let entity_pattern_single = regex::Regex::new(r#"<!ENTITY\s+(\w+)\s+'([^']*?)'\s*>"#).unwrap();
     for capture in entity_pattern_single.captures_iter(doctype) {
         if entity_count >= MAX_ENTITIES {
@@ -33,7 +33,7 @@ pub fn parse_entities_from_doctype(doctype: &str, entities: &mut HashMap<String,
         }
     }
 
-    // Handle parameter entities: <!ENTITY % name PROTECTED_6_>
+    // Handle parameter entities: <!ENTITY % name "value">
     let param_entity_pattern = regex::Regex::new(r#"<!ENTITY\s+%\s+(\w+)\s+"([^"]*?)"\s*>"#).unwrap();
     for capture in param_entity_pattern.captures_iter(doctype) {
         if entity_count >= MAX_ENTITIES {
@@ -47,7 +47,7 @@ pub fn parse_entities_from_doctype(doctype: &str, entities: &mut HashMap<String,
         }
     }
 
-    // Handle external entity references: <!ENTITY name SYSTEM PROTECTED_8_>
+    // Handle external entity references: <!ENTITY name SYSTEM "uri">
     // For SVG processing, we typically ignore external entities for security reasons
     // but we can at least log them or provide a placeholder
     let external_entity_pattern = regex::Regex::new(r#"<!ENTITY\s+(\w+)\s+SYSTEM\s+"([^"]+)"\s*>"#).unwrap();
@@ -62,7 +62,7 @@ pub fn parse_entities_from_doctype(doctype: &str, entities: &mut HashMap<String,
         }
     }
 
-    // Handle public external entities: <!ENTITY name PUBLIC PROTECTED_10_ PROTECTED_11_>
+    // Handle public external entities: <!ENTITY name PUBLIC "public_id" "system_id">
     let public_entity_pattern = regex::Regex::new(r#"<!ENTITY\s+(\w+)\s+PUBLIC\s+"[^"]*"\s+"[^"]*"\s*>"#).unwrap();
     for capture in public_entity_pattern.captures_iter(doctype) {
         if entity_count >= MAX_ENTITIES {

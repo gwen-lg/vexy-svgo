@@ -28,7 +28,7 @@ workspace = true
 
 
 [[bin]]
-name = "vexy_svgo"
+name = "vexy-svgo"
 path = "src/main.rs"
 
 

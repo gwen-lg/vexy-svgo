@@ -6,7 +6,61 @@
 //! Elements are sorted first by frequency (most frequent first), then by
 //! element name length (longest first), then by element name (alphabetically).
 //!
-//! Reference: SVGOPROTECTED_79_s a defs element
+//! Reference: SVGO's sortDefsChildren plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration parameters for sort defs children plugin (currently empty)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SortDefsChildrenConfig {
+    // No configuration options - matches SVGO behavior
+}
+
+impl Default for SortDefsChildrenConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin that sorts children of defs elements
+pub struct SortDefsChildrenPlugin {
+    config: SortDefsChildrenConfig,
+}
+
+impl SortDefsChildrenPlugin {
+    /// Create a new SortDefsChildrenPlugin
+    pub fn new() -> Self {
+        Self {
+            config: SortDefsChildrenConfig::default(),
+        }
+    }
+
+    /// Create a new SortDefsChildrenPlugin with config
+    pub fn with_config(config: SortDefsChildrenConfig) -> Self {
+        Self { config }
+    }
+
+    /// Parse configuration from JSON
+    fn parse_config(params: &Value) -> Result<SortDefsChildrenConfig> {
+        if params.is_null() || (params.is_object() && params.as_object().unwrap().is_empty()) {
+            Ok(SortDefsChildrenConfig::default())
+        } else if params.is_object() {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
+        } else {
+            Ok(SortDefsChildrenConfig::default())
+        }
+    }
+
+    /// Sort children of defs elements
+    fn sort_defs_children_recursive(&self, element: &mut Element) {
+        // Process this element if it's a defs element
         if element.name == "defs" {
             // Count frequencies of each element name
             let mut frequencies: HashMap<String, u32> = HashMap::new();
@@ -66,7 +120,7 @@ impl Default for SortDefsChildrenPlugin {
 
 impl Plugin for SortDefsChildrenPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_3_
+        "sortDefsChildren"
     }
 
     fn description(&self) -> &'static str {
@@ -179,7 +233,7 @@ mod tests {
         let mut defs = create_element("defs");
 
         // Add elements with same frequency (1 each) but different name lengths
-        // Should be sorted by length: PROTECTED_23_ (14), PROTECTED_24_ (4), PROTECTED_25_ (1)
+        // Should be sorted by length: "linearGradient" (14), "rect" (4), "g" (1)
         defs.children.push(Node::Element(create_element("g")));
         defs.children.push(Node::Element(create_element("rect")));
         defs.children
@@ -215,7 +269,7 @@ mod tests {
         let mut defs = create_element("defs");
 
         // Add elements with same frequency (1 each) and same length (4 chars)
-        // Should be sorted alphabetically: PROTECTED_33_, PROTECTED_34_
+        // Should be sorted alphabetically: "path", "rect"
         defs.children.push(Node::Element(create_element("rect")));
         defs.children.push(Node::Element(create_element("path")));
 
@@ -424,58 +478,4 @@ mod tests {
 
 // Use parameterized testing framework for SVGO fixture tests
 // TODO: Re-enable after fixing XML parsing and text content handling
-// crate::plugin_fixture_tests!(SortDefsChildrenPlugin, PROTECTED_78_);
-
-        doc.root.children.push(Node::Element(defs));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check expected order:
-        // 1. circles (freq 3, len 6) - 3 elements
-        // 2. rects (freq 2, len 4) - 2 elements
-        // 3. linearGradient (freq 1, len 14) - 1 element
-        // 4. path (freq 1, len 4) - 1 element
-        // 5. g (freq 1, len 1) - 1 element
-        if let Node::Element(defs_elem) = &doc.root.children[0] {
-            assert_eq!(defs_elem.children.len(), 8);
-
-            let element_names: Vec<&str> = defs_elem
-                .children
-                .iter()
-                .filter_map(|child| {
-                    if let Node::Element(elem) = child {
-                        Some(elem.name.as_ref())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            assert_eq!(
-                element_names,
-                vec![
-                    "circle",
-                    "circle",
-                    "circle", // frequency 3
-                    "rect",
-                    "rect",           // frequency 2
-                    "linearGradient", // frequency 1, length 14
-                    "path",           // frequency 1, length 4
-                    "g"               // frequency 1, length 1
-                ]
-            );
-        }
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = SortDefsChildrenPlugin::parse_config(&json!({})).unwrap();
-        // No fields to check since config is empty
-        let _ = config;
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-// TODO: Re-enable after fixing XML parsing and text content handling
-// crate::plugin_fixture_tests!(SortDefsChildrenPlugin, PROTECTED_78_);
+// crate::plugin_fixture_tests!(SortDefsChildrenPlugin, "sortDefsChildren");

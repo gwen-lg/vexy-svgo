@@ -131,102 +131,102 @@ pub fn create_plugin_with_params<P: Plugin + Default>(params: Option<&Value>) ->
         plugin.validate_params(params_value)?;
     }
     
-    // For now, return default plugin since we donPROTECTED_46_t read files at compile time
-        // For now, wePROTECTED_52_t read files at compile time
-        // For now, we'll use the single test function approach
-        #[test]
-        fn test_all_fixtures() {
-            let fixtures = load_plugin_fixtures($plugin_name).unwrap();
+    // For now, return default plugin since we don't have a generic way
+    // to create plugins with parameters. Each plugin needs to implement
+    // its own parameter parsing in the fixture tests.
+    // TODO: Use PluginWithParams trait when available for the specific plugin type
+    Ok(plugin)
+}
 
-            for fixture in fixtures {
-                test_single_fixture::<$plugin_type>(&fixture);
-            }
-        }
+/// Create a plugin with parameters using the PluginWithParams trait
+pub fn create_plugin_with_params_typed<P: crate::PluginWithParams + Default>(params: Option<&Value>) -> Result<P> {
+    if let Some(params_value) = params {
+        let config = P::parse_config(params_value)?;
+        Ok(P::with_config(config))
+    } else {
+        Ok(P::default())
+    }
+}
 
-        fn test_single_fixture<P: Plugin + Default>(fixture: &TestFixture) {
-            let mut plugin = if let Some(ref params) = fixture.params {
-                create_plugin_with_params::<P>(Some(params)).unwrap_or_else(|e| {
-                    panic!(
-                        "Failed to create plugin with params for fixture {}: {}",
-                        fixture.name, e
-                    )
-                })
-            } else {
-                P::default()
-            };
+/// Test a plugin with a single input/output pair
+pub fn test_plugin<P: Plugin>(plugin: P, input: &str, expected: &str) {
+    let mut doc = parse_svg(input).expect("Failed to parse input SVG");
+    plugin.apply(&mut doc).expect("Plugin failed to apply");
+    let actual = stringify(&doc).expect("Failed to stringify document");
+    
+    if !compare_svg(&actual, expected) {
+        panic!(
+            "Plugin test failed:\nExpected:\n{}\n\nActual:\n{}\n",
+            expected,
+            actual
+        );
+    }
+}
 
-            let result = apply_plugin_to_svg(&mut plugin, &fixture.input, fixture.params.as_ref()).unwrap_or_else(|e| {
-                panic!("Failed to apply plugin to fixture {}: {}", fixture.name, e)
-            });
+/// Assert that a plugin produces the expected output
+pub fn assert_plugin_output<P: Plugin>(plugin: &P, input: &str, expected: &str) {
+    let mut doc = parse_svg(input).expect("Failed to parse input SVG");
+    plugin.apply(&mut doc).expect("Plugin failed to apply");
+    let actual = stringify(&doc).expect("Failed to stringify document");
+    
+    assert!(
+        compare_svg(&actual, expected),
+        "Plugin output mismatch:\nExpected:\n{}\n\nActual:\n{}\n",
+        expected,
+        actual
+    );
+}
 
-            if !compare_svg(&result, &fixture.expected) {
-                panic!(
-                    "Fixture {} failed\nInput:\n{}\nExpected:\n{}\nActual:\n{}",
-                    fixture.name, fixture.input, fixture.expected, result
-                );
-            }
-        }
+/// Macro for asserting element attributes
+#[macro_export]
+macro_rules! assert_attr_eq {
+    ($element:expr, $attr:expr, $expected:expr) => {
+        assert_eq!(
+            $element.attr($attr).map(|s| s.as_str()),
+            $expected,
+            "Attribute '{}' mismatch",
+            $attr
+        )
     };
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
+/// Macro for plugins that support parameters via PluginWithParams trait
+#[macro_export]
+macro_rules! plugin_fixture_tests_with_params {
+    ($plugin_type:ty, $plugin_name:literal) => {
+        #[cfg(test)]
+        mod fixture_tests {
+            use super::*;
+            use $crate::test_utils::*;
 
-    #[test]
-    fn test_parse_fixture_simple() {
-        let content = r#"<svg><g/></svg>
-@@@
-<svg><g/></svg>"#;
+            #[test]
+            fn test_plugin_with_fixtures() {
+                let fixtures = load_plugin_fixtures($plugin_name).unwrap();
 
-        let fixture = parse_fixture(content, "test").unwrap();
-        assert_eq!(fixture.name, "test");
-        assert_eq!(fixture.input, "<svg><g/></svg>");
-        assert_eq!(fixture.expected, "<svg><g/></svg>");
-        assert!(fixture.params.is_none());
-    }
+                if fixtures.is_empty() {
+                    println!("No fixtures found for plugin: {}", $plugin_name);
+                    return;
+                }
 
-    #[test]
-    fn test_parse_fixture_with_params() {
-        let content = r#"<svg><g/></svg>
-@@@
-<svg><g/></svg>
-@@@
-{"test": true}"#;
+                let fixture_count = fixtures.len();
+                for fixture in fixtures {
+                    println!("Testing fixture: {}", fixture.name);
 
-        let fixture = parse_fixture(content, "test").unwrap();
-        assert_eq!(fixture.name, "test");
-        assert_eq!(fixture.input, "<svg><g/></svg>");
-        assert_eq!(fixture.expected, "<svg><g/></svg>");
-        assert_eq!(fixture.params, Some(json!({"test": true})));
-    }
+                    // Create plugin instance with parameters
+                    let mut plugin = if let Some(ref params) = fixture.params {
+                        let config = <$plugin_type>::parse_config(params).unwrap_or_else(|e| {
+                            panic!(
+                                "Failed to parse config for fixture {}: {}",
+                                fixture.name, e
+                            )
+                        });
+                        <$plugin_type>::with_config(config)
+                    } else {
+                        <$plugin_type>::default()
+                    };
 
-    #[test]
-    fn test_normalize_svg() {
-        let svg1 = r#"<svg>
-    <g>
-        <rect/>
-    </g>
-</svg>"#;
-
-        let svg2 = "<svg>\n<g>\n<rect/>\n</g>\n</svg>";
-
-        assert_eq!(normalize_svg(svg1), normalize_svg(svg2));
-    }
-
-    #[test]
-    fn test_compare_svg() {
-        let svg1 = "<svg><g><rect/></g></svg>";
-        let svg2 = r#"<svg>
-    <g>
-        <rect/>
-    </g>
-</svg>"#;
-
-        assert!(compare_svg(svg1, svg2));
-    }
-}
+                    // Apply plugin to input
+                    let result = apply_plugin_to_svg(&mut plugin, &fixture.input, fixture.params.as_ref()).unwrap_or_else(|e| {
                         panic!("Failed to apply plugin to fixture {}: {}", fixture.name, e)
                     });
 

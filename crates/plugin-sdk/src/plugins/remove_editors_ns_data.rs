@@ -21,36 +21,36 @@ use vexy_svgo_core::visitor::Visitor;
 /// Default editor namespaces to remove
 static EDITOR_NAMESPACES: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
-        PROTECTED_0_,
-        PROTECTED_1_,
-        PROTECTED_2_,
-        PROTECTED_3_,
-        PROTECTED_4_,
-        PROTECTED_5_,
-        PROTECTED_6_,
-        PROTECTED_7_,
-        PROTECTED_8_,
-        PROTECTED_9_,
-        PROTECTED_10_,
-        PROTECTED_11_,
-        PROTECTED_12_,
-        PROTECTED_13_,
-        PROTECTED_14_,
-        PROTECTED_15_,
-        PROTECTED_16_,
-        PROTECTED_17_,
-        PROTECTED_18_,
-        PROTECTED_19_,
-        PROTECTED_20_,
-        PROTECTED_21_,
-        PROTECTED_22_,
-        PROTECTED_23_,
+        "http://creativecommons.org/ns#",
+        "http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd",
+        "http://krita.org/namespaces/svg/krita",
+        "http://ns.adobe.com/AdobeIllustrator/10.0/",
+        "http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/",
+        "http://ns.adobe.com/Extensibility/1.0/",
+        "http://ns.adobe.com/Flows/1.0/",
+        "http://ns.adobe.com/GenericCustomNamespace/1.0/",
+        "http://ns.adobe.com/Graphs/1.0/",
+        "http://ns.adobe.com/ImageReplacement/1.0/",
+        "http://ns.adobe.com/SaveForWeb/1.0/",
+        "http://ns.adobe.com/Variables/1.0/",
+        "http://ns.adobe.com/XPath/1.0/",
+        "http://purl.org/dc/elements/1.1/",
+        "http://schemas.microsoft.com/visio/2003/SVGExtensions/",
+        "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
+        "http://taptrix.com/vectorillustrator/svg_extensions",
+        "http://www.bohemiancoding.com/sketch/ns",
+        "http://www.figma.com/figma/ns",
+        "http://www.inkscape.org/namespaces/inkscape",
+        "http://www.serif.com/",
+        "http://www.vector.evaxdesign.sk",
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "https://boxy-svg.com",
     ])
 });
 
 /// Configuration parameters for remove editors ns data plugin
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = PROTECTED_24_)]
+#[serde(rename_all = "camelCase")]
 pub struct RemoveEditorsNSDataConfig {
     /// Additional namespace URIs to remove
     #[serde(default)]
@@ -87,7 +87,7 @@ impl RemoveEditorsNSDataPlugin {
     fn parse_config(params: &Value) -> Result<RemoveEditorsNSDataConfig> {
         if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
-                .map_err(|e| anyhow!(PROTECTED_25_, e))
+                .map_err(|e| anyhow!("Invalid configuration: {}", e))
         } else {
             Ok(RemoveEditorsNSDataConfig::default())
         }
@@ -106,7 +106,7 @@ impl Plugin for RemoveEditorsNSDataPlugin {
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_27_
+        "Remove editors namespaces, elements and attributes"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -114,21 +114,21 @@ impl Plugin for RemoveEditorsNSDataPlugin {
             // Validate parameters
             for (key, value) in obj {
                 match key.as_str() {
-                    PROTECTED_28_ => {
+                    "additionalNamespaces" => {
                         if !value.is_array() {
-                            return Err(anyhow!(PROTECTED_29_, key));
+                            return Err(anyhow!("{} must be an array", key));
                         }
                         if let Some(arr) = value.as_array() {
                             for item in arr {
                                 if !item.is_string() {
                                     return Err(anyhow!(
-                                        PROTECTED_30_
+                                        "additionalNamespaces must contain only strings"
                                     ));
                                 }
                             }
                         }
                     }
-                    _ => return Err(anyhow!(PROTECTED_31_, key)),
+                    _ => return Err(anyhow!("Unknown parameter: {}", key)),
                 }
             }
         }
@@ -186,19 +186,19 @@ impl EditorsNSDataRemovalVisitor {
 
     /// Process namespace declarations on SVG element
     fn process_namespace_declarations(&mut self, element: &mut Element) {
-        if element.name == PROTECTED_32_ {
+        if element.name == "svg" {
             let mut attrs_to_remove = Vec::new();
 
             // Find xmlns declarations that match editor namespaces
             for (name, value) in &element.attributes {
-                if name.starts_with(PROTECTED_33_) {
+                if name.starts_with("xmlns:") {
                     if self.state.namespaces_to_remove.contains(value) {
                         // Extract the prefix
                         let prefix = &name[6..];
                         self.state.prefixes_to_remove.insert(prefix.to_string());
                         attrs_to_remove.push(name.clone());
                     }
-                } else if name == PROTECTED_34_ && self.state.namespaces_to_remove.contains(value) {
+                } else if name == "xmlns" && self.state.namespaces_to_remove.contains(value) {
                     // Default namespace is an editor namespace
                     attrs_to_remove.push(name.clone());
                 }

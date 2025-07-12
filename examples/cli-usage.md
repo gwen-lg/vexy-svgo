@@ -240,8 +240,7 @@ vexy_svgo icon.svg -o icon-optimized.svg \
 ### Preserve editability
 
 ```bash
-# Keep SVG editable in vector editors
-vexy_svgo input.svg -o output.svg \
+vexy-svgo input.svg -o output.svg \
   --pretty \
   --disable convertPathData,mergePaths \
   --config keep-editable.yml
@@ -251,11 +250,11 @@ vexy_svgo input.svg -o output.svg \
 
 ```bash
 # Verbose output for debugging
-vexy_svgo input.svg -o output.svg --verbose
+vexy-svgo input.svg -o output.svg --verbose
 
 # Quiet mode (suppress non-error output)
-vexy_svgo input.svg -o output.svg --quiet
+vexy-svgo input.svg -o output.svg --quiet
 
 # Continue on errors when processing multiple files
-vexy_svgo *.svg --continue-on-error
+vexy-svgo *.svg --continue-on-error
 ```

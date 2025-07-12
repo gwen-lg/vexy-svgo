@@ -1,4 +1,4 @@
-// TypeScript definitions for Vexy SVGO WebAssembly module
+ * Vexy SVGO WebAssembly module
 // this_file: crates/wasm/vexy_svgo.d.ts
 
 /**

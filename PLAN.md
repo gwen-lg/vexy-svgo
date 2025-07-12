@@ -7,7 +7,7 @@ This document outlines a comprehensive plan to improve and fix the Vexy SVGO cod
 ## Current Status
 
 ### Completed Tasks
-1. ✅ Fixed all import statements from `svgn_core` to `vexy_svgo_core`
+1. ✅ Fixed all import statements from `vexy_svgo_core` to `vexy_svgo_core`
 2. ✅ Updated all SVGN references in comments to Vexy SVGO
 3. ✅ Fixed corrupted files with PROTECTED_ placeholders
 4. ✅ Fixed missing struct fields (Element.attributes)
@@ -55,7 +55,7 @@ This phase focuses on standardizing the naming conventions across the codebase, 
     *   **Action:** This is the most significant change and requires careful execution.
         *   **Rename CLI executable:** Change the `vexy_svgo` binary name to `vexy-svgo`. This will involve updating `Cargo.toml` for the `cli` crate and build scripts.
         *   **Update CLI command examples:** Change all instances of `vexy_svgo` to `vexy-svgo` in `README.md`, `examples/cli-usage.md`, and `docs/plugin-marketplace.md` (CLI commands).
-        *   **Update binary names in build scripts:** Change `vexy_svgo-linux`, `vexy_svgo-macos-universal`, `vexy_svgo-windows` to `vexy-svgo-linux`, `vexy-svgo-macos-universal`, `vexy-svgo-windows` in `scripts/build.sh`.
+        *   **Update binary names in build scripts:** Change `vexy_svgo-linux`, `vexy_svgo-macos-universal`, `vexy_svgo-windows` to `vexy-svgo-linux`, `vexy_svgo-macos-universal`, `vexy-svgo-windows` in `scripts/build.sh`.
         *   **Update repository URLs:** Change `https://github.com/twardoch/vexy_svgo` to `https://github.com/twardoch/vexy-svgo` in `Cargo.toml`, `README.md`, `examples/wasm-enhanced-demo.html`, `docs/wasm-demo.html`, `docs/plugin-development.md`, `release.sh`, `issues/301.txt`. (Note: This might require an actual GitHub repository rename, which is outside the scope of direct file modification but should be noted).
         *   **Update package manager instructions:** Ensure `brew install vexy-svgo` and `choco install vexy-svgo` are used in `README.md`. (Currently `vexy_svgo` is used, which is inconsistent with kebab-case for package managers).
         *   **Update project root check in `release.sh`:** Change `vexy_svgo` to `vexy-svgo`.
@@ -214,3 +214,12 @@ This phase focuses on standardizing the naming conventions across the codebase, 
 ## Conclusion
 
 The Vexy SVGO project has a solid foundation but needs systematic improvements to reach production quality. This plan prioritizes immediate fixes to get a working release, followed by feature completion and long-term optimizations. The focus should be on maintaining SVGO compatibility while leveraging Rust's performance advantages.
+
+### Build Log Analysis and Suggestions
+
+The build log indicates that the main project builds successfully for macOS, but the WebAssembly (WASM) build fails due to issues with the `getrandom` crate.
+
+**Problem:** The `getrandom` crate, a dependency, is not correctly configured for the `wasm32-unknown-unknown` target. It requires the `wasm_js` feature to be enabled for WASM builds.
+
+**Suggestion:**
+- **Modify `crates/wasm/Cargo.toml`:** Add `features = ["js"]` to the `getrandom` dependency under the `[dependencies]` section, specifically for the `wasm32-unknown-unknown` target. This will enable the necessary WASM-specific features for `getrandom`.

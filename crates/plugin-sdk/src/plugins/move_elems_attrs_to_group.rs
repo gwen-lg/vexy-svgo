@@ -5,7 +5,61 @@
 //! This plugin optimizes SVG by moving attributes that all child elements
 //! share to their parent group element, reducing redundancy.
 //!
-//! Reference: SVGOPROTECTED_103_static str> {
+//! Reference: SVGO's moveElemsAttrsToGroup plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
+use std::collections::{HashMap, HashSet};
+
+/// Configuration for the moveElemsAttrsToGroup plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct MoveElemsAttrsToGroupConfig {}
+
+impl Default for MoveElemsAttrsToGroupConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin to move common attributes from elements to their group
+pub struct MoveElemsAttrsToGroupPlugin {
+    config: MoveElemsAttrsToGroupConfig,
+}
+
+impl MoveElemsAttrsToGroupPlugin {
+    pub fn new() -> Self {
+        Self {
+            config: MoveElemsAttrsToGroupConfig::default(),
+        }
+    }
+
+    pub fn with_config(config: MoveElemsAttrsToGroupConfig) -> Self {
+        Self { config }
+    }
+
+    fn parse_config(params: &Value) -> Result<MoveElemsAttrsToGroupConfig> {
+        if params.is_null() {
+            Ok(MoveElemsAttrsToGroupConfig::default())
+        } else {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
+        }
+    }
+
+    /// Check if a group can have attributes moved to it
+    fn can_move_to_group(&self, element: &Element) -> bool {
+        matches!(
+            element.name.as_ref(),
+            "g" | "svg" | "symbol" | "defs" | "clipPath" | "mask"
+        )
+    }
+
+    /// Get attributes that can be moved to parent group
+    fn get_movable_attributes() -> HashSet<&'static str> {
         [
             "fill",
             "stroke",
@@ -112,12 +166,56 @@
         attrs_to_add: &HashMap<String, String>,
     ) {
         for (name, value) in attrs_to_add {
-            // Only add if the parent doesnPROTECTED_104_static str {
+            // Only add if the parent doesn't already have this attribute
+            if !parent.has_attr(name) {
+                parent.set_attr(name, value);
+            }
+        }
+    }
+
+    /// Process an element and its children
+    fn process_element(&self, element: &mut Element) {
+        // Process children first (depth-first)
+        let mut i = 0;
+        while i < element.children.len() {
+            if let Node::Element(child) = &mut element.children[i] {
+                self.process_element(child);
+            }
+            i += 1;
+        }
+
+        // Only process group-like elements that can contain other elements
+        if !self.can_move_to_group(element) {
+            return;
+        }
+
+        // Find common attributes among all child elements
+        let common_attrs = self.find_common_attributes(&element.children);
+
+        if common_attrs.is_empty() {
+            return;
+        }
+
+        // Remove these attributes from all children and add to parent
+        let attrs_to_remove: HashSet<String> = common_attrs.keys().cloned().collect();
+        self.remove_attributes_from_children(&mut element.children, &attrs_to_remove);
+        self.add_attributes_to_parent(element, &common_attrs);
+    }
+}
+
+impl Default for MoveElemsAttrsToGroupPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for MoveElemsAttrsToGroupPlugin {
+    fn name(&self) -> &'static str {
         "moveElemsAttrsToGroup"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_30_
+        "move common attributes from elements to their group"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -233,104 +331,6 @@ mod tests {
             }
             if let Node::Element(ref circle) = result_group.children[1] {
                 assert_eq!(circle.attr("fill").map(|s| s.as_str()), Some("blue"));
-            }
-        }
-    }
-
-    #[test]
-    fn test_multiple_common_attributes() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
-
-        let mut group = create_test_element("g", vec![]);
-        group.children = vec![
-            Node::Element(create_test_element(
-                "rect",
-                vec![("fill", "red"), ("stroke", "blue"), ("opacity", "0.5")],
-            )),
-            Node::Element(create_test_element(
-                "circle",
-                vec![("fill", "red"), ("stroke", "blue"), ("opacity", "0.5")],
-            )),
-        ];
-
-        let mut document = Document::default();
-        document.root.children = vec![Node::Element(group)];
-
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // Check that the group has all common attributes
-        if let Node::Element(ref group) = document.root.children[0] {
-            assert_eq!(group.attr("fill").map(|s| s.as_str()), Some("red"));
-            assert_eq!(group.attr("stroke").map(|s| s.as_str()), Some("blue"));
-            assert_eq!(group.attr("opacity").map(|s| s.as_str()), Some("0.5"));
-
-            // Check that children no longer have these attributes
-            for child in &group.children {
-                if let Node::Element(elem) = child {
-                    assert!(!elem.has_attr("fill"));
-                    assert!(!elem.has_attr("stroke"));
-                    assert!(!elem.has_attr("opacity"));
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn test_group_already_has_attribute() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
-
-        let mut group = create_test_element("g", vec![("fill", "green")]);
-        group.children = vec![
-            Node::Element(create_test_element("rect", vec![("fill", "red")])),
-            Node::Element(create_test_element("circle", vec![("fill", "red")])),
-        ];
-
-        let mut document = Document::default();
-        document.root.children = vec![Node::Element(group)];
-
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // Group should keep its original fill attribute
-        if let Node::Element(ref group) = document.root.children[0] {
-            assert_eq!(group.attr("fill").map(|s| s.as_str()), Some("green"));
-
-            // Children should not have fill attribute removed since group already had different value
-            for child in &group.children {
-                if let Node::Element(elem) = child {
-                    assert!(!elem.has_attr("fill"));
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn test_single_child_no_change() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
-
-        let mut group = create_test_element("g", vec![]);
-        group.children = vec![Node::Element(create_test_element(
-            "rect",
-            vec![("fill", "red")],
-        ))];
-
-        let mut document = Document::default();
-        document.root.children = vec![Node::Element(group.clone())];
-
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // No changes should be made with only one child
-        if let Node::Element(ref result_group) = document.root.children[0] {
-            assert!(!result_group.has_attr("fill"));
-
-            if let Node::Element(ref rect) = result_group.children[0] {
-                assert_eq!(rect.attr("fill").map(|s| s.as_str()), Some("red"));
-            }
-        }
-    }
-}
             }
         }
     }

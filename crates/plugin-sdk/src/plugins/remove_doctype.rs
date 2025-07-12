@@ -5,7 +5,10 @@
 //! This plugin removes DOCTYPE declarations from SVG documents.
 //! DOCTYPE declarations are not needed in SVG and can cause issues.
 //!
-//! According to the SVG WG: PROTECTED_0_
+//! According to the SVG WG: "the SVG DTDs are a source of so many
+//! issues that the SVG WG has decided not to write one for the upcoming
+//! SVG 1.2 standard. In fact SVG WG members are even telling people not
+//! to use a DOCTYPE declaration in SVG 1.0 and 1.1 documents"
 //! https://jwatt.org/svg/authoring/#doctype-declaration
 
 use crate::Plugin;
@@ -64,7 +67,7 @@ impl Default for RemoveDoctypePlugin {
 
 impl Plugin for RemoveDoctypePlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_3_
+        "removeDoctype"
     }
 
     fn description(&self) -> &'static str {
@@ -216,9 +219,6 @@ mod tests {
         let _ = config;
     }
 }
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveDoctypePlugin, "removeDoctype");
 
 // Use parameterized testing framework for SVGO fixture tests
 crate::plugin_fixture_tests!(RemoveDoctypePlugin, "removeDoctype");

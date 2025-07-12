@@ -62,6 +62,7 @@ optional = true
 
 [dependencies.getrandom]
 workspace = true
+features = ["wasm_js"]
 
 
 [features]

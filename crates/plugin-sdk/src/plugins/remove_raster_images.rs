@@ -5,12 +5,123 @@
 //! This plugin removes raster image references in <image> elements.
 //! It detects and removes images with JPEG, PNG, or GIF formats.
 //!
-//! Reference: SVGOPROTECTED_72_static str {
+//! Reference: SVGO's removeRasterImages plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use regex::Regex;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration parameters for remove raster images plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveRasterImagesConfig {
+    // No configuration options for this plugin
+}
+
+impl Default for RemoveRasterImagesConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin that removes raster images
+pub struct RemoveRasterImagesPlugin {
+    config: RemoveRasterImagesConfig,
+    raster_pattern: Regex,
+}
+
+impl RemoveRasterImagesPlugin {
+    /// Create a new RemoveRasterImagesPlugin
+    pub fn new() -> Self {
+        // Pattern to match raster image references
+        // Matches: .jpg, .jpeg, .png, .gif or image/jpeg, image/png, image/gif
+        let raster_pattern =
+            Regex::new(r"(\.|image/)(jpe?g|png|gif)").expect("Invalid regex pattern");
+
+        Self {
+            config: RemoveRasterImagesConfig::default(),
+            raster_pattern,
+        }
+    }
+
+    /// Create a new RemoveRasterImagesPlugin with config
+    pub fn with_config(config: RemoveRasterImagesConfig) -> Self {
+        let mut plugin = Self::new();
+        plugin.config = config;
+        plugin
+    }
+
+    /// Parse configuration from JSON
+    fn parse_config(params: &Value) -> Result<RemoveRasterImagesConfig> {
+        if params.is_null() {
+            Ok(RemoveRasterImagesConfig::default())
+        } else if params.is_object() {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
+        } else {
+            Err(anyhow::anyhow!("Configuration must be an object"))
+        }
+    }
+
+    /// Check if element is a raster image
+    fn is_raster_image(&self, element: &Element) -> bool {
+        if element.name != "image" {
+            return false;
+        }
+
+        // Check xlink:href attribute
+        if let Some(href) = element.attributes.get("xlink:href") {
+            if self.raster_pattern.is_match(href) {
+                return true;
+            }
+        }
+
+        // Also check href attribute (SVG2 style)
+        if let Some(href) = element.attributes.get("href") {
+            if self.raster_pattern.is_match(href) {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    /// Process element to remove raster images
+    fn process_element(&self, element: &mut Element) {
+        // Remove image elements that reference raster images
+        element.children.retain(|child| {
+            if let Node::Element(elem) = child {
+                !self.is_raster_image(elem)
+            } else {
+                true
+            }
+        });
+
+        // Recursively process children
+        for child in &mut element.children {
+            if let Node::Element(elem) = child {
+                self.process_element(elem);
+            }
+        }
+    }
+}
+
+impl Default for RemoveRasterImagesPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveRasterImagesPlugin {
+    fn name(&self) -> &'static str {
         "removeRasterImages"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_9_
+        "removes raster images (disabled by default)"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -40,10 +151,10 @@ mod tests {
     #[test]
     fn test_plugin_creation() {
         let plugin = RemoveRasterImagesPlugin::new();
-        assert_eq!(plugin.name(), PROTECTED_10_);
+        assert_eq!(plugin.name(), "removeRasterImages");
         assert_eq!(
             plugin.description(),
-            PROTECTED_11_
+            "removes raster images (disabled by default)"
         );
     }
 
@@ -52,20 +163,20 @@ mod tests {
         let plugin = RemoveRasterImagesPlugin::new();
 
         let mut doc = Document::new();
-        doc.root = create_element(PROTECTED_12_);
+        doc.root = create_element("svg");
 
         // Add JPEG image
-        let mut image = create_element(PROTECTED_13_);
+        let mut image = create_element("image");
         image
             .attributes
-            .insert(PROTECTED_14_.to_string(), PROTECTED_15_.to_string());
+            .insert("xlink:href".to_string(), "photo.jpg".to_string());
         doc.root.children.push(Node::Element(image));
 
         // Add SVG image (should be preserved)
-        let mut svg_image = create_element(PROTECTED_16_);
+        let mut svg_image = create_element("image");
         svg_image
             .attributes
-            .insert(PROTECTED_17_.to_string(), PROTECTED_18_.to_string());
+            .insert("xlink:href".to_string(), "icon.svg".to_string());
         doc.root.children.push(Node::Element(svg_image));
 
         // Apply plugin
@@ -75,8 +186,8 @@ mod tests {
         assert_eq!(doc.root.children.len(), 1);
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(
-                elem.attributes.get(PROTECTED_19_),
-                Some(&PROTECTED_20_.to_string())
+                elem.attributes.get("xlink:href"),
+                Some(&"icon.svg".to_string())
             );
         }
     }
@@ -86,13 +197,13 @@ mod tests {
         let plugin = RemoveRasterImagesPlugin::new();
 
         let mut doc = Document::new();
-        doc.root = create_element(PROTECTED_21_);
+        doc.root = create_element("svg");
 
         // Add PNG image
-        let mut image = create_element(PROTECTED_22_);
+        let mut image = create_element("image");
         image
             .attributes
-            .insert(PROTECTED_23_.to_string(), PROTECTED_24_.to_string());
+            .insert("xlink:href".to_string(), "logo.png".to_string());
         doc.root.children.push(Node::Element(image));
 
         // Apply plugin
@@ -107,13 +218,13 @@ mod tests {
         let plugin = RemoveRasterImagesPlugin::new();
 
         let mut doc = Document::new();
-        doc.root = create_element(PROTECTED_25_);
+        doc.root = create_element("svg");
 
         // Add GIF image
-        let mut image = create_element(PROTECTED_26_);
+        let mut image = create_element("image");
         image
             .attributes
-            .insert(PROTECTED_27_.to_string(), PROTECTED_28_.to_string());
+            .insert("xlink:href".to_string(), "animation.gif".to_string());
         doc.root.children.push(Node::Element(image));
 
         // Apply plugin
@@ -128,21 +239,21 @@ mod tests {
         let plugin = RemoveRasterImagesPlugin::new();
 
         let mut doc = Document::new();
-        doc.root = create_element(PROTECTED_29_);
+        doc.root = create_element("svg");
 
         // Add data URI JPEG
-        let mut image1 = create_element(PROTECTED_30_);
+        let mut image1 = create_element("image");
         image1.attributes.insert(
-            PROTECTED_31_.to_string(),
-            PROTECTED_32_.to_string(),
+            "xlink:href".to_string(),
+            "data:image/jpeg;base64,/9j/4AAQ...".to_string(),
         );
         doc.root.children.push(Node::Element(image1));
 
         // Add data URI PNG
-        let mut image2 = create_element(PROTECTED_33_);
+        let mut image2 = create_element("image");
         image2.attributes.insert(
-            // this_file: crates/plugin-sdk/src/plugins/remove_raster_images.rs.to_string(),
-            //! Remove raster images plugin implementation.to_string(),
+            "xlink:href".to_string(),
+            "data:image/png;base64,iVBORw0KGg...".to_string(),
         );
         doc.root.children.push(Node::Element(image2));
 
@@ -158,13 +269,13 @@ mod tests {
         let plugin = RemoveRasterImagesPlugin::new();
 
         let mut doc = Document::new();
-        doc.root = create_element(//!);
+        doc.root = create_element("svg");
 
         // Add image with SVG2 href attribute
-        let mut image = create_element(//! This plugin removes raster image references in <image> elements.);
+        let mut image = create_element("image");
         image
             .attributes
-            .insert(//! It detects and removes images with JPEG, PNG, or GIF formats..to_string(), //!.to_string());
+            .insert("href".to_string(), "picture.jpeg".to_string());
         doc.root.children.push(Node::Element(image));
 
         // Apply plugin
@@ -179,141 +290,30 @@ mod tests {
         let plugin = RemoveRasterImagesPlugin::new();
 
         let mut doc = Document::new();
-        doc.root = create_element(//! Reference: SVGOPROTECTED_72_static str {);
+        doc.root = create_element("svg");
 
         // Add various vector image formats
-        let mut svg_image = create_element(// Apply plugin);
+        let mut svg_image = create_element("image");
         svg_image
             .attributes
-            .insert(// Check that non-image elements were preserved.to_string(), // Apply plugin to empty document.to_string());
+            .insert("xlink:href".to_string(), "vector.svg".to_string());
         doc.root.children.push(Node::Element(svg_image));
 
-        let mut pdf_image = create_element(// Empty object is valid);
+        let mut pdf_image = create_element("image");
         pdf_image
             .attributes
-            .insert(// Null is valid.to_string(), // Non-object is invalid.to_string());
+            .insert("xlink:href".to_string(), "document.pdf".to_string());
         doc.root.children.push(Node::Element(pdf_image));
 
-        let mut data_svg = create_element(// Use parameterized testing framework for SVGO fixture tests);
+        let mut data_svg = create_element("image");
         data_svg.attributes.insert(
-            // Check that all vector images were preserved.to_string(),
-            // Create nested structure.to_string(),
+            "xlink:href".to_string(),
+            "data:image/svg+xml;base64,PHN2Zy...".to_string(),
         );
         doc.root.children.push(Node::Element(data_svg));
 
         // Apply plugin
         plugin.apply(&mut doc).unwrap();
-
-        // Check that all vector images were preserved
-        assert_eq!(doc.root.children.len(), 3);
-    }
-
-    #[test]
-    fn test_removes_nested_raster_images() {
-        let plugin = RemoveRasterImagesPlugin::new();
-
-        let mut doc = Document::new();
-        doc.root = create_element(// Apply plugin);
-
-        // Create nested structure
-        let mut group = create_element(// Check nested removal);
-
-        let mut image1 = create_element(// First child should be rect (image removed));
-        image1
-            .attributes
-            .insert(// Check pattern has no image.to_string(), // Add elements with raster-like hrefs that aren't images.to_string());
-        group.children.push(Node::Element(image1));
-
-        let rect = create_element(// Apply plugin);
-        group.children.push(Node::Element(rect));
-
-        let mut defs = create_element(// Check that non-image elements were preserved);
-        let mut pattern = create_element(// Apply plugin to empty document);
-        let mut image2 = create_element(// Empty object is valid);
-        image2
-            .attributes
-            .insert(// Null is valid.to_string(), // Non-object is invalid.to_string());
-        pattern.children.push(Node::Element(image2));
-        defs.children.push(Node::Element(pattern));
-        group.children.push(Node::Element(defs));
-
-        doc.root.children.push(Node::Element(group));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check nested removal
-        if let Node::Element(g) = &doc.root.children[0] {
-            // First child should be rect (image removed)
-            if let Node::Element(r) = &g.children[0] {
-                assert_eq!(r.name, // Use parameterized testing framework for SVGO fixture tests);
-            }
-
-            // Check pattern has no image
-            if let Node::Element(d) = &g.children[1] {
-                if let Node::Element(p) = &d.children[0] {
-                    assert_eq!(p.children.len(), 0);
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn test_ignores_non_image_elements() {
-        let plugin = RemoveRasterImagesPlugin::new();
-
-        let mut doc = Document::new();
-        doc.root = create_element(PROTECTED_62_);
-
-        // Add elements with raster-like hrefs that aren't images
-        let mut use_elem = create_element("use");
-        use_elem
-            .attributes
-            .insert("xlink:href".to_string(), "icon.png".to_string());
-        doc.root.children.push(Node::Element(use_elem));
-
-        let mut a_elem = create_element("a");
-        a_elem
-            .attributes
-            .insert("href".to_string(), "photo.jpg".to_string());
-        doc.root.children.push(Node::Element(a_elem));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that non-image elements were preserved
-        assert_eq!(doc.root.children.len(), 2);
-    }
-
-    #[test]
-    fn test_empty_document() {
-        let plugin = RemoveRasterImagesPlugin::new();
-
-        let mut doc = Document::new();
-        doc.root = create_element("svg");
-
-        // Apply plugin to empty document
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_parameter_validation() {
-        let plugin = RemoveRasterImagesPlugin::new();
-
-        // Empty object is valid
-        assert!(plugin.validate_params(&json!({})).is_ok());
-
-        // Null is valid
-        assert!(plugin.validate_params(&Value::Null).is_ok());
-
-        // Non-object is invalid
-        assert!(plugin.validate_params(&json!("invalid")).is_err());
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveRasterImagesPlugin, "removeRasterImages");
 
         // Check that all vector images were preserved
         assert_eq!(doc.root.children.len(), 3);

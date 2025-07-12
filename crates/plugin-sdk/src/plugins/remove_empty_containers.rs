@@ -20,17 +20,17 @@ use vexy_svgo_core::visitor::Visitor;
 /// Based on https://www.w3.org/TR/SVG11/intro.html#TermContainerElement
 static CONTAINER_ELEMENTS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     [
-        PROTECTED_0_,
-        PROTECTED_1_,
-        PROTECTED_2_,
-        PROTECTED_3_,
-        PROTECTED_4_,
-        PROTECTED_5_,
-        PROTECTED_6_,
-        PROTECTED_7_,
-        PROTECTED_8_,
-        PROTECTED_9_,
-        PROTECTED_10_,
+        "a",
+        "defs",
+        "foreignObject",
+        "g",
+        "marker",
+        "mask",
+        "missing-glyph",
+        "pattern",
+        "svg",
+        "switch",
+        "symbol",
     ]
     .into_iter()
     .collect()
@@ -58,7 +58,7 @@ impl Plugin for RemoveEmptyContainersPlugin {
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_12_
+        "Remove empty container elements"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -66,7 +66,7 @@ impl Plugin for RemoveEmptyContainersPlugin {
         if let Some(obj) = params.as_object() {
             if !obj.is_empty() {
                 return Err(anyhow::anyhow!(
-                    PROTECTED_13_
+                    "removeEmptyContainers plugin does not accept any parameters"
                 ));
             }
         }
@@ -120,7 +120,20 @@ impl EmptyContainerRemovalVisitor {
             return false;
         }
 
-        // DonPROTECTED_52_s safe to remove this empty container
+        // Don't remove elements that are direct children of <switch>
+        if let Some(parent) = self.parent_stack.last() {
+            if parent == "switch" {
+                return false;
+            }
+        }
+
+        // The <g> may not have content, but the filter may cause a rectangle
+        // to be created and filled with pattern
+        if element.name == "g" && element.attributes.contains_key("filter") {
+            return false;
+        }
+
+        // If we get here, it's safe to remove this empty container
         true
     }
 }
@@ -364,19 +377,6 @@ mod tests {
         let plugin = RemoveEmptyContainersPlugin::new();
         let mut doc = Document::new();
 
-        // Add text node
-        doc.root.children.push(Node::Text("Hello".to_string()));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Text nodes should be preserved
-        assert_eq!(doc.root.children.len(), 1);
-        assert!(matches!(doc.root.children.get(0), Some(Node::Text(_))));
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveEmptyContainersPlugin, "removeEmptyContainers");
         // Add text node
         doc.root.children.push(Node::Text("Hello".to_string()));
 

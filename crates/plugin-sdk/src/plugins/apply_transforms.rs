@@ -10,72 +10,72 @@
 //! - Simplifying path data for further optimization
 //! - Improving rendering performance
 //!
-//! Based on SVGOPROTECTED_30_)PROTECTED_31_(PROTECTED_32_,PROTECTED_33_ PROTECTED_34_MPROTECTED_35_LPROTECTED_36_mPROTECTED_37_lPROTECTED_38_HPROTECTED_39_HPROTECTED_40_VPROTECTED_41_VPROTECTED_42_CPROTECTED_43_ZPROTECTED_44_zPROTECTED_45_,PROTECTED_46_-PROTECTED_47_+PROTECTED_48_.PROTECTED_49_0PROTECTED_50_.PROTECTED_51_static str {
-        "applyTransforms"
-    }
+//! Based on SVGO's applyTransforms plugin
 
-    fn description(&self) -> &'static str {
-        PROTECTED_1_
-    }
+use crate::Plugin;
+use anyhow::Result;
+use nalgebra::{Matrix3, Point2};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
 
-    fn apply(&self, document: &mut Document) -> Result<()> {
-        self.apply_transforms_recursive(&mut document.root);
-        Ok(())
-    }
+/// Configuration for the applyTransforms plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ApplyTransformsConfig {
+    /// Apply transforms to stroked paths (may change stroke width)
+    #[serde(default = "default_true")]
+    pub apply_to_stroked: bool,
 
-    fn validate_params(&self, params: &Value) -> Result<()> {
-        Self::parse_config(params)?;
-        Ok(())
-    }
+    /// Decimal precision for transformed coordinates
+    #[serde(default = "default_float_precision")]
+    pub float_precision: u8,
 }
 
-impl Clone for ApplyTransformsPlugin {
-    fn clone(&self) -> Self {
+impl Default for ApplyTransformsConfig {
+    fn default() -> Self {
         Self {
-            config: self.config.clone(),
+            apply_to_stroked: true,
+            float_precision: 3,
         }
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+fn default_true() -> bool {
+    true
+}
 
-    #[test]
-    fn test_parse_transform_translate() {
-        let transform = PROTECTED_2_;
-        let matrix = ApplyTransformsPlugin::parse_transform(transform).unwrap();
-        let point = Point2::new(0.0, 0.0);
-        let transformed = matrix.transform_point(&point);
-        assert_eq!(transformed.x, 10.0);
-        assert_eq!(transformed.y, 20.0);
-    }
+fn default_float_precision() -> u8 {
+    3
+}
 
-    #[test]
-    fn test_parse_transform_scale() {
-        let transform = PROTECTED_3_;
-        let matrix = ApplyTransformsPlugin::parse_transform(transform).unwrap();
-        let point = Point2::new(5.0, 5.0);
-        let transformed = matrix.transform_point(&point);
-        assert_eq!(transformed.x, 10.0);
-        assert_eq!(transformed.y, 10.0);
-    }
+pub struct ApplyTransformsPlugin {
+    config: ApplyTransformsConfig,
+}
 
-    #[test]
-    fn test_format_number() {
-        let plugin = ApplyTransformsPlugin::new();
-        assert_eq!(plugin.format_number(1.0), PROTECTED_4_);
-        assert_eq!(plugin.format_number(1.500), PROTECTED_5_);
-        assert_eq!(plugin.format_number(1.234567), PROTECTED_6_);
+impl Default for ApplyTransformsPlugin {
+    fn default() -> Self {
+        Self::new()
     }
 }
+
+impl ApplyTransformsPlugin {
+    pub fn new() -> Self {
+        Self {
+            config: ApplyTransformsConfig::default(),
+        }
+    }
+
+    pub fn with_config(config: ApplyTransformsConfig) -> Self {
+        Self { config }
+    }
 
     fn parse_config(params: &Value) -> Result<ApplyTransformsConfig> {
         if params.is_null() {
             Ok(ApplyTransformsConfig::default())
         } else {
             serde_json::from_value(params.clone())
-                .map_err(|e| anyhow::anyhow!(PROTECTED_7_, e))
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
         }
     }
 
@@ -103,7 +103,7 @@ mod tests {
                     .collect();
                 
                 match fn_name {
-                    PROTECTED_8_ => {
+                    "translate" => {
                         if params.len() >= 1 {
                             let tx = params[0];
                             let ty = params.get(1).copied().unwrap_or(0.0);
@@ -115,7 +115,7 @@ mod tests {
                             matrix = translate * matrix;
                         }
                     }
-                    PROTECTED_9_ => {
+                    "scale" => {
                         if params.len() >= 1 {
                             let sx = params[0];
                             let sy = params.get(1).copied().unwrap_or(sx);
@@ -127,7 +127,7 @@ mod tests {
                             matrix = scale * matrix;
                         }
                     }
-                    PROTECTED_10_ => {
+                    "rotate" => {
                         if params.len() >= 1 {
                             let angle = params[0].to_radians();
                             let cos_a = angle.cos();
@@ -163,7 +163,7 @@ mod tests {
                             }
                         }
                     }
-                    PROTECTED_11_ => {
+                    "matrix" => {
                         if params.len() >= 6 {
                             let custom = Matrix3::new(
                                 params[0], params[2], params[4],
@@ -184,22 +184,22 @@ mod tests {
     /// Apply transforms to the document recursively
     fn apply_transforms_recursive(&self, element: &mut Element) {
         // Check if element has both transform and is a path
-        if element.name == PROTECTED_12_ {
-            if let Some(transform) = element.attributes.get(PROTECTED_13_) {
+        if element.name == "path" {
+            if let Some(transform) = element.attributes.get("transform") {
                 // Check if we should skip stroked paths
-                let has_stroke = element.attributes.get(PROTECTED_14_)
-                    .map(|s| s != PROTECTED_15_)
+                let has_stroke = element.attributes.get("stroke")
+                    .map(|s| s != "none")
                     .unwrap_or(false);
                 
                 if !has_stroke || self.config.apply_to_stroked {
                     // Parse transform matrix
                     if let Some(matrix) = Self::parse_transform(transform) {
                         // Apply to path data
-                        if let Some(d) = element.attributes.get(PROTECTED_16_) {
+                        if let Some(d) = element.attributes.get("d") {
                             let transformed = self.transform_path_data(d, &matrix);
-                            element.attributes.insert(PROTECTED_17_.to_string(), transformed);
+                            element.attributes.insert("d".to_string(), transformed);
                             // Remove transform attribute after applying
-                            element.attributes.shift_remove(PROTECTED_18_);
+                            element.attributes.shift_remove("transform");
                         }
                     }
                 }
@@ -233,7 +233,7 @@ mod tests {
                         if let (Some(x), Some(y)) = (self.parse_coord(&mut chars), self.parse_coord(&mut chars)) {
                             let point = Point2::new(x, y);
                             let transformed = matrix.transform_point(&point);
-                            result.push_str(&format!(PROTECTED_19_, 
+                            result.push_str(&format!("{} {} ", 
                                 self.format_number(transformed.x),
                                 self.format_number(transformed.y)
                             ));
@@ -251,7 +251,7 @@ mod tests {
                             let transformed_end = matrix.transform_point(&end);
                             let new_dx = transformed_end.x - transformed_start.x;
                             let new_dy = transformed_end.y - transformed_start.y;
-                            result.push_str(&format!(PROTECTED_20_, 
+                            result.push_str(&format!("{} {} ", 
                                 self.format_number(new_dx),
                                 self.format_number(new_dy)
                             ));
@@ -269,12 +269,12 @@ mod tests {
                                 // Convert to L command
                                 result.pop(); // Remove 'H'
                                 result.pop(); // Remove space
-                                result.push_str(&format!(PROTECTED_21_, 
+                                result.push_str(&format!("L {} {} ", 
                                     self.format_number(transformed.x),
                                     self.format_number(transformed.y)
                                 ));
                             } else {
-                                result.push_str(&format!(PROTECTED_22_, self.format_number(transformed.x)));
+                                result.push_str(&format!("{} ", self.format_number(transformed.x)));
                             }
                             current_x = transformed.x;
                             current_y = transformed.y;
@@ -290,12 +290,12 @@ mod tests {
                                 // Convert to L command
                                 result.pop(); // Remove 'V'
                                 result.pop(); // Remove space
-                                result.push_str(&format!(PROTECTED_23_, 
+                                result.push_str(&format!("L {} {} ", 
                                     self.format_number(transformed.x),
                                     self.format_number(transformed.y)
                                 ));
                             } else {
-                                result.push_str(&format!(PROTECTED_24_, self.format_number(transformed.y)));
+                                result.push_str(&format!("{} ", self.format_number(transformed.y)));
                             }
                             current_x = transformed.x;
                             current_y = transformed.y;
@@ -307,7 +307,7 @@ mod tests {
                             if let (Some(x), Some(y)) = (self.parse_coord(&mut chars), self.parse_coord(&mut chars)) {
                                 let point = Point2::new(x, y);
                                 let transformed = matrix.transform_point(&point);
-                                result.push_str(&format!(PROTECTED_25_, 
+                                result.push_str(&format!("{} {} ", 
                                     self.format_number(transformed.x),
                                     self.format_number(transformed.y)
                                 ));
@@ -374,7 +374,7 @@ mod tests {
 
     /// Format a number with the configured precision
     fn format_number(&self, num: f64) -> String {
-        format!(PROTECTED_26_, num, prec = self.config.float_precision as usize)
+        format!("{:.prec$}", num, prec = self.config.float_precision as usize)
             .trim_end_matches('0')
             .trim_end_matches('.')
             .to_string()

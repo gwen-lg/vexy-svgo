@@ -59,12 +59,57 @@ impl ConvertEllipseToCirclePlugin {
 
     /// Recursively convert ellipse elements to circle elements
     fn convert_ellipse_to_circle_recursive(&self, element: &mut Element) {
-        // Process this element if itPROTECTED_112_static str {
+        // Process this element if it's an ellipse
+        if element.name == "ellipse" {
+            let rx = element
+                .attributes
+                .get("rx")
+                .cloned()
+                .unwrap_or_else(|| "0".to_string());
+            let ry = element
+                .attributes
+                .get("ry")
+                .cloned()
+                .unwrap_or_else(|| "0".to_string());
+
+            // Convert to circle if rx == ry or either is "auto"
+            if rx == ry || rx == "auto" || ry == "auto" {
+                element.name = "circle".into();
+
+                // Choose the appropriate radius value
+                let radius = if rx == "auto" { ry } else { rx };
+
+                // Remove rx and ry attributes
+                element.attributes.remove("rx");
+                element.attributes.remove("ry");
+
+                // Add r attribute
+                element.attributes.insert("r".to_string(), radius);
+            }
+        }
+
+        // Process child elements recursively
+        for child in &mut element.children {
+            if let Node::Element(elem) = child {
+                self.convert_ellipse_to_circle_recursive(elem);
+            }
+        }
+    }
+}
+
+impl Default for ConvertEllipseToCirclePlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for ConvertEllipseToCirclePlugin {
+    fn name(&self) -> &'static str {
         "convertEllipseToCircle"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_16_
+        "converts non-eccentric <ellipse>s to <circle>s"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -170,7 +215,7 @@ mod tests {
         let plugin = ConvertEllipseToCirclePlugin::new();
         let mut doc = Document::new();
 
-        // Create ellipse with rx=PROTECTED_41_
+        // Create ellipse with rx="auto"
         let mut ellipse = create_element("ellipse");
         ellipse
             .attributes
@@ -201,7 +246,7 @@ mod tests {
         let plugin = ConvertEllipseToCirclePlugin::new();
         let mut doc = Document::new();
 
-        // Create ellipse with ry=PROTECTED_54_
+        // Create ellipse with ry="auto"
         let mut ellipse = create_element("ellipse");
         ellipse
             .attributes
@@ -328,51 +373,6 @@ mod tests {
             .attributes
             .insert("rx".to_string(), "5".to_string());
         ellipse2
-            .attributes
-            .insert("ry".to_string(), "10".to_string());
-        group.children.push(Node::Element(ellipse2));
-
-        doc.root.children.push(Node::Element(group));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Should have converted one ellipse to circle
-        assert_eq!(count_elements_by_name(&doc.root, "ellipse"), 1);
-        assert_eq!(count_elements_by_name(&doc.root, "circle"), 1);
-    }
-
-    #[test]
-    fn test_no_ellipses() {
-        let plugin = ConvertEllipseToCirclePlugin::new();
-        let mut doc = Document::new();
-
-        // Add non-ellipse elements
-        let rect = create_element("rect");
-        doc.root.children.push(Node::Element(rect));
-
-        let circle = create_element("circle");
-        doc.root.children.push(Node::Element(circle));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Should have no changes
-        assert_eq!(count_elements_by_name(&doc.root, "ellipse"), 0);
-        assert_eq!(count_elements_by_name(&doc.root, "circle"), 1);
-        assert_eq!(count_elements_by_name(&doc.root, "rect"), 1);
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = ConvertEllipseToCirclePlugin::parse_config(&json!({})).unwrap();
-        // No fields to check since config is empty
-        let _ = config;
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(ConvertEllipseToCirclePlugin, "convertEllipseToCircle");
             .attributes
             .insert("ry".to_string(), "10".to_string());
         group.children.push(Node::Element(ellipse2));

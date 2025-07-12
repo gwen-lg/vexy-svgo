@@ -83,7 +83,7 @@ impl Default for RemoveMetadataPlugin {
 
 impl Plugin for RemoveMetadataPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_3_
+        "removeMetadata"
     }
 
     fn description(&self) -> &'static str {

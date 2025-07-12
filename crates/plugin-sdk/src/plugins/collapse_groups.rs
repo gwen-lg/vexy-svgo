@@ -40,49 +40,49 @@ impl CollapseGroupsPlugin {
             std::sync::OnceLock::new();
         INHERITABLE_ATTRS.get_or_init(|| {
             [
-                PROTECTED_5_,
-                PROTECTED_6_,
-                PROTECTED_7_,
-                PROTECTED_8_,
-                PROTECTED_9_,
-                PROTECTED_10_,
-                PROTECTED_11_,
-                PROTECTED_12_,
-                PROTECTED_13_,
-                PROTECTED_14_,
-                PROTECTED_15_,
-                PROTECTED_16_,
-                PROTECTED_17_,
-                PROTECTED_18_,
-                PROTECTED_19_,
-                PROTECTED_20_,
-                PROTECTED_21_,
-                PROTECTED_22_,
-                PROTECTED_23_,
-                PROTECTED_24_,
-                PROTECTED_25_,
-                PROTECTED_26_,
-                PROTECTED_27_,
-                PROTECTED_28_,
-                PROTECTED_29_,
-                PROTECTED_30_,
-                PROTECTED_31_,
-                PROTECTED_32_,
-                PROTECTED_33_,
-                PROTECTED_34_,
-                PROTECTED_35_,
-                PROTECTED_36_,
-                PROTECTED_37_,
-                PROTECTED_38_,
-                PROTECTED_39_,
-                PROTECTED_40_,
-                PROTECTED_41_,
-                PROTECTED_42_,
-                PROTECTED_43_,
-                PROTECTED_44_,
-                PROTECTED_45_,
-                PROTECTED_46_,
-                PROTECTED_47_,
+                "clip-rule",
+                "color",
+                "color-interpolation",
+                "color-interpolation-filters",
+                "color-profile",
+                "color-rendering",
+                "cursor",
+                "direction",
+                "fill",
+                "fill-opacity",
+                "fill-rule",
+                "font",
+                "font-family",
+                "font-size",
+                "font-size-adjust",
+                "font-stretch",
+                "font-style",
+                "font-variant",
+                "font-weight",
+                "glyph-orientation-horizontal",
+                "glyph-orientation-vertical",
+                "image-rendering",
+                "kerning",
+                "letter-spacing",
+                "marker",
+                "marker-end",
+                "marker-mid",
+                "marker-start",
+                "pointer-events",
+                "shape-rendering",
+                "stroke",
+                "stroke-dasharray",
+                "stroke-dashoffset",
+                "stroke-linecap",
+                "stroke-linejoin",
+                "stroke-miterlimit",
+                "stroke-opacity",
+                "stroke-width",
+                "text-anchor",
+                "text-rendering",
+                "visibility",
+                "word-spacing",
+                "writing-mode",
             ]
             .into_iter()
             .collect()
@@ -103,24 +103,24 @@ impl CollapseGroupsPlugin {
     /// Check if attributes can be safely moved from group to child
     fn can_move_attributes(group: &Element, child: &Element) -> bool {
         // Child must not have an id (to avoid reference conflicts)
-        if child.attributes.contains_key(PROTECTED_48_) {
+        if child.attributes.contains_key("id") {
             return false;
         }
 
         // Group must not have filter (filters apply to group boundary)
-        if group.attributes.contains_key(PROTECTED_49_) {
+        if group.attributes.contains_key("filter") {
             return false;
         }
 
         // Both cannot have class attributes (would conflict)
-        if group.attributes.contains_key(PROTECTED_50_) && child.attributes.contains_key(PROTECTED_51_) {
+        if group.attributes.contains_key("class") && child.attributes.contains_key("class") {
             return false;
         }
 
         // Check for clip-path/mask conflicts
-        if (group.attributes.contains_key(PROTECTED_52_)
-            && child.attributes.contains_key(PROTECTED_53_))
-            || (group.attributes.contains_key(PROTECTED_54_) && child.attributes.contains_key(PROTECTED_55_))
+        if (group.attributes.contains_key("clip-path")
+            && child.attributes.contains_key("clip-path"))
+            || (group.attributes.contains_key("mask") && child.attributes.contains_key("mask"))
         {
             return false;
         }
@@ -132,11 +132,11 @@ impl CollapseGroupsPlugin {
     fn move_attributes(group: &Element, child: &mut Element) {
         for (attr_name, attr_value) in &group.attributes {
             match attr_name.as_str() {
-                PROTECTED_56_ => {
+                "transform" => {
                     // Concatenate transforms: parent transform comes first
-                    if let Some(child_transform) = child.attributes.get(PROTECTED_57_) {
-                        let combined = format!(PROTECTED_58_, attr_value, child_transform);
-                        child.attributes.insert(PROTECTED_59_.to_string(), combined);
+                    if let Some(child_transform) = child.attributes.get("transform") {
+                        let combined = format!("{} {}", attr_value, child_transform);
+                        child.attributes.insert("transform".to_string(), combined);
                     } else {
                         child
                             .attributes
@@ -144,7 +144,7 @@ impl CollapseGroupsPlugin {
                     }
                 }
                 _ => {
-                    // Handle inheritance: replace PROTECTED_60_ with parent's value
+                    // Handle inheritance: replace "inherit" with parent's value
                     if let Some(existing_value) = child.attributes.get(attr_name) {
                         if existing_value == "inherit"
                             && Self::inheritable_attributes().contains(attr_name.as_str())
@@ -153,7 +153,9 @@ impl CollapseGroupsPlugin {
                                 .attributes
                                 .insert(attr_name.clone(), attr_value.clone());
                         }
-                        // If child already has non-inherit value, donPROTECTED_149_t have this attribute, so add it
+                        // If child already has non-inherit value, don't override
+                    } else {
+                        // Child doesn't have this attribute, so add it
                         child
                             .attributes
                             .insert(attr_name.clone(), attr_value.clone());
@@ -218,7 +220,7 @@ impl Plugin for CollapseGroupsPlugin {
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_64_
+        "Collapse unnecessary group elements"
     }
 
     fn validate_params(&self, params: &serde_json::Value) -> anyhow::Result<()> {
@@ -505,7 +507,5 @@ mod tests {
             assert_eq!(element.children.len(), 2);
             assert_eq!(element.attributes.get("fill"), Some(&"red".to_string()));
         }
-    }
-}
     }
 }

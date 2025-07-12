@@ -2,7 +2,16 @@
 
 //! Remove non-inheritable group attributes plugin implementation
 //!
-//! This plugin removes non-inheritable groupPROTECTED_230_s removeNonInheritableGroupAttrs plugin
+//! This plugin removes non-inheritable group's presentation attributes.
+//! Group elements can only inherit certain presentation attributes,
+//! and this plugin removes attributes that cannot be inherited.
+//!
+//! The plugin checks if an attribute is:
+//! 1. A presentation attribute (can affect visual rendering)
+//! 2. NOT inheritable by child elements
+//! 3. NOT allowed as a group attribute (exceptions for groups)
+//!
+//! Reference: SVGO's removeNonInheritableGroupAttrs plugin
 
 use crate::Plugin;
 use anyhow::Result;
@@ -37,67 +46,67 @@ impl RemoveNonInheritableGroupAttrsPlugin {
     pub fn new() -> Self {
         // Presentation attributes (can affect visual rendering)
         let presentation_attrs = [
-            PROTECTED_1_,
-            PROTECTED_2_,
-            PROTECTED_3_,
-            PROTECTED_4_,
-            PROTECTED_5_,
-            PROTECTED_6_,
-            PROTECTED_7_,
-            PROTECTED_8_,
-            PROTECTED_9_,
-            PROTECTED_10_,
-            PROTECTED_11_,
-            PROTECTED_12_,
-            PROTECTED_13_,
-            PROTECTED_14_,
-            PROTECTED_15_,
-            PROTECTED_16_,
-            PROTECTED_17_,
-            PROTECTED_18_,
-            PROTECTED_19_,
-            PROTECTED_20_,
-            PROTECTED_21_,
-            PROTECTED_22_,
-            PROTECTED_23_,
-            PROTECTED_24_,
-            PROTECTED_25_,
-            PROTECTED_26_,
-            PROTECTED_27_,
-            PROTECTED_28_,
-            PROTECTED_29_,
-            PROTECTED_30_,
-            PROTECTED_31_,
-            PROTECTED_32_,
-            PROTECTED_33_,
-            PROTECTED_34_,
-            PROTECTED_35_,
-            PROTECTED_36_,
-            PROTECTED_37_,
-            PROTECTED_38_,
-            PROTECTED_39_,
-            PROTECTED_40_,
-            PROTECTED_41_,
-            PROTECTED_42_,
-            PROTECTED_43_,
-            PROTECTED_44_,
-            PROTECTED_45_,
-            PROTECTED_46_,
-            PROTECTED_47_,
-            PROTECTED_48_,
-            PROTECTED_49_,
-            PROTECTED_50_,
-            PROTECTED_51_,
-            PROTECTED_52_,
-            PROTECTED_53_,
-            PROTECTED_54_,
-            PROTECTED_55_,
-            PROTECTED_56_,
-            PROTECTED_57_,
-            PROTECTED_58_,
-            PROTECTED_59_,
-            PROTECTED_60_,
-            PROTECTED_61_,
+            "alignment-baseline",
+            "baseline-shift",
+            "clip-path",
+            "clip-rule",
+            "clip",
+            "color-interpolation-filters",
+            "color-interpolation",
+            "color-profile",
+            "color-rendering",
+            "color",
+            "cursor",
+            "direction",
+            "display",
+            "dominant-baseline",
+            "enable-background",
+            "fill-opacity",
+            "fill-rule",
+            "fill",
+            "filter",
+            "flood-color",
+            "flood-opacity",
+            "font-family",
+            "font-size-adjust",
+            "font-size",
+            "font-stretch",
+            "font-style",
+            "font-variant",
+            "font-weight",
+            "glyph-orientation-horizontal",
+            "glyph-orientation-vertical",
+            "image-rendering",
+            "letter-spacing",
+            "lighting-color",
+            "marker-end",
+            "marker-mid",
+            "marker-start",
+            "mask",
+            "opacity",
+            "overflow",
+            "paint-order",
+            "pointer-events",
+            "shape-rendering",
+            "stop-color",
+            "stop-opacity",
+            "stroke-dasharray",
+            "stroke-dashoffset",
+            "stroke-linecap",
+            "stroke-linejoin",
+            "stroke-miterlimit",
+            "stroke-opacity",
+            "stroke-width",
+            "stroke",
+            "text-anchor",
+            "text-decoration",
+            "text-rendering",
+            "transform",
+            "unicode-bidi",
+            "vector-effect",
+            "visibility",
+            "word-spacing",
+            "writing-mode",
         ]
         .iter()
         .cloned()
@@ -105,50 +114,50 @@ impl RemoveNonInheritableGroupAttrsPlugin {
 
         // Inheritable attributes (can be inherited by child elements)
         let inheritable_attrs = [
-            PROTECTED_62_,
-            PROTECTED_63_,
-            PROTECTED_64_,
-            PROTECTED_65_,
-            PROTECTED_66_,
-            PROTECTED_67_,
-            PROTECTED_68_,
-            PROTECTED_69_,
-            PROTECTED_70_,
-            PROTECTED_71_,
-            PROTECTED_72_,
-            PROTECTED_73_,
-            PROTECTED_74_,
-            PROTECTED_75_,
-            PROTECTED_76_,
-            PROTECTED_77_,
-            PROTECTED_78_,
-            PROTECTED_79_,
-            PROTECTED_80_,
-            PROTECTED_81_,
-            PROTECTED_82_,
-            PROTECTED_83_,
-            PROTECTED_84_,
-            PROTECTED_85_,
-            PROTECTED_86_,
-            PROTECTED_87_,
-            PROTECTED_88_,
-            PROTECTED_89_,
-            PROTECTED_90_,
-            PROTECTED_91_,
-            PROTECTED_92_,
-            PROTECTED_93_,
-            PROTECTED_94_,
-            PROTECTED_95_,
-            PROTECTED_96_,
-            PROTECTED_97_,
-            PROTECTED_98_,
-            PROTECTED_99_,
-            PROTECTED_100_,
-            PROTECTED_101_,
-            PROTECTED_102_,
-            PROTECTED_103_,
-            PROTECTED_104_,
-            PROTECTED_105_,
+            "clip-rule",
+            "color-interpolation-filters",
+            "color-interpolation",
+            "color-profile",
+            "color-rendering",
+            "color",
+            "cursor",
+            "direction",
+            "dominant-baseline",
+            "fill-opacity",
+            "fill-rule",
+            "fill",
+            "font-family",
+            "font-size-adjust",
+            "font-size",
+            "font-stretch",
+            "font-style",
+            "font-variant",
+            "font-weight",
+            "font",
+            "glyph-orientation-horizontal",
+            "glyph-orientation-vertical",
+            "image-rendering",
+            "letter-spacing",
+            "marker-end",
+            "marker-mid",
+            "marker-start",
+            "marker",
+            "paint-order",
+            "pointer-events",
+            "shape-rendering",
+            "stroke-dasharray",
+            "stroke-dashoffset",
+            "stroke-linecap",
+            "stroke-linejoin",
+            "stroke-miterlimit",
+            "stroke-opacity",
+            "stroke-width",
+            "stroke",
+            "text-anchor",
+            "text-rendering",
+            "visibility",
+            "word-spacing",
+            "writing-mode",
         ]
         .iter()
         .cloned()
@@ -156,14 +165,14 @@ impl RemoveNonInheritableGroupAttrsPlugin {
 
         // Presentation attributes that are allowed on groups even if non-inheritable
         let presentation_non_inheritable_group_attrs = [
-            PROTECTED_106_,
-            PROTECTED_107_,
-            PROTECTED_108_,
-            PROTECTED_109_,
-            PROTECTED_110_,
-            PROTECTED_111_,
-            PROTECTED_112_,
-            PROTECTED_113_,
+            "clip-path",
+            "display",
+            "filter",
+            "mask",
+            "opacity",
+            "text-decoration",
+            "transform",
+            "unicode-bidi",
         ]
         .iter()
         .cloned()
@@ -190,7 +199,7 @@ impl RemoveNonInheritableGroupAttrsPlugin {
             Ok(RemoveNonInheritableGroupAttrsConfig::default())
         } else if params.is_object() {
             serde_json::from_value(params.clone())
-                .map_err(|e| anyhow::anyhow!(PROTECTED_114_, e))
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
         } else {
             Ok(RemoveNonInheritableGroupAttrsConfig::default())
         }
@@ -204,13 +213,47 @@ impl RemoveNonInheritableGroupAttrsPlugin {
 
             for attr_name in element.attributes.keys() {
                 // Remove if:
-                // 1. ItPROTECTED_233_s NOT inheritable AND
-                // 3. ItPROTECTED_234_static str {
+                // 1. It's a presentation attribute AND
+                // 2. It's NOT inheritable AND
+                // 3. It's NOT allowed as a group attribute
+                if self.presentation_attrs.contains(attr_name.as_str())
+                    && !self.inheritable_attrs.contains(attr_name.as_str())
+                    && !self
+                        .presentation_non_inheritable_group_attrs
+                        .contains(attr_name.as_str())
+                {
+                    attrs_to_remove.push(attr_name.clone());
+                }
+            }
+
+            // Remove the identified attributes
+            for attr_name in attrs_to_remove {
+                element.attributes.remove(&attr_name);
+            }
+        }
+
+        // Process child elements recursively
+        for child in &mut element.children {
+            if let Node::Element(elem) = child {
+                self.remove_non_inheritable_group_attrs_recursive(elem);
+            }
+        }
+    }
+}
+
+impl Default for RemoveNonInheritableGroupAttrsPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveNonInheritableGroupAttrsPlugin {
+    fn name(&self) -> &'static str {
         "removeNonInheritableGroupAttrs"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_117_
+        "removes non-inheritable group's presentational attributes"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -511,49 +554,6 @@ mod tests {
         if let Node::Element(outer_elem) = &doc.root.children[0] {
             // Outer group: removed non-inheritable, kept inheritable
             assert!(!outer_elem.attributes.contains_key("alignment-baseline"));
-            assert_eq!(outer_elem.attributes.get("fill"), Some(&"red".to_string()));
-
-            if let Node::Element(inner_elem) = &outer_elem.children[0] {
-                // Inner group: removed non-inheritable, kept inheritable
-                assert!(!inner_elem.attributes.contains_key("baseline-shift"));
-                assert_eq!(
-                    inner_elem.attributes.get("stroke"),
-                    Some(&"blue".to_string())
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn test_empty_group() {
-        let plugin = RemoveNonInheritableGroupAttrsPlugin::new();
-        let mut doc = Document::new();
-
-        // Create empty group
-        let group = create_element("g");
-        doc.root.children.push(Node::Element(group));
-
-        // Apply plugin - should not crash
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_ok());
-
-        // Group should still exist
-        assert_eq!(doc.root.children.len(), 1);
-        if let Node::Element(elem) = &doc.root.children[0] {
-            assert_eq!(elem.name, "g");
-        }
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = RemoveNonInheritableGroupAttrsPlugin::parse_config(&json!({})).unwrap();
-        // No fields to check since config is empty
-        let _ = config;
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveNonInheritableGroupAttrsPlugin, "removeNonInheritableGroupAttrs");
             assert_eq!(outer_elem.attributes.get("fill"), Some(&"red".to_string()));
 
             if let Node::Element(inner_elem) = &outer_elem.children[0] {

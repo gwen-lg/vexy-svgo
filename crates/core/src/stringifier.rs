@@ -132,15 +132,15 @@ fn estimate_element_size(element: &Element) -> usize {
     
     // Attributes
     for (name, value) in &element.attributes {
-        size += name.len() + value.len() + 4; // name=PROTECTED_9_
+        size += name.len() + value.len() + 4; // name="value"
     }
     
     // Namespaces
     for (prefix, uri) in &element.namespaces {
         if prefix.is_empty() {
-            size += 7 + uri.len(); // xmlns=PROTECTED_10_
+            size += 7 + uri.len(); // xmlns="uri"
         } else {
-            size += 7 + prefix.len() + uri.len(); // xmlns:prefix=PROTECTED_11_
+            size += 7 + prefix.len() + uri.len(); // xmlns:prefix="uri"
         }
     }
     

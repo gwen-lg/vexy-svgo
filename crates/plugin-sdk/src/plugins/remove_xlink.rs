@@ -5,7 +5,26 @@
 //! This plugin removes the deprecated XLink namespace and converts XLink attributes
 //! to their SVG 2 equivalents where applicable. XLink was deprecated in SVG 2.
 //!
-//! Reference: SVGOPROTECTED_88_t support SVG 2 href
+//! Reference: SVGO's removeXlink plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// XLink namespace URI
+const XLINK_NAMESPACE: &str = "http://www.w3.org/1999/xlink";
+
+/// Elements that use xlink:href but were deprecated in SVG 2
+const LEGACY_ELEMENTS: &[&str] = &["cursor", "filter", "font-face-uri", "glyphRef", "tref"];
+
+/// Configuration for the removeXlink plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveXlinkConfig {
+    /// Include legacy elements that don't support SVG 2 href
     #[serde(default)]
     pub include_legacy: bool,
 }
@@ -215,12 +234,55 @@ impl RemoveXlinkPlugin {
         xlink_prefixes: &[String],
         used_in_legacy: &[String],
     ) {
-        // Remove any remaining xlink attributes that werenPROTECTED_89_:PROTECTED_90_static str {
+        // Remove any remaining xlink attributes that weren't converted
+        let attrs_to_remove: Vec<String> = element
+            .attributes
+            .keys()
+            .filter(|key| {
+                if let Some(colon_pos) = key.find(':') {
+                    let prefix = &key[..colon_pos];
+                    xlink_prefixes.contains(&prefix.to_string())
+                        && !used_in_legacy.contains(&prefix.to_string())
+                } else {
+                    false
+                }
+            })
+            .cloned()
+            .collect();
+
+        for attr in attrs_to_remove {
+            element.remove_attr(&attr);
+        }
+    }
+}
+
+impl Default for RemoveXlinkPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+struct XlinkContext {
+    xlink_prefixes: Vec<String>,
+    used_in_legacy: Vec<String>,
+}
+
+impl XlinkContext {
+    fn new() -> Self {
+        Self {
+            xlink_prefixes: Vec::new(),
+            used_in_legacy: Vec::new(),
+        }
+    }
+}
+
+impl Plugin for RemoveXlinkPlugin {
+    fn name(&self) -> &'static str {
         "removeXlink"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_26_
+        "remove xlink namespace and replaces attributes with the SVG 2 equivalent where applicable"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -370,7 +432,7 @@ mod tests {
         let result = plugin.apply(&mut document);
         assert!(result.is_ok());
 
-        // xlink:show=PROTECTED_55_ should become target=PROTECTED_56_
+        // xlink:show="new" should become target="_blank"
         if let Node::Element(ref elem) = document.root.children[0] {
             assert!(!elem.has_attr("xlink:show"));
             assert_eq!(elem.attr("target").map(|s| s.as_str()), Some("_blank"));
@@ -424,68 +486,6 @@ mod tests {
     fn test_preserve_legacy_elements() {
         let mut document = create_test_document();
 
-        document.root.set_attr("xmlns:xlink", XLINK_NAMESPACE);
-
-        let mut filter_element = Element {
-            name: Cow::Borrowed("filter"),
-            attributes: IndexMap::new(),
-            namespaces: IndexMap::new(),
-            children: vec![],
-        };
-        filter_element.set_attr("xlink:href", "#filter1");
-
-        document.root.children = vec![Node::Element(filter_element)];
-
-        let plugin = RemoveXlinkPlugin::new();
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // Legacy elements should preserve xlink attributes by default
-        if let Node::Element(ref filter) = document.root.children[0] {
-            assert!(filter.has_attr("xlink:href"));
-            assert!(!filter.has_attr("href"));
-        } else {
-            panic!("Expected filter element");
-        }
-
-        // xlink namespace should be preserved for legacy usage
-        assert!(document.root.has_attr("xmlns:xlink"));
-    }
-
-    #[test]
-    fn test_include_legacy_option() {
-        let mut document = create_test_document();
-
-        document.root.set_attr("xmlns:xlink", XLINK_NAMESPACE);
-
-        let mut filter_element = Element {
-            name: Cow::Borrowed("filter"),
-            attributes: IndexMap::new(),
-            namespaces: IndexMap::new(),
-            children: vec![],
-        };
-        filter_element.set_attr("xlink:href", "#filter1");
-
-        document.root.children = vec![Node::Element(filter_element)];
-
-        let params = serde_json::json!({"includeLegacy": true});
-        let plugin = RemoveXlinkPlugin::new();
-        plugin.validate_params(&params).unwrap();
-        let plugin = RemoveXlinkPlugin::with_config(RemoveXlinkConfig {
-            include_legacy: true,
-        });
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // With includeLegacy=true, should convert even legacy elements
-        if let Node::Element(ref filter) = document.root.children[0] {
-            assert!(!filter.has_attr("xlink:href"));
-            assert_eq!(filter.attr("href").map(|s| s.as_str()), Some("#filter1"));
-        } else {
-            panic!("Expected filter element");
-        }
-    }
-}
         document.root.set_attr("xmlns:xlink", XLINK_NAMESPACE);
 
         let mut filter_element = Element {

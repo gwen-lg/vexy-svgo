@@ -5,143 +5,143 @@
 //! This plugin collapses multiple transformations, converts matrices to short aliases,
 //! converts long transform notations to short ones, and removes useless transforms.
 //!
-//! Reference: SVGOPROTECTED_80_,PROTECTED_81_.PROTECTED_82_0PROTECTED_83_.PROTECTED_84_static str {
-        "convertTransform"
-    }
+//! Reference: SVGO's convertTransform plugin
 
-    fn description(&self) -> &'static str {
-        PROTECTED_1_
-    }
+use crate::Plugin;
+use anyhow::Result;
+use nalgebra::Matrix3;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::f64::consts::PI;
+use vexy_svgo_core::ast::{Document, Element, Node};
 
-    fn validate_params(&self, params: &Value) -> Result<()> {
-        Self::parse_config(params)?;
-        Ok(())
-    }
-
-    fn apply(&self, document: &mut Document) -> Result<()> {
-        self.process_element(&mut document.root);
-        Ok(())
-    }
+/// Configuration for the convertTransform plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ConvertTransformConfig {
+    /// Convert matrices to shorter aliases (translate, scale, rotate)
+    #[serde(default = "default_true")]
+    pub convert_to_shorts: bool,
+    /// Precision for degree values
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deg_precision: Option<u8>,
+    /// Precision for float values
+    #[serde(default = "default_float_precision")]
+    pub float_precision: u8,
+    /// Precision for transform values (matrix parameters)
+    #[serde(default = "default_transform_precision")]
+    pub transform_precision: u8,
+    /// Convert matrices to transform functions
+    #[serde(default = "default_true")]
+    pub matrix_to_transform: bool,
+    /// Use short translate notation
+    #[serde(default = "default_true")]
+    pub short_translate: bool,
+    /// Use short scale notation
+    #[serde(default = "default_true")]
+    pub short_scale: bool,
+    /// Use short rotate notation
+    #[serde(default = "default_true")]
+    pub short_rotate: bool,
+    /// Remove useless transforms
+    #[serde(default = "default_true")]
+    pub remove_useless: bool,
+    /// Collapse multiple transforms into one
+    #[serde(default = "default_true")]
+    pub collapse_into_one: bool,
+    /// Include leading zero
+    #[serde(default = "default_true")]
+    pub leading_zero: bool,
+    /// Add extra space for negative values
+    #[serde(default)]
+    pub negative_extra_space: bool,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use indexmap::IndexMap;
-    use serde_json::json;
+fn default_true() -> bool {
+    true
+}
 
-    fn create_test_element_with_transform(transform: &str) -> Element {
-        let mut attributes = IndexMap::new();
-        attributes.insert(PROTECTED_2_.to_string(), transform.to_string());
-        Element {
-            name: PROTECTED_3_.into(),
-            attributes,
-            children: vec![],
-            namespaces: IndexMap::new(),
+fn default_float_precision() -> u8 {
+    3
+}
+
+fn default_transform_precision() -> u8 {
+    5
+}
+
+impl Default for ConvertTransformConfig {
+    fn default() -> Self {
+        Self {
+            convert_to_shorts: true,
+            deg_precision: None,
+            float_precision: 3,
+            transform_precision: 5,
+            matrix_to_transform: true,
+            short_translate: true,
+            short_scale: true,
+            short_rotate: true,
+            remove_useless: true,
+            collapse_into_one: true,
+            leading_zero: true,
+            negative_extra_space: false,
         }
     }
-
-    #[test]
-    fn test_plugin_info() {
-        let plugin = ConvertTransformPlugin::new();
-        assert_eq!(plugin.name(), PROTECTED_4_);
-        assert_eq!(
-            plugin.description(),
-            PROTECTED_5_
-        );
-    }
-
-    #[test]
-    fn test_param_validation() {
-        let plugin = ConvertTransformPlugin::new();
-
-        // Test null params
-        assert!(plugin.validate_params(&Value::Null).is_ok());
-
-        // Test valid params
-        assert!(plugin
-            .validate_params(&json!({
-                PROTECTED_6_: true,
-                PROTECTED_7_: 3,
-                PROTECTED_8_: 5,
-                PROTECTED_9_: true,
-                PROTECTED_10_: true,
-                PROTECTED_11_: true,
-                PROTECTED_12_: true,
-                PROTECTED_13_: true,
-                PROTECTED_14_: true,
-                PROTECTED_15_: true,
-                PROTECTED_16_: false
-            }))
-            .is_ok());
-
-        // Test invalid params
-        assert!(plugin
-            .validate_params(&json!({
-                PROTECTED_17_: true
-            }))
-            .is_err());
-    }
-
-    #[test]
-    fn test_parse_transform_string() {
-        let plugin = ConvertTransformPlugin::new();
-        let transforms = plugin.parse_transform_string(PROTECTED_18_);
-
-        assert_eq!(transforms.len(), 2);
-        assert_eq!(transforms[0].name, PROTECTED_19_);
-        assert_eq!(transforms[0].data, vec![10.0, 20.0]);
-        assert_eq!(transforms[1].name, PROTECTED_20_);
-        assert_eq!(transforms[1].data, vec![2.0]);
-    }
-
-    #[test]
-    fn test_remove_useless_transforms() {
-        let plugin = ConvertTransformPlugin::new();
-
-        // Identity transforms
-        assert!(
-            plugin.is_useless_transform(&Transform::new(PROTECTED_21_.to_string(), vec![0.0, 0.0]))
-        );
-        assert!(plugin.is_useless_transform(&Transform::new(PROTECTED_22_.to_string(), vec![1.0, 1.0])));
-        assert!(plugin.is_useless_transform(&Transform::new(PROTECTED_23_.to_string(), vec![0.0])));
-
-        // Non-identity transforms
-        assert!(
-            !plugin.is_useless_transform(&Transform::new(PROTECTED_24_.to_string(), vec![10.0, 0.0]))
-        );
-        assert!(!plugin.is_useless_transform(&Transform::new(PROTECTED_25_.to_string(), vec![2.0, 1.0])));
-        assert!(!plugin.is_useless_transform(&Transform::new(PROTECTED_26_.to_string(), vec![45.0])));
-    }
-
-    #[test]
-    fn test_plugin_removes_identity_transform() {
-        let mut doc = Document::default();
-        doc.root = create_test_element_with_transform(PROTECTED_27_);
-
-        let plugin = ConvertTransformPlugin::new();
-        plugin.apply(&mut doc).unwrap();
-
-        // Transform should be removed
-        assert!(!doc.root.has_attr(PROTECTED_28_));
-    }
-
-    #[test]
-    fn test_plugin_optimizes_transform() {
-        let mut doc = Document::default();
-        doc.root = create_test_element_with_transform(PROTECTED_29_);
-
-        let config = ConvertTransformConfig {
-            short_translate: true,
-            ..Default::default()
-        };
-        let plugin = ConvertTransformPlugin::with_config(config);
-        plugin.apply(&mut doc).unwrap();
-
-        // Should be shortened to single parameter
-        assert_eq!(doc.root.attr(PROTECTED_30_).map(|s| s.as_str()), Some(PROTECTED_31_));
-    }
 }
+
+/// Represents a single transform operation
+#[derive(Debug, Clone, PartialEq)]
+struct Transform {
+    name: String,
+    data: Vec<f64>,
+}
+
+impl Transform {
+    /// Create a new transform
+    fn new(name: String, data: Vec<f64>) -> Self {
+        Self { name, data }
+    }
+
+    /// Convert to matrix representation
+    fn to_matrix(&self) -> Matrix3<f64> {
+        match self.name.as_str() {
+            "matrix" => {
+                if self.data.len() >= 6 {
+                    Matrix3::new(
+                        self.data[0],
+                        self.data[2],
+                        self.data[4],
+                        self.data[1],
+                        self.data[3],
+                        self.data[5],
+                        0.0,
+                        0.0,
+                        1.0,
+                    )
+                } else {
+                    Matrix3::identity()
+                }
+            }
+            "translate" => {
+                let tx = self.data.first().copied().unwrap_or(0.0);
+                let ty = self.data.get(1).copied().unwrap_or(0.0);
+                Matrix3::new(1.0, 0.0, tx, 0.0, 1.0, ty, 0.0, 0.0, 1.0)
+            }
+            "scale" => {
+                let sx = self.data.first().copied().unwrap_or(1.0);
+                let sy = self.data.get(1).copied().unwrap_or(sx);
+                Matrix3::new(sx, 0.0, 0.0, 0.0, sy, 0.0, 0.0, 0.0, 1.0)
+            }
+            "rotate" => {
+                let angle = self.data.first().copied().unwrap_or(0.0) * PI / 180.0;
+                let cx = self.data.get(1).copied().unwrap_or(0.0);
+                let cy = self.data.get(2).copied().unwrap_or(0.0);
+
+                let cos_a = angle.cos();
+                let sin_a = angle.sin();
+
+                if cx == 0.0 && cy == 0.0 {
+                    Matrix3::new(cos_a, -sin_a, 0.0, sin_a, cos_a, 0.0, 0.0, 0.0, 1.0)
+                } else {
                     // rotate(angle, cx, cy) = translate(cx, cy) rotate(angle) translate(-cx, -cy)
                     let translate_to = Matrix3::new(1.0, 0.0, cx, 0.0, 1.0, cy, 0.0, 0.0, 1.0);
                     let rotate = Matrix3::new(cos_a, -sin_a, 0.0, sin_a, cos_a, 0.0, 0.0, 0.0, 1.0);
@@ -149,11 +149,11 @@ mod tests {
                     translate_to * rotate * translate_back
                 }
             }
-            PROTECTED_32_ => {
+            "skewX" => {
                 let angle = self.data.first().copied().unwrap_or(0.0) * PI / 180.0;
                 Matrix3::new(1.0, angle.tan(), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
             }
-            PROTECTED_33_ => {
+            "skewY" => {
                 let angle = self.data.first().copied().unwrap_or(0.0) * PI / 180.0;
                 Matrix3::new(1.0, 0.0, 0.0, angle.tan(), 1.0, 0.0, 0.0, 0.0, 1.0)
             }
@@ -183,7 +183,7 @@ impl ConvertTransformPlugin {
             Ok(ConvertTransformConfig::default())
         } else {
             serde_json::from_value(params.clone())
-                .map_err(|e| anyhow::anyhow!(PROTECTED_34_, e))
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
         }
     }
 
@@ -193,7 +193,7 @@ impl ConvertTransformPlugin {
 
         // Regex pattern to match transform functions
         let re = regex::Regex::new(
-            rPROTECTED_35_,
+            r"\s*(matrix|translate|scale|rotate|skewX|skewY)\s*\(\s*([^)]*)\s*\)",
         )
         .unwrap();
 
@@ -262,44 +262,44 @@ impl ConvertTransformPlugin {
         if self.config.matrix_to_transform {
             // Pure translation
             if a == 1.0 && b == 0.0 && c == 0.0 && d == 1.0 {
-                return Transform::new(PROTECTED_36_.to_string(), vec![e, f]);
+                return Transform::new("translate".to_string(), vec![e, f]);
             }
 
             // Pure scale
             if b == 0.0 && c == 0.0 && e == 0.0 && f == 0.0 {
-                return Transform::new(PROTECTED_37_.to_string(), vec![a, d]);
+                return Transform::new("scale".to_string(), vec![a, d]);
             }
 
             // Pure rotation (no translation)
             if e == 0.0 && f == 0.0 && (a * a + b * b - 1.0).abs() < 1e-10 {
                 let angle = b.atan2(a) * 180.0 / PI;
-                return Transform::new(PROTECTED_38_.to_string(), vec![angle]);
+                return Transform::new("rotate".to_string(), vec![angle]);
             }
         }
 
         // Fallback to matrix
-        Transform::new(PROTECTED_39_.to_string(), vec![a, b, c, d, e, f])
+        Transform::new("matrix".to_string(), vec![a, b, c, d, e, f])
     }
 
     /// Convert transform to shorter notation if possible
     fn convert_to_short(&self, transform: Transform) -> Transform {
         match transform.name.as_str() {
-            PROTECTED_40_ => {
+            "translate" => {
                 if self.config.short_translate
                     && transform.data.len() >= 2
                     && transform.data[1] == 0.0
                 {
-                    Transform::new(PROTECTED_41_.to_string(), vec![transform.data[0]])
+                    Transform::new("translate".to_string(), vec![transform.data[0]])
                 } else {
                     transform
                 }
             }
-            PROTECTED_42_ => {
+            "scale" => {
                 if self.config.short_scale
                     && transform.data.len() >= 2
                     && transform.data[0] == transform.data[1]
                 {
-                    Transform::new(PROTECTED_43_.to_string(), vec![transform.data[0]])
+                    Transform::new("scale".to_string(), vec![transform.data[0]])
                 } else {
                     transform
                 }
@@ -319,21 +319,21 @@ impl ConvertTransformPlugin {
     /// Check if transform is useless (identity)
     fn is_useless_transform(&self, transform: &Transform) -> bool {
         match transform.name.as_str() {
-            PROTECTED_44_ => {
+            "translate" => {
                 transform.data.is_empty()
                     || (!transform.data.is_empty()
                         && transform.data[0] == 0.0
                         && (transform.data.len() == 1 || transform.data[1] == 0.0))
             }
-            PROTECTED_45_ => {
+            "scale" => {
                 transform.data.is_empty()
                     || (!transform.data.is_empty()
                         && transform.data[0] == 1.0
                         && (transform.data.len() == 1 || transform.data[1] == 1.0))
             }
-            PROTECTED_46_ => transform.data.is_empty() || transform.data[0] == 0.0,
-            PROTECTED_47_ | PROTECTED_48_ => transform.data.is_empty() || transform.data[0] == 0.0,
-            PROTECTED_49_ => {
+            "rotate" => transform.data.is_empty() || transform.data[0] == 0.0,
+            "skewX" | "skewY" => transform.data.is_empty() || transform.data[0] == 0.0,
+            "matrix" => {
                 transform.data.len() >= 6 &&
                 transform.data[0] == 1.0 && // a
                 transform.data[1] == 0.0 && // b
@@ -360,11 +360,11 @@ impl ConvertTransformPlugin {
                     .iter()
                     .map(|&val| self.format_number(val))
                     .collect::<Vec<_>>()
-                    .join(PROTECTED_50_);
-                format!(PROTECTED_51_, t.name, data_str)
+                    .join(",");
+                format!("{}({})", t.name, data_str)
             })
             .collect::<Vec<_>>()
-            .join(PROTECTED_52_)
+            .join(" ")
     }
 
     /// Format number according to precision settings
@@ -372,9 +372,9 @@ impl ConvertTransformPlugin {
         let precision = self.config.float_precision;
 
         let formatted = if precision == 0 {
-            format!(PROTECTED_53_, val)
+            format!("{:.0}", val)
         } else {
-            format!(PROTECTED_54_, val, prec = precision as usize)
+            format!("{:.prec$}", val, prec = precision as usize)
         };
 
         // Remove trailing zeros after decimal point
@@ -391,41 +391,41 @@ impl ConvertTransformPlugin {
     /// Process element recursively
     fn process_element(&self, element: &mut Element) {
         // Process transform attribute
-        if let Some(transform_value) = element.attr(PROTECTED_55_) {
+        if let Some(transform_value) = element.attr("transform") {
             let transforms = self.parse_transform_string(transform_value);
             let optimized = self.optimize_transforms(transforms);
 
             if optimized.is_empty() {
-                element.remove_attr(PROTECTED_56_);
+                element.remove_attr("transform");
             } else {
                 let new_value = self.transforms_to_string(optimized);
-                element.set_attr(PROTECTED_57_, &new_value);
+                element.set_attr("transform", &new_value);
             }
         }
 
         // Process gradientTransform attribute
-        if let Some(transform_value) = element.attr(PROTECTED_58_) {
+        if let Some(transform_value) = element.attr("gradientTransform") {
             let transforms = self.parse_transform_string(transform_value);
             let optimized = self.optimize_transforms(transforms);
 
             if optimized.is_empty() {
-                element.remove_attr(PROTECTED_59_);
+                element.remove_attr("gradientTransform");
             } else {
                 let new_value = self.transforms_to_string(optimized);
-                element.set_attr(PROTECTED_60_, &new_value);
+                element.set_attr("gradientTransform", &new_value);
             }
         }
 
         // Process patternTransform attribute
-        if let Some(transform_value) = element.attr(PROTECTED_61_) {
+        if let Some(transform_value) = element.attr("patternTransform") {
             let transforms = self.parse_transform_string(transform_value);
             let optimized = self.optimize_transforms(transforms);
 
             if optimized.is_empty() {
-                element.remove_attr(PROTECTED_62_);
+                element.remove_attr("patternTransform");
             } else {
                 let new_value = self.transforms_to_string(optimized);
-                element.set_attr(PROTECTED_63_, &new_value);
+                element.set_attr("patternTransform", &new_value);
             }
         }
 

@@ -5,7 +5,49 @@
 //! This plugin removes attributes from elements that match specified CSS selectors.
 //! It supports single selectors or multiple selectors with different attribute removals.
 //!
-//! Reference: SVGOPROTECTED_93_de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+//! Reference: SVGO's removeAttributesBySelector plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration for a single selector
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SelectorConfig {
+    /// CSS selector string
+    pub selector: String,
+    /// Attributes to remove (can be a single attribute or list)
+    #[serde(deserialize_with = "deserialize_attributes")]
+    pub attributes: Vec<String>,
+}
+
+/// Configuration for the RemoveAttributesBySelector plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
+pub enum RemoveAttributesBySelectorConfig {
+    /// Single selector configuration
+    Single {
+        selector: String,
+        #[serde(deserialize_with = "deserialize_attributes")]
+        attributes: Vec<String>,
+    },
+    /// Multiple selector configurations
+    Multiple { selectors: Vec<SelectorConfig> },
+}
+
+impl Default for RemoveAttributesBySelectorConfig {
+    fn default() -> Self {
+        Self::Multiple {
+            selectors: Vec::new(),
+        }
+    }
+}
+
+/// Custom deserializer for attributes that can be a string or array of strings
+fn deserialize_attributes<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -43,7 +85,7 @@ impl RemoveAttributesBySelectorPlugin {
             Ok(RemoveAttributesBySelectorConfig::default())
         } else {
             serde_json::from_value(params.clone())
-                .map_err(|e| anyhow::anyhow!(PROTECTED_4_, e))
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
         }
     }
 
@@ -74,17 +116,17 @@ impl RemoveAttributesBySelectorPlugin {
         let matches = if let Some(class_name) = selector.strip_prefix('.') {
             // Class selector: .className
             element
-                .attr(PROTECTED_5_)
+                .attr("class")
                 .is_some_and(|classes| classes.split_whitespace().any(|c| c == class_name))
         } else if let Some(id) = selector.strip_prefix('#') {
             // ID selector: #elementId
-            element.attr(PROTECTED_6_).is_some_and(|elem_id| elem_id == id)
+            element.attr("id").is_some_and(|elem_id| elem_id == id)
         } else if selector.starts_with('[') && selector.ends_with(']') {
-            // Attribute selector: [attr='value'] or [attr=PROTECTED_7_] or [attr=value]
+            // Attribute selector: [attr='value'] or [attr="value"] or [attr=value]
             self.parse_and_match_attribute_selector(element, selector)?
         } else if selector.contains('[') || selector.contains(']') {
             // Malformed attribute selector - should error
-            return Err(anyhow::anyhow!(PROTECTED_8_, selector));
+            return Err(anyhow::anyhow!("Malformed CSS selector: {}", selector));
         } else {
             // Element selector: elementName
             element.name == selector
@@ -123,7 +165,7 @@ impl RemoveAttributesBySelectorPlugin {
         let content = &selector[1..selector.len() - 1];
 
         // Handle different attribute selector formats:
-        // [attr='value'], [attr=PROTECTED_9_], [attr=value]
+        // [attr='value'], [attr="value"], [attr=value]
         if let Some(eq_pos) = content.find('=') {
             let attr_name = content[..eq_pos].trim();
             let attr_value = content[eq_pos + 1..].trim();
@@ -157,7 +199,7 @@ impl Default for RemoveAttributesBySelectorPlugin {
 
 impl Plugin for RemoveAttributesBySelectorPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_11_
+        "removeAttributesBySelector"
     }
 
     fn description(&self) -> &'static str {
@@ -202,7 +244,7 @@ mod tests {
             children: vec![],
         };
 
-        // Add rect with fill=PROTECTED_14_
+        // Add rect with fill="#00ff00"
         let mut rect = Element {
             name: "rect".into(),
             attributes: IndexMap::new(),
@@ -310,7 +352,7 @@ mod tests {
     fn test_multiple_selectors() {
         let mut doc = create_test_document();
 
-        // Add an element with id=PROTECTED_57_
+        // Add an element with id="remove"
         let mut circle = Element {
             name: "circle".into(),
             attributes: IndexMap::new(),
@@ -371,48 +413,6 @@ mod tests {
         if let Some(Node::Element(ref rect)) = doc.root.children.first() {
             assert_eq!(rect.attr("fill"), None);
         }
-    }
-
-    #[test]
-    fn test_class_selector() {
-        let mut doc = create_test_document();
-
-        // Add class to rect
-        if let Some(Node::Element(ref mut rect)) = doc.root.children.get_mut(0) {
-            rect.set_attr("class", "remove-me another-class");
-        }
-
-        let config = RemoveAttributesBySelectorConfig::Single {
-            selector: ".remove-me".to_string(),
-            attributes: vec!["fill".to_string()],
-        };
-        let plugin = RemoveAttributesBySelectorPlugin::with_config(config);
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that fill was removed
-        if let Some(Node::Element(ref rect)) = doc.root.children.first() {
-            assert_eq!(rect.attr("fill"), None);
-            assert_eq!(
-                rect.attr("class").map(|s| s.as_str()),
-                Some("remove-me another-class")
-            );
-        }
-    }
-
-    #[test]
-    fn test_invalid_selector() {
-        let mut doc = create_test_document();
-        let config = RemoveAttributesBySelectorConfig::Single {
-            selector: "[invalid selector".to_string(),
-            attributes: vec!["fill".to_string()],
-        };
-        let plugin = RemoveAttributesBySelectorPlugin::with_config(config);
-
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_err());
-    }
-}
     }
 
     #[test]

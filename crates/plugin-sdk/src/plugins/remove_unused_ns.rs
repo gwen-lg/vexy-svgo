@@ -5,12 +5,94 @@
 //! This plugin removes unused namespace declarations from the root SVG element
 //! which are not used in elements or attributes throughout the document.
 //!
-//! Reference: SVGOPROTECTED_68_:PROTECTED_69_:PROTECTED_70_:PROTECTED_71_:PROTECTED_72_static str {
+//! Reference: SVGO's removeUnusedNS plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashSet;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration for the removeUnusedNS plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveUnusedNSConfig {}
+
+impl Default for RemoveUnusedNSConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin to remove unused namespace declarations
+pub struct RemoveUnusedNSPlugin {
+    config: RemoveUnusedNSConfig,
+}
+
+impl RemoveUnusedNSPlugin {
+    pub fn new() -> Self {
+        Self {
+            config: RemoveUnusedNSConfig::default(),
+        }
+    }
+
+    pub fn with_config(config: RemoveUnusedNSConfig) -> Self {
+        Self { config }
+    }
+
+    fn parse_config(params: &Value) -> Result<RemoveUnusedNSConfig> {
+        if params.is_null() {
+            Ok(RemoveUnusedNSConfig::default())
+        } else {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
+        }
+    }
+
+    fn check_usage(&self, element: &Element, unused_namespaces: &mut HashSet<String>) {
+        // Check if element name uses a namespace
+        if element.name.contains(':') {
+            let parts: Vec<&str> = element.name.split(':').collect();
+            if parts.len() >= 2 {
+                let ns = parts[0];
+                unused_namespaces.remove(ns);
+            }
+        }
+
+        // Check if any attributes use namespaces
+        for attr_name in element.attributes.keys() {
+            if attr_name.contains(':') {
+                let parts: Vec<&str> = attr_name.split(':').collect();
+                if parts.len() >= 2 {
+                    let ns = parts[0];
+                    unused_namespaces.remove(ns);
+                }
+            }
+        }
+
+        // Recursively check children
+        for child in &element.children {
+            if let Node::Element(ref elem) = child {
+                self.check_usage(elem, unused_namespaces);
+            }
+        }
+    }
+}
+
+impl Default for RemoveUnusedNSPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveUnusedNSPlugin {
+    fn name(&self) -> &'static str {
         "removeUnusedNS"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_3_
+        "removes unused namespaces declaration"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -24,8 +106,8 @@
 
         // Collect xmlns: attributes from root element
         for attr_name in document.root.attributes.keys() {
-            if attr_name.starts_with(PROTECTED_4_) {
-                let local = attr_name.strip_prefix(PROTECTED_5_).unwrap();
+            if attr_name.starts_with("xmlns:") {
+                let local = attr_name.strip_prefix("xmlns:").unwrap();
                 unused_namespaces.insert(local.to_string());
             }
         }
@@ -35,7 +117,7 @@
 
         // Remove unused namespace declarations from root element
         for ns in &unused_namespaces {
-            let xmlns_attr = format!(PROTECTED_6_, ns);
+            let xmlns_attr = format!("xmlns:{}", ns);
             document.root.remove_attr(&xmlns_attr);
         }
 
@@ -226,88 +308,6 @@ mod tests {
         assert!(result.is_ok());
 
         // Should still have original attributes
-        assert_eq!(document.root.attr("width").map(|s| s.as_str()), Some("100"));
-        assert_eq!(document.root.attr("height").map(|s| s.as_str()), Some("100"));
-    }
-
-    #[test]
-    fn test_nested_element_namespace_usage() {
-        let mut document = create_test_document();
-
-        // Add namespace
-        document
-            .root
-            .set_attr("xmlns:deep", "http://example.com/deep");
-
-        // Create nested structure where namespace is used deep in the tree
-        let mut deep_element = Element {
-            name: "text".into(),
-            attributes: IndexMap::new(),
-            children: vec![],
-            namespaces: IndexMap::new(),
-        };
-        deep_element.set_attr("deep:attr", "value");
-
-        let middle_element = Element {
-            name: "g".into(),
-            attributes: IndexMap::new(),
-            children: vec![Node::Element(deep_element)],
-            namespaces: IndexMap::new(),
-        };
-
-        let container_element = Element {
-            name: "g".into(),
-            attributes: IndexMap::new(),
-            children: vec![Node::Element(middle_element)],
-            namespaces: IndexMap::new(),
-        };
-
-        document.root.children = vec![Node::Element(container_element)];
-
-        let plugin = RemoveUnusedNSPlugin::new();
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // deep namespace should be preserved (used in nested element)
-        assert!(document.root.has_attr("xmlns:deep"));
-    }
-
-    #[test]
-    fn test_mixed_used_and_unused_namespaces() {
-        let mut document = create_test_document();
-
-        // Add multiple namespaces
-        document
-            .root
-            .set_attr("xmlns:used", "http://example.com/used");
-        document
-            .root
-            .set_attr("xmlns:unused", "http://example.com/unused");
-        document
-            .root
-            .set_attr("xmlns:alsounused", "http://example.com/alsounused");
-
-        // Add an element that uses only one namespace
-        let mut element = Element {
-            name: "rect".into(),
-            attributes: IndexMap::new(),
-            children: vec![],
-            namespaces: IndexMap::new(),
-        };
-        element.set_attr("used:data", "value");
-
-        document.root.children = vec![Node::Element(element)];
-
-        let plugin = RemoveUnusedNSPlugin::new();
-        let result = plugin.apply(&mut document);
-        assert!(result.is_ok());
-
-        // Only used namespace should remain
-        assert!(document.root.has_attr("xmlns:used"));
-        assert!(!document.root.has_attr("xmlns:unused"));
-        assert!(!document.root.has_attr("xmlns:alsounused"));
-    }
-}
         assert_eq!(document.root.attr("width").map(|s| s.as_str()), Some("100"));
         assert_eq!(document.root.attr("height").map(|s| s.as_str()), Some("100"));
     }

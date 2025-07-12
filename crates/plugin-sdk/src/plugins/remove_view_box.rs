@@ -3,26 +3,88 @@
 //! Remove viewBox plugin implementation
 //!
 //! This plugin removes viewBox attribute when it coincides with width/height box.
-//! It follows the same logic as SVGOPROTECTED_113_static HashSet<&PROTECTED_114_static str>> =
+//! It follows the same logic as SVGO's removeViewBox plugin.
+
+use crate::Plugin;
+use anyhow::Result;
+use std::collections::HashSet;
+use vexy_svgo_core::ast::{Document, Element, Node};
+use vexy_svgo_core::visitor::Visitor;
+
+/// Plugin that removes viewBox attribute when possible
+pub struct RemoveViewBoxPlugin;
+
+impl RemoveViewBoxPlugin {
+    /// Create a new RemoveViewBoxPlugin
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Elements that can have viewBox attribute
+    fn viewbox_elements() -> &'static HashSet<&'static str> {
+        static VIEWBOX_ELEMENTS: std::sync::OnceLock<HashSet<&'static str>> =
             std::sync::OnceLock::new();
         VIEWBOX_ELEMENTS.get_or_init(|| ["pattern", "svg", "symbol"].into_iter().collect())
     }
 
     /// Check if viewBox can be removed
     fn can_remove_viewbox(element: &Element, is_nested_svg: bool) -> bool {
-        // DonPROTECTED_115_ PROTECTED_116_,PROTECTED_117_pxPROTECTED_118_static str {
+        // Don't remove viewBox from nested SVG elements
+        if element.name == "svg" && is_nested_svg {
+            return false;
+        }
+
+        // Check if element has viewBox, width, and height attributes
+        let Some(viewbox_attr) = element.attributes.get("viewBox") else {
+            return false;
+        };
+        let Some(width_attr) = element.attributes.get("width") else {
+            return false;
+        };
+        let Some(height_attr) = element.attributes.get("height") else {
+            return false;
+        };
+
+        // Parse viewBox values
+        let viewbox_parts: Vec<&str> = viewbox_attr.split(&[' ', ','][..]).collect();
+        if viewbox_parts.len() != 4 {
+            return false;
+        }
+
+        // Check if viewBox starts at origin (0, 0)
+        if viewbox_parts[0] != "0" || viewbox_parts[1] != "0" {
+            return false;
+        }
+
+        // Remove 'px' suffix from width and height if present
+        let width_value = width_attr.strip_suffix("px").unwrap_or(width_attr);
+        let height_value = height_attr.strip_suffix("px").unwrap_or(height_attr);
+
+        // Check if width and height match viewBox dimensions
+        viewbox_parts[2] == width_value && viewbox_parts[3] == height_value
+    }
+}
+
+impl Default for RemoveViewBoxPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveViewBoxPlugin {
+    fn name(&self) -> &'static str {
         "removeViewBox"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_12_
+        "Remove viewBox attribute when possible"
     }
 
     fn validate_params(&self, params: &serde_json::Value) -> anyhow::Result<()> {
         if let Some(obj) = params.as_object() {
             if !obj.is_empty() {
                 return Err(anyhow::anyhow!(
-                    PROTECTED_13_
+                    "removeViewBox plugin does not accept parameters"
                 ));
             }
         }
@@ -50,7 +112,7 @@ impl ViewBoxRemovalVisitor {
 
     /// Check if current element is a nested SVG
     fn is_nested_svg(&self, element_name: &str) -> bool {
-        element_name == PROTECTED_14_ && self.element_stack.len() > 0
+        element_name == "svg" && self.element_stack.len() > 0
     }
 }
 
@@ -61,7 +123,7 @@ impl Visitor<'_> for ViewBoxRemovalVisitor {
             let is_nested_svg = self.is_nested_svg(&element.name);
 
             if RemoveViewBoxPlugin::can_remove_viewbox(element, is_nested_svg) {
-                element.attributes.shift_remove(PROTECTED_15_);
+                element.attributes.shift_remove("viewBox");
             }
         }
 
@@ -263,68 +325,6 @@ mod tests {
         let mut doc = Document::new();
 
         // Set attributes on the root SVG element
-        doc.root
-            .attributes
-            .insert("viewBox".to_string(), "0 0 200 100".to_string());
-        doc.root
-            .attributes
-            .insert("width".to_string(), "200".to_string());
-        doc.root
-            .attributes
-            .insert("height".to_string(), "100".to_string());
-
-        // Create nested SVG element
-        let nested_svg = create_element_with_attrs(
-            "svg",
-            &[
-                ("viewBox", "0 0 100 50"),
-                ("width", "100"),
-                ("height", "50"),
-            ],
-        );
-
-        doc.root.children.push(Node::Element(nested_svg));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that outer SVG viewBox was removed but nested SVG viewBox was preserved
-        assert!(!doc.root.attributes.contains_key("viewBox"));
-
-        if let Some(Node::Element(nested_svg)) = doc.root.children.first() {
-            assert!(nested_svg.attributes.contains_key("viewBox"));
-            assert_eq!(
-                nested_svg.attributes.get("viewBox"),
-                Some(&"0 0 100 50".to_string())
-            );
-        }
-    }
-
-    #[test]
-    fn test_plugin_apply_pattern_element() {
-        let plugin = RemoveViewBoxPlugin::new();
-        let mut doc = Document::new();
-
-        // Create pattern element with removable viewBox
-        let pattern_element = create_element_with_attrs(
-            "pattern",
-            &[("viewBox", "0 0 10 10"), ("width", "10"), ("height", "10")],
-        );
-
-        doc.root.children.push(Node::Element(pattern_element));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that viewBox was removed
-        if let Some(Node::Element(pattern)) = doc.root.children.first() {
-            assert!(!pattern.attributes.contains_key("viewBox"));
-            assert!(pattern.attributes.contains_key("width"));
-            assert!(pattern.attributes.contains_key("height"));
-        }
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveViewBoxPlugin, "removeViewBox");
         doc.root
             .attributes
             .insert("viewBox".to_string(), "0 0 200 100".to_string());

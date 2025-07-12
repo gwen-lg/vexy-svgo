@@ -5,12 +5,90 @@
 //! This plugin removes all <style> elements from SVG documents.
 //! This is useful when you want to remove all embedded CSS styles.
 //!
-//! Reference: SVGOPROTECTED_58_static str {
+//! Reference: SVGO's removeStyleElement plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration parameters for remove style element plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveStyleElementConfig {
+    // No configuration options for this plugin
+}
+
+impl Default for RemoveStyleElementConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin that removes style elements
+pub struct RemoveStyleElementPlugin {
+    config: RemoveStyleElementConfig,
+}
+
+impl RemoveStyleElementPlugin {
+    /// Create a new RemoveStyleElementPlugin
+    pub fn new() -> Self {
+        Self {
+            config: RemoveStyleElementConfig::default(),
+        }
+    }
+
+    /// Create a new RemoveStyleElementPlugin with config
+    pub fn with_config(config: RemoveStyleElementConfig) -> Self {
+        Self { config }
+    }
+
+    /// Parse configuration from JSON
+    fn parse_config(params: &Value) -> Result<RemoveStyleElementConfig> {
+        if params.is_null() {
+            Ok(RemoveStyleElementConfig::default())
+        } else if params.is_object() {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
+        } else {
+            Err(anyhow::anyhow!("Configuration must be an object"))
+        }
+    }
+
+    /// Process element to remove style elements
+    fn process_element(&self, element: &mut Element) {
+        // Remove style elements
+        element.children.retain(|child| {
+            if let Node::Element(elem) = child {
+                elem.name != "style"
+            } else {
+                true
+            }
+        });
+
+        // Recursively process children
+        for child in &mut element.children {
+            if let Node::Element(elem) = child {
+                self.process_element(elem);
+            }
+        }
+    }
+}
+
+impl Default for RemoveStyleElementPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveStyleElementPlugin {
+    fn name(&self) -> &'static str {
         "removeStyleElement"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_5_
+        "removes <style> element (disabled by default)"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -222,84 +300,6 @@ mod tests {
         doc.root
             .children
             .push(Node::Element(create_element("circle")));
-        doc.root
-            .children
-            .push(Node::Element(create_element("path")));
-
-        let children_before = doc.root.children.len();
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that nothing was removed
-        assert_eq!(doc.root.children.len(), children_before);
-    }
-
-    #[test]
-    fn test_style_with_attributes() {
-        let plugin = RemoveStyleElementPlugin::new();
-
-        let mut doc = Document::new();
-        doc.root = create_element("svg");
-
-        // Add style element with attributes
-        let mut style = create_element("style");
-        style
-            .attributes
-            .insert("type".to_string(), "text/css".to_string());
-        style
-            .attributes
-            .insert("media".to_string(), "screen".to_string());
-        style.children.push(Node::Text(
-            "@media print { .no-print { display: none; } }".to_string(),
-        ));
-        doc.root.children.push(Node::Element(style));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that style was removed regardless of attributes
-        assert_eq!(doc.root.children.len(), 0);
-    }
-
-    #[test]
-    fn test_parameter_validation() {
-        let plugin = RemoveStyleElementPlugin::new();
-
-        // Empty object is valid
-        assert!(plugin.validate_params(&json!({})).is_ok());
-
-        // Null is valid
-        assert!(plugin.validate_params(&Value::Null).is_ok());
-
-        // Non-object is invalid
-        assert!(plugin.validate_params(&json!("invalid")).is_err());
-    }
-
-    #[test]
-    fn test_cdata_style_content() {
-        let plugin = RemoveStyleElementPlugin::new();
-
-        let mut doc = Document::new();
-        doc.root = create_element("svg");
-
-        // Add style with CDATA content
-        let mut style = create_element("style");
-        style.children.push(Node::Text(
-            "<![CDATA[ .class { fill: red; } ]]>".to_string(),
-        ));
-        doc.root.children.push(Node::Element(style));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that style was removed
-        assert_eq!(doc.root.children.len(), 0);
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveStyleElementPlugin, "removeStyleElement");
         doc.root
             .children
             .push(Node::Element(create_element("path")));

@@ -148,7 +148,18 @@ impl MergePathsPlugin {
         true
     }
 
-    /// Merge two path elementsPROTECTED_171_s data
+    /// Merge two path elements' path data
+    fn merge_path_data(&self, d1: &str, d2: &str) -> String {
+        if d1.is_empty() {
+            return d2.to_string();
+        }
+        if d2.is_empty() {
+            return d1.to_string();
+        }
+
+        let mut result = d1.to_string();
+
+        // Add the second path's data
         // Note: In a full implementation, this would need proper path parsing
         // and handling of Z commands, coordinate normalization, etc.
         if !result.ends_with(' ') {
@@ -168,7 +179,7 @@ impl Default for MergePathsPlugin {
 
 impl Plugin for MergePathsPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_36_
+        "mergePaths"
     }
 
     fn description(&self) -> &'static str {
@@ -283,7 +294,7 @@ impl PathMergeVisitor {
                     }
 
                     // Remove the merged paths (remove in reverse order to maintain indices)
-                    // Skip the first element (index 0) since thatPROTECTED_175_re keeping
+                    // Skip the first element (index 0) since that's the one we're keeping
                     for (idx, _) in merge_info.iter().rev().take(merge_info.len() - 1) {
                         element.children.remove(*idx);
                     }
@@ -369,7 +380,18 @@ impl PathMergeVisitor {
         true
     }
 
-    /// Merge two path elementsPROTECTED_176_s data
+    /// Merge two path elements' path data
+    fn merge_path_data(&self, d1: &str, d2: &str) -> String {
+        if d1.is_empty() {
+            return d2.to_string();
+        }
+        if d2.is_empty() {
+            return d1.to_string();
+        }
+
+        let mut result = d1.to_string();
+
+        // Add the second path's data
         // Note: In a full implementation, this would need proper path parsing
         // and handling of Z commands, coordinate normalization, etc.
         if !result.ends_with(' ') {
@@ -403,8 +425,8 @@ mod tests {
     }
 
     fn create_path_element(d: &str) -> Element<'static> {
-        let mut element = create_element(PROTECTED_82_);
-        element.attributes.insert(PROTECTED_83_.to_string(), d.to_string());
+        let mut element = create_element("path");
+        element.attributes.insert("d".to_string(), d.to_string());
         element
     }
 
@@ -637,28 +659,6 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_config() {
-        // Test default config
-        let config = MergePathsPlugin::parse_config(&json!({})).unwrap();
-        assert_eq!(config.force, false);
-        assert_eq!(config.float_precision, 3);
-        assert_eq!(config.no_space_after_flags, false);
-
-        // Test custom config
-        let config = MergePathsPlugin::parse_config(&json!({
-            "force": true,
-            "floatPrecision": 5,
-            "noSpaceAfterFlags": true
-        }))
-        .unwrap();
-        assert_eq!(config.force, true);
-        assert_eq!(config.float_precision, 5);
-        assert_eq!(config.no_space_after_flags, true);
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(MergePathsPlugin, "mergePaths");
     fn test_parse_config() {
         // Test default config
         let config = MergePathsPlugin::parse_config(&json!({})).unwrap();

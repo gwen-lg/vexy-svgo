@@ -181,6 +181,12 @@ fn main() {
                 .action(ArgAction::SetTrue),
         )
         .arg(
+            Arg::new("dry-run")
+                .help("Show what would be optimized without making changes")
+                .long("dry-run")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("parallel")
                 .help("Number of threads for parallel processing (0 = auto)")
                 .long("parallel")
@@ -212,11 +218,17 @@ fn main() {
 fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
+    let dry_run = matches.get_flag("dry-run");
     let no_color = matches.get_flag("no-color") || std::env::var("NO_COLOR").is_ok();
     
     // Configure colored output
     if no_color {
         colored::control::set_override(false);
+    }
+    
+    // Notify about dry-run mode
+    if dry_run && !quiet {
+        println!("{} Dry run mode: no files will be modified", "🔍".bright_yellow());
     }
 
     // Load configuration
@@ -314,13 +326,13 @@ fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
         InputMode::Stdin => {
             let mut buffer = String::new();
             io::stdin().read_to_string(&mut buffer)?;
-            process_string(&buffer, output_mode, &config, quiet, verbose)?;
+            process_string(&buffer, output_mode, &config, quiet, verbose, dry_run)?;
         }
         InputMode::String(content) => {
-            process_string(&content, output_mode, &config, quiet, verbose)?;
+            process_string(&content, output_mode, &config, quiet, verbose, dry_run)?;
         }
         InputMode::Files(files) => {
-            process_files(&files, output_mode, &config, quiet, verbose, no_color)?;
+            process_files(&files, output_mode, &config, quiet, verbose, dry_run, no_color)?;
         }
         InputMode::Folder(folder) => {
             let recursive = matches.get_flag("recursive");
@@ -328,7 +340,7 @@ fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
                 .get_many::<String>("exclude")
                 .map(|v| v.map(|s| s.as_str()).collect())
                 .unwrap_or_default();
-            process_folder(&folder, &config, quiet, verbose, recursive, &exclude_patterns)?;
+            process_folder(&folder, &config, quiet, verbose, dry_run, recursive, &exclude_patterns)?;
         }
     }
 
@@ -391,6 +403,7 @@ fn process_string(
     config: &Config,
     quiet: bool,
     verbose: bool,
+    dry_run: bool,
 ) -> Result<(), VexySvgoError> {
     if verbose {
         println!("{} Optimizing SVG content ({} bytes)", "🔧".bright_cyan(), content.len().to_string().bright_white());
@@ -410,7 +423,9 @@ fn process_string(
             io::stdout().flush()?;
         }
         OutputMode::File(path) => {
-            fs::write(&path, &result.data)?;
+            if !dry_run {
+                fs::write(&path, &result.data)?;
+            }
             if !quiet {
                 let original_size = content.len();
                 let optimized_size = result.data.len();
@@ -420,8 +435,10 @@ fn process_string(
                 } else {
                     0.0
                 };
+                let dry_run_prefix = if dry_run { "[DRY RUN] ".bright_yellow() } else { "".normal() };
                 println!(
-                    "{}: {} {} {} ({})",
+                    "{}{}: {} {} {} ({})",
+                    dry_run_prefix,
                     path.bright_blue(),
                     format_bytes(original_size).yellow(),
                     "→".cyan(),
@@ -442,6 +459,7 @@ fn process_files(
     config: &Config,
     quiet: bool,
     verbose: bool,
+    dry_run: bool,
     _no_color: bool,
 ) -> Result<(), VexySvgoError> {
     if verbose {
@@ -467,7 +485,9 @@ fn process_files(
             }
             let content = fs::read_to_string(&files[0])?;
             let result = optimize_with_config(&content, config.clone())?;
-            fs::write(&output_path, &result.data)?;
+            if !dry_run {
+                fs::write(&output_path, &result.data)?;
+            }
             if !quiet {
                 let original_size = content.len();
                 let optimized_size = result.data.len();
@@ -477,8 +497,10 @@ fn process_files(
                 } else {
                     0.0
                 };
+                let dry_run_prefix = if dry_run { "[DRY RUN] ".bright_yellow() } else { "".normal() };
                 println!(
-                    "{} {} {}: {} {} {} ({})",
+                    "{}{} {} {}: {} {} {} ({})",
+                    dry_run_prefix,
                     files[0].bright_blue(),
                     "→".cyan(),
                     output_path.bright_blue(),
@@ -505,7 +527,9 @@ fn process_files(
                     .ok_or("Invalid file name")?;
                 let output_file = output_path.join(file_name);
 
-                fs::write(&output_file, &result.data)?;
+                if !dry_run {
+                    fs::write(&output_file, &result.data)?;
+                }
                 if !quiet {
                     let original_size = content.len();
                     let optimized_size = result.data.len();
@@ -515,8 +539,10 @@ fn process_files(
                     } else {
                         0.0
                     };
+                    let dry_run_prefix = if dry_run { "[DRY RUN] ".bright_yellow() } else { "".normal() };
                     println!(
-                        "{} → {}: {} → {} ({:.1}%)",
+                        "{}{} → {}: {} → {} ({:.1}%)",
+                        dry_run_prefix,
                         file,
                         output_file.display(),
                         format_bytes(original_size),
@@ -530,7 +556,9 @@ fn process_files(
             for file in files {
                 let content = fs::read_to_string(file)?;
                 let result = optimize_with_config(&content, config.clone())?;
-                fs::write(file, &result.data)?;
+                if !dry_run {
+                    fs::write(file, &result.data)?;
+                }
                 if !quiet {
                     let original_size = content.len();
                     let optimized_size = result.data.len();
@@ -540,8 +568,10 @@ fn process_files(
                     } else {
                         0.0
                     };
+                    let dry_run_prefix = if dry_run { "[DRY RUN] ".bright_yellow() } else { "".normal() };
                     println!(
-                        "{}: {} → {} ({:.1}%)",
+                        "{}{}: {} → {} ({:.1}%)",
+                        dry_run_prefix,
                         file,
                         format_bytes(original_size),
                         format_bytes(optimized_size),
@@ -560,9 +590,18 @@ fn process_folder(
     config: &Config,
     quiet: bool,
     verbose: bool,
+    dry_run: bool,
     recursive: bool,
     exclude_patterns: &[&str],
 ) -> Result<(), VexySvgoError> {
+    if verbose {
+        println!("{} Scanning folder: {}", "📂".bright_cyan(), folder.bright_blue());
+        println!("  {} Recursive: {}", "🔍".cyan(), recursive.to_string().bright_white());
+        if !exclude_patterns.is_empty() {
+            println!("  {} Excluding patterns: {}", "🚫".yellow(), exclude_patterns.join(", ").bright_white());
+        }
+    }
+    
     let folder_path = Path::new(folder);
     if !folder_path.is_dir() {
         return Err(vexy_svgo_core::error::CliError::InvalidDirectory { 
@@ -575,6 +614,10 @@ fn process_folder(
     } else {
         find_svg_files(folder_path, exclude_patterns)?
     };
+    
+    if verbose {
+        println!("{} Found {} SVG file(s)", "📄".bright_cyan(), svg_files.len().to_string().bright_white());
+    }
 
     if svg_files.is_empty() {
         if !quiet {
@@ -614,7 +657,9 @@ fn process_folder(
             Ok(content) => {
                 match optimize_with_config(&content, config.clone()) {
                     Ok(result) => {
-                        fs::write(svg_file, &result.data)?;
+                        if !dry_run {
+                            fs::write(svg_file, &result.data)?;
+                        }
                         let original_size = content.len();
                         let optimized_size = result.data.len();
                         total_original += original_size;
@@ -678,9 +723,11 @@ fn process_folder(
         } else {
             0.0
         };
+        let dry_run_prefix = if dry_run { "[DRY RUN] " } else { "" };
         println!(
-            "\n{} Total: {} {} {} ({})",
+            "\n{} {}Total: {} {} {} ({})",
             "✨".bright_yellow(),
+            dry_run_prefix.bright_yellow(),
             format_bytes(total_original).yellow(),
             "→".cyan(),
             format_bytes(total_optimized).green(),

@@ -109,7 +109,7 @@ impl Default for InlineStylesPlugin {
 
 impl Plugin for InlineStylesPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_6_
+        "inlineStyles"
     }
 
     fn description(&self) -> &'static str {
@@ -144,7 +144,166 @@ impl Plugin for InlineStylesPlugin {
         // Count matches if onlyMatchedOnce is enabled
         if collector.config.only_matched_once {
             // This would require another pass through the document
-            // For now, wePROTECTED_141_:PROTECTED_142_d use proper CSS parsing
+            // For now, we'll skip this optimization
+        }
+        
+        // Second pass: apply styles to elements
+        let mut applier = StyleApplierVisitor { visitor: &mut collector };
+        vexy_svgo_core::visitor::walk_document(&mut applier, document)?;
+        
+        // Third pass: clean up if configured
+        if collector.config.remove_matched_selectors {
+            let mut cleaner = StyleCleanerVisitor {
+                used_selectors: &collector.used_selectors,
+                config: &collector.config,
+            };
+            vexy_svgo_core::visitor::walk_document(&mut cleaner, document)?;
+        }
+        
+        Ok(())
+    }
+}
+
+/// Represents a CSS rule with selector and declarations
+#[derive(Debug, Clone)]
+struct CssRuleData {
+    selector: String,
+    declarations: Vec<(String, String)>,
+    specificity: u32,
+    source_index: usize, // Track which style element this came from
+}
+
+/// Visitor implementation that inlines styles
+struct InlineStylesVisitor {
+    config: InlineStylesConfig,
+    style_elements: Vec<(usize, String)>, // (element_id, css_content)
+    element_counter: usize,
+    css_rules: Vec<CssRuleData>,
+    match_counts: HashMap<String, usize>,
+    used_selectors: HashSet<String>,
+}
+
+impl InlineStylesVisitor {
+    fn new(config: InlineStylesConfig) -> Self {
+        Self {
+            config,
+            style_elements: Vec::new(),
+            element_counter: 0,
+            css_rules: Vec::new(),
+            match_counts: HashMap::new(),
+            used_selectors: HashSet::new(),
+        }
+    }
+
+    /// Extract CSS content from a style element
+    fn extract_css_content(element: &Element) -> String {
+        let mut content = String::new();
+
+        for child in &element.children {
+            match child {
+                Node::Text(text) => content.push_str(text),
+                Node::CData(cdata) => content.push_str(cdata),
+                _ => {}
+            }
+        }
+
+        content
+    }
+
+    /// Check if a selector contains pseudo-classes or pseudo-elements
+    fn selector_contains_pseudo(selector: &str) -> bool {
+        selector.contains(':')
+            && (selector.contains(":hover")
+                || selector.contains(":active")
+                || selector.contains(":focus")
+                || selector.contains(":visited")
+                || selector.contains(":link")
+                || selector.contains(":first-child")
+                || selector.contains(":last-child")
+                || selector.contains(":nth-child")
+                || selector.contains(":nth-of-type")
+                || selector.contains(":before")
+                || selector.contains("::before")
+                || selector.contains(":after")
+                || selector.contains("::after"))
+    }
+
+    /// Parse CSS and extract rules
+    fn parse_css_rules(&mut self, css_content: &str, source_index: usize) -> Result<()> {
+        let options = ParserOptions::default();
+
+        match StyleSheet::parse(css_content, options) {
+            Ok(stylesheet) => {
+                for rule in &stylesheet.rules.0 {
+                    self.process_css_rule(rule, source_index)?;
+                }
+            }
+            Err(_) => {
+                // If parsing fails, we skip this style element
+                // This matches SVGO behavior
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Process a single CSS rule
+    fn process_css_rule(&mut self, rule: &CssRule, source_index: usize) -> Result<()> {
+        match rule {
+            CssRule::Style(style_rule) => {
+                // Extract selector string
+                let mut selector_string = String::new();
+                let mut printer = lightningcss::printer::Printer::new(
+                    &mut selector_string,
+                    PrinterOptions::default(),
+                );
+                style_rule.selectors.to_css(&mut printer).ok();
+
+                // Skip pseudo-selectors if not enabled
+                if !self.config.use_pseudos && Self::selector_contains_pseudo(&selector_string) {
+                    return Ok(());
+                }
+
+                // Extract declarations
+                let declarations = self.extract_declarations(&style_rule.declarations);
+
+                if !declarations.is_empty() {
+                    // Calculate specificity (simplified)
+                    let specificity = self.calculate_specificity(&selector_string);
+
+                    self.css_rules.push(CssRuleData {
+                        selector: selector_string,
+                        declarations,
+                        specificity,
+                        source_index,
+                    });
+                }
+            }
+            CssRule::Media(media_rule) if self.config.use_mqs => {
+                // Process rules inside media queries
+                for inner_rule in &media_rule.rules.0 {
+                    self.process_css_rule(inner_rule, source_index)?;
+                }
+            }
+            _ => {
+                // Skip other rule types
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Extract declarations from a declaration block
+    fn extract_declarations(&self, declarations: &DeclarationBlock) -> Vec<(String, String)> {
+        let mut result = Vec::new();
+
+        // Convert declarations to string and parse
+        let mut css_string = String::new();
+        let mut printer =
+            lightningcss::printer::Printer::new(&mut css_string, PrinterOptions::default());
+        if declarations.to_css(&mut printer).is_ok() {
+            // Parse the CSS string to extract property-value pairs
+            // This is a simplified parser - in production, we'd use proper CSS parsing
             for decl in css_string.split(';') {
                 let parts: Vec<&str> = decl.split(':').collect();
                 if parts.len() == 2 {
@@ -173,7 +332,45 @@ impl Plugin for InlineStylesPlugin {
         specificity += (selector.matches('.').count() as u32) * 1000;
         specificity += (selector.matches('[').count() as u32) * 1000;
 
-        // Count element selectors (simplified - count words that arenPROTECTED_148_.PROTECTED_149_#PROTECTED_150_[PROTECTED_151_d use a proper CSS selector matching library
+        // Count element selectors (simplified - count words that aren't classes/ids)
+        let element_count = selector
+            .split_whitespace()
+            .filter(|s| !s.starts_with('.') && !s.starts_with('#') && !s.starts_with('['))
+            .count() as u32;
+        specificity += element_count;
+
+        specificity
+    }
+
+    /// Apply styles to an element
+    fn apply_styles_to_element(&mut self, element: &mut Element) {
+        let mut styles_to_apply: HashMap<String, String> = HashMap::new();
+
+        // Check each CSS rule to see if it matches this element
+        for rule in &self.css_rules {
+            if self.selector_matches_element(&rule.selector, element) {
+                // Track that this selector was used
+                self.used_selectors.insert(rule.selector.clone());
+
+                // Apply declarations (later rules override earlier ones due to cascade)
+                for (property, value) in &rule.declarations {
+                    styles_to_apply.insert(property.clone(), value.clone());
+                }
+            }
+        }
+
+        // Apply collected styles to the element
+        if !styles_to_apply.is_empty() {
+            let existing_style = element.attributes.get("style").cloned().unwrap_or_default();
+            let new_style = merge_styles(&existing_style, &styles_to_apply);
+            element.attributes.insert("style".to_string(), new_style);
+        }
+    }
+
+    /// Simple selector matching (basic implementation)
+    fn selector_matches_element(&self, selector: &str, element: &Element) -> bool {
+        // This is a simplified selector matching implementation
+        // In production, we'd use a proper CSS selector matching library
 
         let selector = selector.trim();
 
@@ -225,7 +422,7 @@ struct StyleApplierVisitor<'a> {
 
 impl Visitor<'_> for StyleApplierVisitor<'_> {
     fn visit_element_enter(&mut self, element: &mut Element<'_>) -> Result<()> {
-        if element.name != PROTECTED_32_ {
+        if element.name != "style" {
             self.visitor.apply_styles_to_element(element);
         }
         Ok(())
@@ -240,7 +437,7 @@ struct StyleCleanerVisitor<'a> {
 
 impl Visitor<'_> for StyleCleanerVisitor<'_> {
     fn visit_element_enter(&mut self, element: &mut Element<'_>) -> Result<()> {
-        if element.name == PROTECTED_33_ && self.config.remove_matched_selectors {
+        if element.name == "style" && self.config.remove_matched_selectors {
             // For now, remove all text content from style elements
             // In a full implementation, we'd selectively remove only used selectors
             element.children.clear();
@@ -340,203 +537,6 @@ fn merge_styles(existing: &str, new_styles: &HashMap<String, String>) -> String 
             result.push_str("; ");
         }
         result.push_str(&format!("{}: {}", prop, value));
-    }
-
-    result
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-    use std::borrow::Cow;
-    use vexy_svgo_core::ast::{Document, Element, Node};
-
-    fn create_element(name: &'static str) -> Element<'static> {
-        let mut element = Element::new(name);
-        element.name = Cow::Borrowed(name);
-        element
-    }
-
-    fn create_style_element(css: &str) -> Element<'static> {
-        let mut style = create_element(PROTECTED_77_);
-        style.children.push(Node::Text(css.to_string()));
-        style
-    }
-
-    #[test]
-    fn test_plugin_creation() {
-        let plugin = InlineStylesPlugin::new();
-        assert_eq!(plugin.name(), PROTECTED_78_);
-    }
-
-    #[test]
-    fn test_parameter_validation() {
-        let plugin = InlineStylesPlugin::new();
-
-        // Valid parameters
-        assert!(plugin.validate_params(&json!({})).is_ok());
-        assert!(plugin
-            .validate_params(&json!({
-                PROTECTED_79_: true,
-                PROTECTED_80_: false,
-                PROTECTED_81_: true,
-                PROTECTED_82_: false
-            }))
-            .is_ok());
-
-        // Invalid parameters
-        assert!(plugin
-            .validate_params(&json!({PROTECTED_83_: PROTECTED_84_}))
-            .is_err());
-        assert!(plugin
-            .validate_params(&json!({PROTECTED_85_: true}))
-            .is_err());
-    }
-
-    #[test]
-    fn test_is_presentation_attribute() {
-        assert!(is_presentation_attribute(PROTECTED_86_));
-        assert!(is_presentation_attribute(PROTECTED_87_));
-        assert!(is_presentation_attribute(PROTECTED_88_));
-        assert!(!is_presentation_attribute(PROTECTED_89_));
-        assert!(!is_presentation_attribute(PROTECTED_90_));
-        assert!(!is_presentation_attribute(PROTECTED_91_));
-    }
-
-    #[test]
-    fn test_merge_styles() {
-        let existing = PROTECTED_92_;
-        let mut new_styles = HashMap::new();
-        new_styles.insert(PROTECTED_93_.to_string(), PROTECTED_94_.to_string());
-        new_styles.insert(PROTECTED_95_.to_string(), PROTECTED_96_.to_string());
-
-        let result = merge_styles(existing, &new_styles);
-        assert!(result.contains(PROTECTED_97_));
-        assert!(result.contains(PROTECTED_98_));
-        assert!(result.contains(PROTECTED_99_));
-    }
-
-    #[test]
-    fn test_basic_inline_styles() {
-        let plugin = InlineStylesPlugin::new();
-        let mut doc = Document::new();
-
-        // Add a style element
-        let style = create_style_element(PROTECTED_100_);
-        doc.root.children.push(Node::Element(style));
-
-        // Add an element with the class
-        let mut rect = create_element(PROTECTED_101_);
-        rect.attributes
-            .insert(PROTECTED_102_.to_string(), PROTECTED_103_.to_string());
-        doc.root.children.push(Node::Element(rect));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that the style was inlined
-        if let Some(Node::Element(rect)) = doc.root.children.get(1) {
-            assert_eq!(rect.attributes.get(PROTECTED_104_), Some(&PROTECTED_105_.to_string()));
-        }
-    }
-
-    #[test]
-    fn test_id_selector() {
-        let plugin = InlineStylesPlugin::new();
-        let mut doc = Document::new();
-
-        // Add a style element
-        let style = create_style_element(PROTECTED_106_);
-        doc.root.children.push(Node::Element(style));
-
-        // Add an element with the ID
-        let mut circle = create_element(PROTECTED_107_);
-        circle
-            .attributes
-            .insert(PROTECTED_108_.to_string(), PROTECTED_109_.to_string());
-        doc.root.children.push(Node::Element(circle));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that the style was inlined
-        if let Some(Node::Element(circle)) = doc.root.children.get(1) {
-            assert_eq!(
-                circle.attributes.get(PROTECTED_110_),
-                Some(&PROTECTED_111_.to_string())
-            );
-        }
-    }
-
-    #[test]
-    fn test_element_selector() {
-        let plugin = InlineStylesPlugin::new();
-        let mut doc = Document::new();
-
-        // Add a style element
-        let style = create_style_element(PROTECTED_112_);
-        doc.root.children.push(Node::Element(style));
-
-        // Add a rect element
-        let rect = create_element(PROTECTED_113_);
-        doc.root.children.push(Node::Element(rect));
-
-        // Add a circle element (should not match)
-        let circle = create_element(PROTECTED_114_);
-        doc.root.children.push(Node::Element(circle));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that only the rect got the style
-        if let Some(Node::Element(rect)) = doc.root.children.get(1) {
-            assert!(rect.attributes.contains_key(PROTECTED_115_));
-        }
-        if let Some(Node::Element(circle)) = doc.root.children.get(2) {
-            assert!(!circle.attributes.contains_key(PROTECTED_116_));
-        }
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = InlineStylesPlugin::parse_config(&json!({
-            PROTECTED_117_: false,
-            PROTECTED_118_: true,
-            PROTECTED_119_: false,
-            PROTECTED_120_: true
-        }))
-        .unwrap();
-
-        assert_eq!(config.only_matched_once, false);
-        assert_eq!(config.remove_matched_selectors, true);
-        assert_eq!(config.use_mqs, false);
-        assert_eq!(config.use_pseudos, true);
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(InlineStylesPlugin, PROTECTED_121_);
-fn merge_styles(existing: &str, new_styles: &HashMap<String, String>) -> String {
-    let mut merged = HashMap::new();
-
-    // Parse existing styles
-    for part in existing.split(';') {
-        let parts: Vec<&str> = part.split(':').collect();
-        if parts.len() == 2 {
-            merged.insert(parts[0].trim().to_string(), parts[1].trim().to_string());
-        }
-    }
-
-    // Add new styles (overwriting existing ones)
-    for (prop, value) in new_styles {
-        merged.insert(prop.clone(), value.clone());
-    }
-
-    // Build result string
-    let mut result = String::new();
-    for (prop, value) in merged {
-        if !result.is_empty() {
-            result.push_str(PROTECTED_122_);
-        }
-        result.push_str(&format!(PROTECTED_123_, prop, value));
     }
 
     result

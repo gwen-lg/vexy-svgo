@@ -137,12 +137,12 @@ pub fn parse_path_data(path_data: &str) -> Result<Vec<PathCommand>> {
     Ok(commands)
 }
 
-/// Parse a command character into its type and whether itPROTECTED_54_MPROTECTED_55_mPROTECTED_56_LPROTECTED_57_lPROTECTED_58_HPROTECTED_59_hPROTECTED_60_VPROTECTED_61_vPROTECTED_62_CPROTECTED_63_cPROTECTED_64_SPROTECTED_65_sPROTECTED_66_QPROTECTED_67_qPROTECTED_68_TPROTECTED_69_tPROTECTED_70_APROTECTED_71_aPROTECTED_72_ZPROTECTED_73_zPROTECTED_74_ll ignore them
-        params.clear();
-    }
-
-    Ok(())
-}
+/// Parse a command character into its type and whether it's absolute
+fn parse_command_char(ch: char) -> Result<(CommandType, bool)> {
+    match ch {
+        'M' => Ok((CommandType::MoveTo, true)),
+        'm' => Ok((CommandType::MoveTo, false)),
+        'L' => Ok((CommandType::LineTo, true)),
         'l' => Ok((CommandType::LineTo, false)),
         'H' => Ok((CommandType::HorizontalLineTo, true)),
         'h' => Ok((CommandType::HorizontalLineTo, false)),

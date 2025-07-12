@@ -3,7 +3,8 @@
 //! Remove useless definitions plugin implementation
 //!
 //! This plugin removes unused definitions from SVG documents, specifically targeting
-//! <defs> elements and non-rendering elements that don/// Create a new RemoveUselessDefsPlugins removeUselessDefs plugin.
+//! <defs> elements and non-rendering elements that don't have IDs. It follows the
+//! same logic as SVGO's removeUselessDefs plugin.
 
 use crate::Plugin;
 use anyhow::Result;
@@ -97,7 +98,7 @@ impl RemoveUselessDefsPlugin {
 
 impl Plugin for RemoveUselessDefsPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_13_
+        "removeUselessDefs"
     }
 
     fn description(&self) -> &'static str {
@@ -105,7 +106,32 @@ impl Plugin for RemoveUselessDefsPlugin {
     }
 
     fn validate_params(&self, params: &serde_json::Value) -> anyhow::Result<()> {
-        // This plugin doesnPROTECTED_77__> for UselessDefsRemovalVisitor {
+        // This plugin doesn't accept any parameters in the original SVGO implementation
+        if !params.is_null() && !params.as_object().map_or(false, |obj| obj.is_empty()) {
+            return Err(anyhow::anyhow!(
+                "removeUselessDefs plugin does not accept any parameters"
+            ));
+        }
+        Ok(())
+    }
+
+    fn apply(&self, document: &mut Document) -> anyhow::Result<()> {
+        let mut visitor = UselessDefsRemovalVisitor::new();
+        vexy_svgo_core::visitor::walk_document(&mut visitor, document)?;
+        Ok(())
+    }
+}
+
+/// Visitor implementation that removes useless definitions
+struct UselessDefsRemovalVisitor;
+
+impl UselessDefsRemovalVisitor {
+    fn new() -> Self {
+        Self
+    }
+}
+
+impl Visitor<'_> for UselessDefsRemovalVisitor {
     fn visit_element_enter(&mut self, element: &mut Element<'_>) -> Result<()> {
         // Process elements that should be filtered
         if RemoveUselessDefsPlugin::should_process_element(element) {
@@ -132,14 +158,14 @@ mod tests {
 
     fn create_element_with_id(name: &'static str, id: &str) -> Element<'static> {
         let mut element = create_element(name);
-        element.attributes.insert(PROTECTED_16_.to_string(), id.to_string());
+        element.attributes.insert("id".to_string(), id.to_string());
         element
     }
 
     #[test]
     fn test_plugin_creation() {
         let plugin = RemoveUselessDefsPlugin::new();
-        assert_eq!(plugin.name(), PROTECTED_17_);
+        assert_eq!(plugin.name(), "removeUselessDefs");
     }
 
     #[test]
@@ -153,45 +179,45 @@ mod tests {
         assert!(plugin.validate_params(&json!({})).is_ok());
 
         // Invalid: non-empty parameters
-        assert!(plugin.validate_params(&json!({PROTECTED_18_: true})).is_err());
+        assert!(plugin.validate_params(&json!({"someParam": true})).is_err());
     }
 
     #[test]
     fn test_non_rendering_elements() {
         assert!(RemoveUselessDefsPlugin::is_non_rendering_element(
-            PROTECTED_19_
+            "clipPath"
         ));
-        assert!(RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_20_));
+        assert!(RemoveUselessDefsPlugin::is_non_rendering_element("filter"));
         assert!(RemoveUselessDefsPlugin::is_non_rendering_element(
-            PROTECTED_21_
+            "linearGradient"
         ));
-        assert!(RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_22_));
-        assert!(RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_23_));
-        assert!(RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_24_));
+        assert!(RemoveUselessDefsPlugin::is_non_rendering_element("marker"));
+        assert!(RemoveUselessDefsPlugin::is_non_rendering_element("mask"));
+        assert!(RemoveUselessDefsPlugin::is_non_rendering_element("pattern"));
         assert!(RemoveUselessDefsPlugin::is_non_rendering_element(
-            PROTECTED_25_
+            "radialGradient"
         ));
         assert!(RemoveUselessDefsPlugin::is_non_rendering_element(
-            PROTECTED_26_
+            "solidColor"
         ));
-        assert!(RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_27_));
+        assert!(RemoveUselessDefsPlugin::is_non_rendering_element("symbol"));
 
         // Not non-rendering elements
-        assert!(!RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_28_));
-        assert!(!RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_29_));
-        assert!(!RemoveUselessDefsPlugin::is_non_rendering_element(PROTECTED_30_));
+        assert!(!RemoveUselessDefsPlugin::is_non_rendering_element("rect"));
+        assert!(!RemoveUselessDefsPlugin::is_non_rendering_element("path"));
+        assert!(!RemoveUselessDefsPlugin::is_non_rendering_element("defs"));
     }
 
     #[test]
     fn test_should_preserve_node() {
         // Elements with IDs should be preserved
-        let element_with_id = create_element_with_id(PROTECTED_31_, PROTECTED_32_);
+        let element_with_id = create_element_with_id("path", "mypath");
         assert!(RemoveUselessDefsPlugin::should_preserve_node(
             &Node::Element(element_with_id)
         ));
 
         // Style elements should always be preserved
-        let style_element = create_element(PROTECTED_33_);
+        let style_element = create_element("style");
         assert!(RemoveUselessDefsPlugin::should_preserve_node(
             &Node::Element(style_element)
         ));
@@ -360,32 +386,6 @@ mod tests {
     fn test_non_rendering_element_without_id() {
         let plugin = RemoveUselessDefsPlugin::new();
         let mut doc = Document::new();
-
-        // Create clipPath without ID containing useful content
-        let mut clippath = create_element("clipPath");
-        clippath
-            .children
-            .push(Node::Element(create_element("path"))); // Should be removed
-        clippath
-            .children
-            .push(Node::Element(create_element_with_id("circle", "keep"))); // Should be kept
-
-        doc.root.children.push(Node::Element(clippath));
-
-        plugin.apply(&mut doc).unwrap();
-
-        // clipPath without ID should be processed, keeping only useful children
-        if let Some(Node::Element(clippath_element)) = doc.root.children.first() {
-            assert_eq!(clippath_element.name.as_ref(), "clipPath");
-            assert_eq!(clippath_element.children.len(), 1);
-
-            if let Node::Element(child) = &clippath_element.children[0] {
-                assert_eq!(child.name.as_ref(), "circle");
-                assert!(child.attributes.contains_key("id"));
-            }
-        }
-    }
-}
 
         // Create clipPath without ID containing useful content
         let mut clippath = create_element("clipPath");

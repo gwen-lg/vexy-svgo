@@ -66,7 +66,7 @@ impl Default for RemoveUnknownsAndDefaultsPlugin {
 
 impl Plugin for RemoveUnknownsAndDefaultsPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_0_
+        "removeUnknownsAndDefaults"
     }
 
     fn description(&self) -> &'static str {

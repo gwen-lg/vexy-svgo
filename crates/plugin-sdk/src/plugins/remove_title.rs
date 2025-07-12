@@ -6,12 +6,90 @@
 //! Title elements provide accessibility information but can add size
 //! to the SVG when not needed.
 //!
-//! Reference: SVGOPROTECTED_57_static str {
+//! Reference: SVGO's removeTitle plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Configuration parameters for remove title plugin (currently empty)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveTitleConfig {
+    // No configuration options - matches SVGO behavior
+}
+
+impl Default for RemoveTitleConfig {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+/// Plugin that removes title elements
+pub struct RemoveTitlePlugin {
+    config: RemoveTitleConfig,
+}
+
+impl RemoveTitlePlugin {
+    /// Create a new RemoveTitlePlugin
+    pub fn new() -> Self {
+        Self {
+            config: RemoveTitleConfig::default(),
+        }
+    }
+
+    /// Create a new RemoveTitlePlugin with config
+    pub fn with_config(config: RemoveTitleConfig) -> Self {
+        Self { config }
+    }
+
+    /// Parse configuration from JSON
+    fn parse_config(params: &Value) -> Result<RemoveTitleConfig> {
+        if params.is_null() || (params.is_object() && params.as_object().unwrap().is_empty()) {
+            Ok(RemoveTitleConfig::default())
+        } else if params.is_object() {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
+        } else {
+            Ok(RemoveTitleConfig::default())
+        }
+    }
+
+    /// Remove title elements recursively
+    fn remove_title_recursive(&self, element: &mut Element) {
+        // Remove title elements from children
+        element.children.retain(|child| {
+            if let Node::Element(elem) = child {
+                elem.name != "title"
+            } else {
+                true
+            }
+        });
+
+        // Process remaining child elements recursively
+        for child in &mut element.children {
+            if let Node::Element(elem) = child {
+                self.remove_title_recursive(elem);
+            }
+        }
+    }
+}
+
+impl Default for RemoveTitlePlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RemoveTitlePlugin {
+    fn name(&self) -> &'static str {
         "removeTitle"
     }
 
     fn description(&self) -> &'static str {
-        PROTECTED_4_
+        "removes <title>"
     }
 
     fn validate_params(&self, params: &Value) -> Result<()> {
@@ -188,84 +266,6 @@ mod tests {
     #[test]
     fn test_empty_svg() {
         let plugin = RemoveTitlePlugin::new();
-        let mut doc = Document::new();
-
-        // Create empty SVG
-        let svg = create_element("svg");
-        doc.root = svg;
-
-        // Apply plugin - should not crash
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_ok());
-
-        // SVG should still be empty
-        assert_eq!(doc.root.children.len(), 0);
-    }
-
-    #[test]
-    fn test_title_with_attributes() {
-        let plugin = RemoveTitlePlugin::new();
-        let mut doc = Document::new();
-
-        // Create SVG with title that has attributes
-        let mut svg = create_element("svg");
-        let mut title = create_element("title");
-        title
-            .attributes
-            .insert("id".to_string(), "myTitle".to_string());
-        title
-            .attributes
-            .insert("class".to_string(), "title-class".to_string());
-        title.children.push(create_text("Title with attributes"));
-        svg.children.push(Node::Element(title));
-
-        doc.root = svg;
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that title was removed regardless of attributes
-        assert_eq!(doc.root.children.len(), 0);
-    }
-
-    #[test]
-    fn test_preserves_text_nodes() {
-        let plugin = RemoveTitlePlugin::new();
-        let mut doc = Document::new();
-
-        // Create SVG with mixed content
-        let mut svg = create_element("svg");
-        svg.children.push(create_text("Before title"));
-        let mut title = create_element("title");
-        title.children.push(create_text("Title"));
-        svg.children.push(Node::Element(title));
-        svg.children.push(create_text("After title"));
-
-        doc.root = svg;
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Check that text nodes are preserved
-        assert_eq!(doc.root.children.len(), 2);
-        if let Node::Text(text) = &doc.root.children[0] {
-            assert_eq!(text, "Before title");
-        }
-        if let Node::Text(text) = &doc.root.children[1] {
-            assert_eq!(text, "After title");
-        }
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = RemoveTitlePlugin::parse_config(&json!({})).unwrap();
-        // No fields to check since config is empty
-        let _ = config;
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveTitlePlugin, "removeTitle");
         let mut doc = Document::new();
 
         // Create empty SVG

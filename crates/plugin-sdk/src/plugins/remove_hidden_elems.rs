@@ -3,25 +3,25 @@
 //! Remove hidden elements plugin implementation
 //!
 //! This plugin removes elements that are hidden through various means:
-//! - display=PROTECTED_0_
-//! - visibility=PROTECTED_1_ or visibility=PROTECTED_2_
-//! - opacity=PROTECTED_3_ (optional)
+//! - display="none"
+//! - visibility="hidden" or visibility="collapse"
+//! - opacity="0" (optional)
 //! - Zero width/height rectangles, ellipses, images
 //! - Zero radius circles
 //! - Empty paths
 //!
 //! SVGO parameters supported:
-//! - `displayNone` (default: true) - Remove elements with display=PROTECTED_4_
-//! - `opacity0` (default: true) - Remove elements with opacity=PROTECTED_5_
-//! - `circleR0` (default: true) - Remove circles with r=PROTECTED_6_
-//! - `ellipseRX0` (default: true) - Remove ellipses with rx=PROTECTED_7_
-//! - `ellipseRY0` (default: true) - Remove ellipses with ry=PROTECTED_8_
-//! - `rectWidth0` (default: true) - Remove rects with width=PROTECTED_9_
-//! - `rectHeight0` (default: true) - Remove rects with height=PROTECTED_10_
-//! - `patternWidth0` (default: true) - Remove patterns with width=PROTECTED_11_
-//! - `patternHeight0` (default: true) - Remove patterns with height=PROTECTED_12_
-//! - `imageWidth0` (default: true) - Remove images with width=PROTECTED_13_
-//! - `imageHeight0` (default: true) - Remove images with height=PROTECTED_14_
+//! - `displayNone` (default: true) - Remove elements with display="none"
+//! - `opacity0` (default: true) - Remove elements with opacity="0"
+//! - `circleR0` (default: true) - Remove circles with r="0"
+//! - `ellipseRX0` (default: true) - Remove ellipses with rx="0"
+//! - `ellipseRY0` (default: true) - Remove ellipses with ry="0"
+//! - `rectWidth0` (default: true) - Remove rects with width="0"
+//! - `rectHeight0` (default: true) - Remove rects with height="0"
+//! - `patternWidth0` (default: true) - Remove patterns with width="0"
+//! - `patternHeight0` (default: true) - Remove patterns with height="0"
+//! - `imageWidth0` (default: true) - Remove images with width="0"
+//! - `imageHeight0` (default: true) - Remove images with height="0"
 //! - `pathEmptyD` (default: true) - Remove paths with empty d attribute
 //! - `polylineEmptyPoints` (default: true) - Remove polylines with empty points
 //! - `polygonEmptyPoints` (default: true) - Remove polygons with empty points
@@ -37,47 +37,47 @@ use vexy_svgo_core::visitor::Visitor;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveHiddenElemsConfig {
-    /// Remove elements with display=PROTECTED_16_
+    /// Remove elements with display="none"
     #[serde(default = "default_true")]
     pub display_none: bool,
 
-    /// Remove elements with opacity=PROTECTED_18_
+    /// Remove elements with opacity="0"
     #[serde(default = "default_true")]
     pub opacity0: bool,
 
-    /// Remove circles with r=PROTECTED_20_
+    /// Remove circles with r="0"
     #[serde(default = "default_true")]
     pub circle_r0: bool,
 
-    /// Remove ellipses with rx=PROTECTED_22_
+    /// Remove ellipses with rx="0"
     #[serde(default = "default_true")]
     pub ellipse_rx0: bool,
 
-    /// Remove ellipses with ry=PROTECTED_24_
+    /// Remove ellipses with ry="0"
     #[serde(default = "default_true")]
     pub ellipse_ry0: bool,
 
-    /// Remove rects with width=PROTECTED_26_
+    /// Remove rects with width="0"
     #[serde(default = "default_true")]
     pub rect_width0: bool,
 
-    /// Remove rects with height=PROTECTED_28_
+    /// Remove rects with height="0"
     #[serde(default = "default_true")]
     pub rect_height0: bool,
 
-    /// Remove patterns with width=PROTECTED_30_
+    /// Remove patterns with width="0"
     #[serde(default = "default_true")]
     pub pattern_width0: bool,
 
-    /// Remove patterns with height=PROTECTED_32_
+    /// Remove patterns with height="0"
     #[serde(default = "default_true")]
     pub pattern_height0: bool,
 
-    /// Remove images with width=PROTECTED_34_
+    /// Remove images with width="0"
     #[serde(default = "default_true")]
     pub image_width0: bool,
 
-    /// Remove images with height=PROTECTED_36_
+    /// Remove images with height="0"
     #[serde(default = "default_true")]
     pub image_height0: bool,
 
@@ -156,7 +156,7 @@ impl Default for RemoveHiddenElemsPlugin {
 
 impl Plugin for RemoveHiddenElemsPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_42_
+        "removeHiddenElems"
     }
 
     fn description(&self) -> &'static str {
@@ -212,7 +212,7 @@ impl HiddenElemsRemovalVisitor {
 
     /// Check if an element is hidden and should be removed
     fn is_element_hidden(&self, element: &Element) -> bool {
-        // Check display=PROTECTED_60_
+        // Check display="none"
         if self.config.display_none {
             if let Some(display) = element.attributes.get("display") {
                 if display == "none" {
@@ -221,14 +221,14 @@ impl HiddenElemsRemovalVisitor {
             }
         }
 
-        // Check visibility=PROTECTED_63_ or visibility=PROTECTED_64_
+        // Check visibility="hidden" or visibility="collapse"
         if let Some(visibility) = element.attributes.get("visibility") {
             if visibility == "hidden" || visibility == "collapse" {
                 return true;
             }
         }
 
-        // Check opacity=PROTECTED_68_
+        // Check opacity="0"
         if self.config.opacity0 {
             if let Some(opacity) = element.attributes.get("opacity") {
                 if let Ok(opacity_val) = opacity.parse::<f64>() {
@@ -666,7 +666,7 @@ mod tests {
 
         plugin.apply(&mut doc).unwrap();
 
-        // display=PROTECTED_205_ should be kept, opacity=PROTECTED_206_ should be removed
+        // display="none" should be kept, opacity="0" should be removed
         assert_eq!(doc.root.children.len(), 1);
         if let Some(Node::Element(elem)) = doc.root.children.get(0) {
             assert_eq!(elem.attributes.get("display"), Some(&"none".to_string()));

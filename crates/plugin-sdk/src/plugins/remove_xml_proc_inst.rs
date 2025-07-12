@@ -3,7 +3,7 @@
 //! Remove XML Processing Instruction plugin implementation
 //!
 //! This plugin removes XML processing instructions from SVG documents.
-//! Processing instructions like <?xml version=PROTECTED_0_ encoding=PROTECTED_1_?> are
+//! Processing instructions like <?xml version="1.0" encoding="utf-8"?> are
 //! not needed in SVG documents and can be safely removed.
 
 use crate::Plugin;
@@ -62,7 +62,7 @@ impl Default for RemoveXMLProcInstPlugin {
 
 impl Plugin for RemoveXMLProcInstPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_4_
+        "removeXMLProcInst"
     }
 
     fn description(&self) -> &'static str {
@@ -83,9 +83,21 @@ impl Plugin for RemoveXMLProcInstPlugin {
     fn apply(&self, document: &mut Document) -> Result<()> {
         // Remove all XML processing instruction nodes from the document prologue
         document.prologue.retain(|child| {
-            // Remove ProcessingInstruction nodes with target PROTECTED_7_
+            // Remove ProcessingInstruction nodes with target "xml"
             if let Node::ProcessingInstruction { target, .. } = child {
-                // Check if itPROTECTED_39_s an XML processing instruction
+                // Check if it's an XML processing instruction
+                if target == "xml" {
+                    return false; // Remove this node
+                }
+            }
+            true // Keep all other nodes
+        });
+
+        // Also remove XML processing instructions from root children (in case they were misplaced)
+        document.root.children.retain(|child| {
+            // Remove ProcessingInstruction nodes with target "xml"
+            if let Node::ProcessingInstruction { target, .. } = child {
+                // Check if it's an XML processing instruction
                 if target == "xml" {
                     return false; // Remove this node
                 }
@@ -277,18 +289,6 @@ mod tests {
         assert_eq!(doc.root.children.len(), 2);
         assert!(matches!(doc.root.children[0], Node::Text(_)));
         assert!(matches!(doc.root.children[1], Node::Element(_)));
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = RemoveXMLProcInstPlugin::parse_config(&json!({})).unwrap();
-        // No fields to check since config is empty
-        let _ = config;
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveXMLProcInstPlugin, "removeXMLProcInst");
     }
 
     #[test]

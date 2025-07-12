@@ -122,7 +122,7 @@ impl Default for RemoveEmptyTextPlugin {
 
 impl Plugin for RemoveEmptyTextPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_9_
+        "removeEmptyText"
     }
 
     fn description(&self) -> &'static str {

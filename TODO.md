@@ -1,35 +1,33 @@
 # Vexy SVGO TODO List - Linearized Action Items
 
-Now /report and mark completed items as done in @PLAN.md and @TODO.md. Then run `./build.sh` and then check the `./build_logs`. If needed read the @llms.txt code snapshot. Then /work on items from @TODO.md consulting on @PLAN.md. Then review reflect refine revise, and then continue to /work on @PLAN.md and @TODO.md until every single item and issue has been fixed. Iterate iterate iterate! Do not stop, do not ask for confirmation. Work! When you're finishing one task or item, say "Wait, but..." and go on to the next task/item. It’s CRUCIAL that we get to a solution that BUILDS everything correctly!
-
 ## 1. Naming Unification (Immediate Priority)
 
 This phase focuses on standardizing the naming conventions across the codebase, documentation, and CLI to ensure consistency and clarity.
 
 1.  [ ] **Standardize `vexy_svgo` (snake_case) usage:**
 
-    - [ ] Verify all existing uses adhere to `vexy_svgo` in Rust crate names, module paths, internal code identifiers (variables, functions), WASM file names, JavaScript module imports, configuration file names, database names, storage keys.
+    - [ ] Verify all existing uses adhere to `vexy_svgo` in Rust crate names, module paths, internal code identifiers (variables, functions), WASM file names, JavaScript module imports, configuration file names, database names, storage keys. (Keep `vexy_svgo` for internal Rust identifiers, crate names, module paths, WASM file names, and configuration files where snake_case is idiomatic.)
 
 2.  [ ] **Standardize `Vexy SVGO` (Title Case, space separated) usage:**
 
-    - [ ] Change `VEXYSVGO` to `Vexy SVGO` in `test/svgo_compatibility_tests.rs` comment.
-    - [ ] Change `Building VEXYSVGO...` to `Building Vexy SVGO...` in `test/comparative/test_plugins.sh`.
-    - [ ] Change `VEXYSVGO` to `Vexy SVGO` in `crates/ffi/src/lib.rs` comment (related to FFI function descriptions).
-    - [ ] Change `VEXYSVGO Team` to `Vexy SVGO Team` in `CHANGELOG.md` and `scripts/marketplace-setup.sh`.
-    - [ ] Change `VEXYSVGO WebAssembly module` to `Vexy SVGO WebAssembly module` in `crates/wasm/vexy_svgo.d.ts`.
+    - [ ] Change `VEXYSVGO` to `Vexy SVGO` in `test/svgo_compatibility_tests.rs` comment. (Change to `Vexy SVGO` for human-readable comments and documentation.)
+    - [ ] Change `Building VEXYSVGO...` to `Building Vexy SVGO...` in `test/comparative/test_plugins.sh`. (Change to `Vexy SVGO` for human-readable output.)
+    - [ ] Change `VEXYSVGO` to `Vexy SVGO` in `crates/ffi/src/lib.rs` comment (related to FFI function descriptions). (Change to `Vexy SVGO` for human-readable comments.)
+    - [x] Change `VEXYSVGO Team` to `Vexy SVGO Team` in `CHANGELOG.md` and `scripts/marketplace-setup.sh`. (Change to `Vexy SVGO` for human-readable team names in documentation and scripts.)
+    - [x] Change `VEXYSVGO WebAssembly module` to `Vexy SVGO WebAssembly module` in `crates/wasm/vexy_svgo.d.ts`. (Change to `Vexy SVGO` for human-readable descriptions in type definitions.)
 
 3.  [ ] **Standardize `vexy-svgo` (kebab-case) usage for CLI and external references:**
 
-    - [ ] Rename CLI executable: Change the `vexy_svgo` binary name to `vexy-svgo`. This will involve updating `Cargo.toml` for the `cli` crate and build scripts.
-    - [ ] Update CLI command examples: Change all instances of `vexy_svgo` to `vexy-svgo` in `README.md`, `examples/cli-usage.md`, and `docs/plugin-marketplace.md` (CLI commands).
-    - [ ] Update binary names in build scripts: Change `vexy_svgo-linux`, `vexy_svgo-macos-universal`, `vexy_svgo-windows` to `vexy-svgo-linux`, `vexy-svgo-macos-universal`, `vexy-svgo-windows` in `scripts/build.sh`.
-    - [ ] Update repository URLs: Change `https://github.com/twardoch/vexy_svgo` to `https://github.com/twardoch/vexy-svgo` in `Cargo.toml`, `README.md`, `examples/wasm-enhanced-demo.html`, `docs/wasm-demo.html`, `docs/plugin-development.md`, `release.sh`, `issues/301.txt`.
-    - [ ] Update package manager instructions: Ensure `brew install vexy-svgo` and `choco install vexy-svgo` are used in `README.md`.
-    - [ ] Update project root check in `release.sh`: Change `vexy_svgo` to `vexy-svgo`.
-    - [ ] Update `docs/plugin-development.md`: Change `vexy_svgo` in clone/build/mkdir commands to `vexy-svgo`.
+    - [x] Rename CLI executable: Change the `vexy_svgo` binary name to `vexy-svgo`. This will involve updating `Cargo.toml` for the `cli` crate and build scripts. (Change to `vexy-svgo` for the CLI executable name and related build script references.)
+        - [x] Update CLI command examples: Change all instances of `vexy_svgo` to `vexy-svgo` in `README.md`, `examples/cli-usage.md`, and `docs/plugin-marketplace.md` (CLI commands). (Change to `vexy-svgo` for all CLI command examples.)
+    - [ ] Update binary names in build scripts: Change `vexy_svgo-linux`, `vexy_svgo-macos-universal`, `vexy_svgo-windows` to `vexy-svgo-linux`, `vexy-svgo-macos-universal`, `vexy-svgo-windows` in `scripts/build.sh`. (Change to `vexy-svgo` for binary names in build scripts.)
+    - [ ] Update repository URLs: Change `https://github.com/twardoch/vexy_svgo` to `https://github.com/twardoch/vexy-svgo` in `Cargo.toml`, `README.md`, `examples/wasm-enhanced-demo.html`, `docs/wasm-demo.html`, `docs/plugin-development.md`, `release.sh`, `issues/301.txt`. (Change to `vexy-svgo` for repository URLs.)
+    - [ ] Update package manager instructions: Ensure `brew install vexy-svgo` and `choco install vexy-svgo` are used in `README.md`. (Change to `vexy-svgo` for package manager instructions.)
+    - [ ] Update project root check in `release.sh`: Change `vexy_svgo` to `vexy-svgo`. (Change to `vexy-svgo` for project root checks in scripts.)
+    - [ ] Update `docs/plugin-development.md`: Change `vexy_svgo` in clone/build/mkdir commands to `vexy-svgo`. (Change to `vexy-svgo` for commands in documentation.)
 
 4.  [ ] **Remove `VEXYSVGO` (all caps) for general use:**
-    - [ ] Change all instances identified in step 2.2 to `Vexy SVGO` or `vexy_svgo` as appropriate.
+    - [ ] Change all instances identified in step 2.2 to `Vexy SVGO` or `vexy_svgo` as appropriate. (Remove `VEXYSVGO` and replace with `Vexy SVGO` for human-readable text or `vexy_svgo` for code identifiers, depending on context.)
 
 ## 2. 🔧 Phase 1: Code Cleanup (Immediate Priority)
 
@@ -170,5 +168,3 @@ This phase focuses on standardizing the naming conventions across the codebase, 
 78. [ ] Set up `crates.io` publishing
 79. [ ] Create Homebrew formula
 80. [ ] Create npm package wrapper
-
-

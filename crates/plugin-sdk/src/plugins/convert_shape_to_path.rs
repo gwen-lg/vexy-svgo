@@ -5,7 +5,76 @@
 //! This plugin converts rect, line, polyline, polygon, circle and ellipse elements
 //! to path elements for better optimization potential.
 //!
-//! Reference: SVGOPROTECTED_182_s a shape
+//! Reference: SVGO's convertShapeToPath plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use regex::Regex;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::sync::LazyLock;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+static NUMBER_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?").unwrap());
+
+/// Configuration for the convert shape to path plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ConvertShapeToPathConfig {
+    /// Whether to convert circles and ellipses to paths using arc commands
+    #[serde(default)]
+    pub convert_arcs: bool,
+
+    /// Number of decimal places for numeric values
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub float_precision: Option<u8>,
+}
+
+impl Default for ConvertShapeToPathConfig {
+    fn default() -> Self {
+        Self {
+            convert_arcs: false,
+            float_precision: None,
+        }
+    }
+}
+
+/// Plugin that converts basic shapes to path elements
+pub struct ConvertShapeToPathPlugin {
+    config: ConvertShapeToPathConfig,
+}
+
+impl ConvertShapeToPathPlugin {
+    pub fn new() -> Self {
+        Self {
+            config: ConvertShapeToPathConfig::default(),
+        }
+    }
+
+    pub fn with_config(config: ConvertShapeToPathConfig) -> Self {
+        Self { config }
+    }
+
+    fn parse_config(params: &Value) -> Result<ConvertShapeToPathConfig> {
+        if params.is_null() {
+            Ok(ConvertShapeToPathConfig::default())
+        } else {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid plugin configuration: {}", e))
+        }
+    }
+
+    /// Recursively convert shapes in an element and its children
+    fn convert_shapes_in_element(&self, element: &mut Element) {
+        // Process child elements first
+        for child in &mut element.children {
+            if let Node::Element(child_element) = child {
+                self.convert_shapes_in_element(child_element);
+            }
+        }
+
+        // Convert current element if it's a shape
         self.convert_shape_element(element);
     }
 
@@ -22,7 +91,18 @@
         }
     }
 
-    /// Parse a coordinate value, returning None if itPROTECTED_183_%PROTECTED_184_t convert rectangles with rounded corners
+    /// Parse a coordinate value, returning None if it's not a valid number
+    fn parse_coord(value: &str) -> Option<f64> {
+        // Skip if contains non-numeric characters that indicate units or percentages
+        if value.contains('%') || value.contains("px") || value.contains("pt") {
+            return None;
+        }
+        value.parse().ok()
+    }
+
+    /// Convert a rectangle to a path
+    fn convert_rect(&self, element: &mut Element) {
+        // Don't convert rectangles with rounded corners
         if element.has_attr("rx") || element.has_attr("ry") {
             return;
         }
@@ -289,7 +369,7 @@ impl Default for ConvertShapeToPathPlugin {
 
 impl Plugin for ConvertShapeToPathPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_80_
+        "convertShapeToPath"
     }
 
     fn description(&self) -> &'static str {
@@ -534,84 +614,4 @@ mod tests {
 }
 
 // Uncomment when ready to enable fixture tests
-// crate::plugin_fixture_tests!(ConvertShapeToPathPlugin, PROTECTED_181_);
-        assert!(!element.has_attr("points"));
-    }
-
-    #[test]
-    fn test_convert_polygon() {
-        let mut element = create_element("polygon", vec![("points", "20 10 50 40 30 20")]);
-        let plugin = ConvertShapeToPathPlugin::new();
-
-        plugin.convert_polygon(&mut element);
-
-        assert_eq!(element.name, "path");
-        assert_eq!(element.attr("d").unwrap(), "M20 10 50 40 30 20z");
-        assert!(!element.has_attr("points"));
-    }
-
-    #[test]
-    fn test_convert_circle() {
-        let mut element = create_element("circle", vec![("cx", "50"), ("cy", "50"), ("r", "25")]);
-        let config = ConvertShapeToPathConfig {
-            convert_arcs: true,
-            float_precision: None,
-        };
-        let plugin = ConvertShapeToPathPlugin::with_config(config);
-
-        plugin.convert_circle(&mut element);
-
-        assert_eq!(element.name, "path");
-        assert_eq!(
-            element.attr("d").unwrap(),
-            "M50 25A25 25 0 1 0 50 75A25 25 0 1 0 50 25z"
-        );
-        assert!(!element.has_attr("cx"));
-        assert!(!element.has_attr("cy"));
-        assert!(!element.has_attr("r"));
-    }
-
-    #[test]
-    fn test_precision_formatting() {
-        let config = ConvertShapeToPathConfig {
-            convert_arcs: false,
-            float_precision: Some(3),
-        };
-        let plugin = ConvertShapeToPathPlugin::with_config(config);
-
-        assert_eq!(plugin.format_number(10.123456), "10.123");
-        assert_eq!(plugin.format_number(20.987654), "20.988");
-        assert_eq!(plugin.format_number(30.0), "30");
-
-        let plugin_no_precision = ConvertShapeToPathPlugin::new();
-        assert_eq!(plugin_no_precision.format_number(40.5), "40.5");
-        assert_eq!(plugin_no_precision.format_number(50.0), "50");
-    }
-
-    #[test]
-    fn test_polyline_insufficient_points() {
-        let mut element = create_element("polyline", vec![("points", "10 20")]);
-        let plugin = ConvertShapeToPathPlugin::new();
-
-        plugin.convert_poly(&mut element, false);
-
-        // Should be marked for removal
-        assert_eq!(element.name, "");
-        assert!(element.attributes.is_empty());
-    }
-
-    #[test]
-    fn test_skip_unit_values() {
-        let mut element = create_element("rect", vec![("width", "100%"), ("height", "50")]);
-        let plugin = ConvertShapeToPathPlugin::new();
-
-        plugin.convert_rect(&mut element);
-
-        // Should not be converted due to percentage width
-        assert_eq!(element.name, "rect");
-        assert!(element.has_attr("width"));
-    }
-}
-
-// Uncomment when ready to enable fixture tests
-// crate::plugin_fixture_tests!(ConvertShapeToPathPlugin, PROTECTED_211_);
+// crate::plugin_fixture_tests!(ConvertShapeToPathPlugin, "convertShapeToPath");

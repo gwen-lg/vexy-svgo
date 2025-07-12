@@ -11,7 +11,114 @@
 //! - Removes unused styles when usage analysis is enabled
 //! - Configurable optimization settings
 //!
-//! Reference: SVGOPROTECTED_108_s a script element
+//! Reference: SVGO's minifyStyles plugin
+
+use crate::Plugin;
+use anyhow::Result;
+use lightningcss::{
+    stylesheet::{MinifyOptions, ParserOptions, StyleSheet},
+    targets::Targets,
+};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashSet;
+use vexy_svgo_core::ast::{Document, Element, Node};
+
+/// Usage configuration for CSS optimization
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UsageConfig {
+    /// Force usage optimization even when unsafe
+    #[serde(default)]
+    pub force: bool,
+    /// Optimize based on ID usage
+    #[serde(default = "default_true")]
+    pub ids: bool,
+    /// Optimize based on class usage
+    #[serde(default = "default_true")]
+    pub classes: bool,
+    /// Optimize based on tag usage
+    #[serde(default = "default_true")]
+    pub tags: bool,
+}
+
+impl Default for UsageConfig {
+    fn default() -> Self {
+        Self {
+            force: false,
+            ids: true,
+            classes: true,
+            tags: true,
+        }
+    }
+}
+
+/// Configuration parameters for minify styles plugin
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct MinifyStylesConfig {
+    /// Disable or enable structure optimizations
+    #[serde(default = "default_true")]
+    pub restructure: bool,
+    /// Force merging of @media rules with same query
+    #[serde(default)]
+    pub force_media_merge: bool,
+    /// Comment handling strategy
+    #[serde(default)]
+    pub comments: bool,
+    /// Usage-based optimization settings
+    #[serde(default)]
+    pub usage: Option<UsageConfig>,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+impl Default for MinifyStylesConfig {
+    fn default() -> Self {
+        Self {
+            restructure: true,
+            force_media_merge: false,
+            comments: false,
+            usage: None,
+        }
+    }
+}
+
+/// Plugin that minifies CSS content in style elements and attributes
+pub struct MinifyStylesPlugin {
+    config: MinifyStylesConfig,
+}
+
+impl MinifyStylesPlugin {
+    /// Create a new MinifyStylesPlugin
+    pub fn new() -> Self {
+        Self {
+            config: MinifyStylesConfig::default(),
+        }
+    }
+
+    /// Create a new MinifyStylesPlugin with config
+    pub fn with_config(config: MinifyStylesConfig) -> Self {
+        Self { config }
+    }
+
+    /// Parse configuration from JSON
+    fn parse_config(params: &Value) -> Result<MinifyStylesConfig> {
+        if params.is_null() || (params.is_object() && params.as_object().unwrap().is_empty()) {
+            Ok(MinifyStylesConfig::default())
+        } else if params.is_object() {
+            serde_json::from_value(params.clone())
+                .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
+        } else {
+            Ok(MinifyStylesConfig::default())
+        }
+    }
+
+    /// Check if an element contains scripts
+    fn has_scripts(&self, element: &Element) -> bool {
+        // Check if it's a script element
         if element.name == "script" && !element.children.is_empty() {
             return true;
         }
@@ -219,7 +326,7 @@ impl Default for MinifyStylesPlugin {
 
 impl Plugin for MinifyStylesPlugin {
     fn name(&self) -> &'static str {
-        PROTECTED_31_
+        "minifyStyles"
     }
 
     fn description(&self) -> &'static str {
@@ -257,10 +364,10 @@ mod tests {
     #[test]
     fn test_plugin_creation() {
         let plugin = MinifyStylesPlugin::new();
-        assert_eq!(plugin.name(), PROTECTED_33_);
+        assert_eq!(plugin.name(), "minifyStyles");
         assert_eq!(
             plugin.description(),
-            PROTECTED_34_
+            "minifies styles and removes unused styles"
         );
     }
 
@@ -274,21 +381,21 @@ mod tests {
         // Valid parameters (with values)
         assert!(plugin
             .validate_params(&json!({
-                PROTECTED_35_: true,
-                PROTECTED_36_: false,
-                PROTECTED_37_: true,
-                PROTECTED_38_: {
-                    PROTECTED_39_: false,
-                    PROTECTED_40_: true,
-                    PROTECTED_41_: true,
-                    PROTECTED_42_: true
+                "restructure": true,
+                "forceMediaMerge": false,
+                "comments": true,
+                "usage": {
+                    "force": false,
+                    "ids": true,
+                    "classes": true,
+                    "tags": true
                 }
             }))
             .is_ok());
 
         // Invalid parameters (unknown field)
         assert!(plugin
-            .validate_params(&json!({PROTECTED_43_: PROTECTED_44_}))
+            .validate_params(&json!({"unknownParam": "value"}))
             .is_err());
     }
 
@@ -297,7 +404,7 @@ mod tests {
         let plugin = MinifyStylesPlugin::new();
 
         // Test script element
-        let script = create_element(PROTECTED_45_);
+        let script = create_element("script");
         // Note: has_scripts checks if script has children, but for this test we'll check the name
         assert_eq!(script.name, "script");
 
@@ -415,113 +522,6 @@ mod tests {
         // Empty style should be removed, div should remain
         assert_eq!(doc.root.children.len(), 1);
         if let Node::Element(elem) = &doc.root.children[0] {
-            assert_eq!(elem.name, "div");
-        }
-    }
-
-    #[test]
-    fn test_nested_elements() {
-        let plugin = MinifyStylesPlugin::new();
-        let mut doc = Document::new();
-
-        // Create nested structure with style elements
-        let mut group = create_element("g");
-        let mut style = create_element("style");
-        style
-            .children
-            .push(create_text_node(".test { color: blue; }"));
-        group.children.push(Node::Element(style));
-
-        let mut rect = create_element("rect");
-        rect.attributes
-            .insert("style".to_string(), "fill: green;".to_string());
-        group.children.push(Node::Element(rect));
-
-        doc.root.children.push(Node::Element(group));
-
-        // Apply plugin
-        plugin.apply(&mut doc).unwrap();
-
-        // Both nested style element and style attribute should be processed
-        if let Node::Element(group_elem) = &doc.root.children[0] {
-            // Check style element
-            if let Node::Element(style_elem) = &group_elem.children[0] {
-                assert_eq!(style_elem.name, "style");
-                if let Node::Text(text_content) = &style_elem.children[0] {
-                    // LightningCSS might change the output format, so just check if itPROTECTED_117_s not empty
-                    assert!(
-                        !text_content.is_empty(),
-                        "CSS should not be empty after minification"
-                    );
-                    // The color might be in a different format after minification (blue -> #00f)
-                    assert!(
-                        text_content.contains("blue")
-                            || text_content.contains("#00f")
-                            || text_content.contains("#0000ff")
-                    );
-                }
-            }
-
-            // Check style attribute
-            if let Node::Element(rect_elem) = &group_elem.children[1] {
-                let style_attr = rect_elem.attributes.get("style").unwrap();
-                assert!(style_attr.contains("green"));
-            }
-        }
-    }
-
-    #[test]
-    fn test_invalid_css_handling() {
-        let plugin = MinifyStylesPlugin::new();
-        let mut doc = Document::new();
-
-        // Create style element with invalid CSS
-        let mut style = create_element("style");
-        let invalid_css = "this is not valid css { }}}";
-        style.children.push(create_text_node(invalid_css));
-        doc.root.children.push(Node::Element(style));
-
-        // Apply plugin - should not crash
-        let result = plugin.apply(&mut doc);
-        assert!(result.is_ok());
-
-        // Invalid CSS should be preserved
-        if let Node::Element(style_elem) = &doc.root.children[0] {
-            if let Node::Text(text_content) = &style_elem.children[0] {
-                assert_eq!(text_content, invalid_css);
-            }
-        }
-    }
-
-    #[test]
-    fn test_config_parsing() {
-        let config = MinifyStylesPlugin::parse_config(&json!({
-            "restructure": false,
-            "forceMediaMerge": true,
-            "comments": true,
-            "usage": {
-                "force": true,
-                "ids": false,
-                "classes": true,
-                "tags": false
-            }
-        }))
-        .unwrap();
-
-        assert_eq!(config.restructure, false);
-        assert_eq!(config.force_media_merge, true);
-        assert_eq!(config.comments, true);
-
-        let usage = config.usage.unwrap();
-        assert_eq!(usage.force, true);
-        assert_eq!(usage.ids, false);
-        assert_eq!(usage.classes, true);
-        assert_eq!(usage.tags, false);
-    }
-}
-
-// Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(MinifyStylesPlugin, "minifyStyles");
             assert_eq!(elem.name, "div");
         }
     }
