@@ -206,7 +206,7 @@ impl EditorsNSDataRemovalVisitor {
 
             // Remove the xmlns declarations
             for attr in attrs_to_remove {
-                element.attributes.shift_remove(&attr);
+                element.attributes.remove(&attr);
             }
         }
     }
@@ -218,7 +218,7 @@ impl EditorsNSDataRemovalVisitor {
         for name in element.attributes.keys() {
             if let Some(colon_pos) = name.find(':') {
                 let prefix = &name[..colon_pos];
-                if self.state.prefixes_to_remove.contains(prefix) {
+                if self.state.prefixes_to_remove.contains(prefix.as_ref()) {
                     attrs_to_remove.push(name.clone());
                 }
             }

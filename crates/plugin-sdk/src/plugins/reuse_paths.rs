@@ -54,7 +54,7 @@ impl ReusePathsPlugin {
     fn generate_path_key(element: &Element) -> Option<String> {
         let d = element.attr("d")?;
         let fill = element.attr("fill").map(|s| s.as_str()).unwrap_or("");
-        let stroke = element.attr("stroke").map(|s| s.as_str()).unwrap_or("");
+        let stroke = element.attr("stroke").map(|s| s.as_ref()).unwrap_or("");
 
         Some(format!("{};s:{};f:{}", d, stroke, fill))
     }
@@ -267,7 +267,7 @@ impl Plugin for ReusePathsPlugin {
             // Keep only d, fill, and stroke attributes for the definition
             let d_attr = reusable_path
                 .attr("d")
-                .map(|s| s.as_str())
+                .map(|s| s.as_ref())
                 .unwrap_or("")
                 .to_string();
             let fill_attr = reusable_path.attr("fill").map(|s| s.to_string());
@@ -284,7 +284,7 @@ impl Plugin for ReusePathsPlugin {
             }
 
             // Handle ID assignment for the definition
-            let original_id = first_path.attr("id").map(|s| s.as_str());
+            let original_id = first_path.attr("id").map(|s| s.as_ref());
             let definition_id = if let Some(id) = original_id {
                 if existing_hrefs.contains(id) {
                     // ID is already referenced, create new one

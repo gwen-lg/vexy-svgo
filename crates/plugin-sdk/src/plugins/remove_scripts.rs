@@ -157,7 +157,7 @@ impl RemoveScriptsPlugin {
         // Remove all event attributes
         element
             .attributes
-            .retain(|name, _| !self.event_attrs.contains(name.as_str()));
+            .retain(|name, _| !self.event_attrs.contains(name.as_ref()));
 
         // Special handling for <a> elements with javascript: hrefs
         if element.name == "a" {

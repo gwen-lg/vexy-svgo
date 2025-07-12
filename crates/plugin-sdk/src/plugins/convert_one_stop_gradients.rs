@@ -163,7 +163,7 @@ impl ConvertOneStopGradientsPlugin {
                 let url_pattern = format!("url(#{})", gradient_id);
                 new_style = new_style.replace(&url_pattern, replacement_color);
             }
-            if new_style != style.as_str() {
+            if new_style != style.as_ref() {
                 element.set_attr("style", &new_style);
             }
         }

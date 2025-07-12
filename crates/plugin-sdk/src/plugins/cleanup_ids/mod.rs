@@ -379,7 +379,7 @@ impl Visitor<'_> for IdApplierVisitor<'_> {
         // Update references in attributes
         let mut updates = Vec::new();
         for (attr_name, attr_value) in &element.attributes {
-            if REFERENCES_PROPS.contains(&attr_name.as_str())
+            if REFERENCES_PROPS.contains(&attr_name.as_ref())
                 || attr_name == "style"
                 || attr_name == "href"
                 || attr_name == "xlink:href"

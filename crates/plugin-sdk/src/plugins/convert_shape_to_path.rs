@@ -159,11 +159,11 @@ impl ConvertShapeToPathPlugin {
             Some(x) => x,
             None => return,
         };
-        let y1 = match Self::parse_coord(element.attr("y1").map(|s| s.as_str()).unwrap_or("0")) {
+        let y1 = match Self::parse_coord(element.attr("y1").map(|s| s.as_ref()).unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };
-        let x2 = match Self::parse_coord(element.attr("x2").map(|s| s.as_str()).unwrap_or("0")) {
+        let x2 = match Self::parse_coord(element.attr("x2").map(|s| s.as_ref()).unwrap_or("0")) {
             Some(x) => x,
             None => return,
         };

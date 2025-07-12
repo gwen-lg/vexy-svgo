@@ -131,7 +131,7 @@ impl CollapseGroupsPlugin {
     /// Move attributes from group to child element
     fn move_attributes(group: &Element, child: &mut Element) {
         for (attr_name, attr_value) in &group.attributes {
-            match attr_name.as_str() {
+            match attr_name.as_ref() {
                 "transform" => {
                     // Concatenate transforms: parent transform comes first
                     if let Some(child_transform) = child.attributes.get("transform") {

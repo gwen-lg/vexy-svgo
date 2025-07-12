@@ -213,7 +213,7 @@ impl RemoveUselessStrokeAndFillPlugin {
                             k.starts_with("stroke")
                         }
                     })
-                    .cloned()
+                    .map(|s| s.to_string())
                     .collect();
 
                 for attr in stroke_attrs {
@@ -242,17 +242,17 @@ impl RemoveUselessStrokeAndFillPlugin {
         if should_remove_fill {
             // Remove all fill-related attributes except fill itself
             let fill_attrs: Vec<String> = element.attributes
-                .keys()
-                .filter(|k| k.starts_with("fill-"))
-                .cloned()
-                .collect();
+                    .keys()
+                    .filter(|k| k.starts_with("fill-"))
+                    .map(|s| s.to_string())
+                    .collect();
 
             for attr in fill_attrs {
                 element.remove_attr(&attr);
             }
 
             // Set explicit "none" if not already set
-            if fill.is_none_or(|f| f != "none") {
+            if fill.map_or(true, |f| f != "none") {
                 element.set_attr("fill", "none");
             }
         }
@@ -266,10 +266,11 @@ impl RemoveUselessStrokeAndFillPlugin {
         let stroke = current_styles.get("stroke");
         let fill = current_styles.get("fill");
 
-        let no_stroke = stroke.is_none_or(|s| s == "none")
+        let no_stroke = stroke.map_or(true, |s| s == "none")
             || element.attr("stroke").is_some_and(|s| s == "none");
         let no_fill =
-            fill.is_some_and(|f| f == "none") || element.attr("fill").is_some_and(|f| f == "none");
+            let no_fill =
+            let no_fill = fill.map_or(true, |f| f == "none") || element.attr("fill").map_or(false, |f| f == "none");
 
         no_stroke && no_fill
     }

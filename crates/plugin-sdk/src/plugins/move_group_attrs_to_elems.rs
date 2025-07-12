@@ -221,8 +221,8 @@ mod tests {
         // Check that attributes were moved
         match &doc.root.children[0] {
             Node::Element(child) => {
-                assert_eq!(child.attr("fill").map(|s| s.as_str()), Some("red"));
-                assert_eq!(child.attr("stroke").map(|s| s.as_str()), Some("blue"));
+                assert_eq!(child.attr("fill"), Some("red"));
+                assert_eq!(child.attr("stroke"), Some("blue"));
             }
             _ => panic!("Expected element child"),
         }
@@ -232,7 +232,7 @@ mod tests {
         assert!(!doc.root.has_attr("stroke"));
 
         // Check that non-movable attributes remain on group
-        assert_eq!(doc.root.attr("id").map(|s| s.as_str()), Some("group1"));
+        assert_eq!(doc.root.attr("id"), Some("group1"));
     }
 
     #[test]
@@ -257,14 +257,14 @@ mod tests {
         // Check that fill was not moved (child already had it)
         match &doc.root.children[0] {
             Node::Element(child) => {
-                assert_eq!(child.attr("fill").map(|s| s.as_str()), Some("green")); // Original value preserved
-                assert_eq!(child.attr("stroke").map(|s| s.as_str()), Some("blue")); // This was moved
+                assert_eq!(child.attr("fill"), Some("green")); // Original value preserved
+                assert_eq!(child.attr("stroke"), Some("blue")); // This was moved
             }
             _ => panic!("Expected element child"),
         }
 
         // Check that fill remains on group (not moved)
-        assert_eq!(doc.root.attr("fill").map(|s| s.as_str()), Some("red"));
+        assert_eq!(doc.root.attr("fill"), Some("red"));
         assert!(!doc.root.has_attr("stroke")); // This was moved
     }
 
@@ -286,6 +286,6 @@ mod tests {
         plugin.apply(&mut doc).unwrap();
 
         // Check that attributes were not moved
-        assert_eq!(doc.root.attr("fill").map(|s| s.as_str()), Some("red"));
+        assert_eq!(doc.root.attr("fill"), Some("red"));
     }
 }

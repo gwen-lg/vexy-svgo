@@ -482,7 +482,7 @@ impl ConvertColorsPlugin {
         // Convert hex to short name (but not inside masks)
         if self.config.shortname && !in_mask {
             let color_name = val.to_lowercase();
-            if let Some(short_name) = Self::color_short_names().get(color_name.as_str()) {
+            if let Some(short_name) = Self::color_short_names().get(color_name.as_ref()) {
                 val = short_name.to_string();
             }
         }

@@ -581,6 +581,6 @@ mod tests {
         plugin.apply(&mut doc).unwrap();
 
         // Should be shortened to single parameter
-        assert_eq!(doc.root.attr("transform").map(|s| s.as_str()), Some("translate(10)"));
+        assert_eq!(doc.root.attr("transform"), Some("translate(10)"));
     }
 }

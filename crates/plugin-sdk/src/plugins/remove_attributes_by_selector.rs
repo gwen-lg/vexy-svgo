@@ -324,7 +324,7 @@ mod tests {
         // Check that fill was removed but stroke remains
         if let Some(Node::Element(ref rect)) = doc.root.children.first() {
             assert_eq!(rect.attr("fill"), None);
-            assert_eq!(rect.attr("stroke").map(|s| s.as_str()), Some("#00ff00"));
+            assert_eq!(rect.attr("stroke"), Some("#00ff00"));
         }
     }
 
@@ -344,7 +344,7 @@ mod tests {
             assert_eq!(rect.attr("fill"), None);
             assert_eq!(rect.attr("stroke"), None);
             // Other attributes should remain
-            assert_eq!(rect.attr("width").map(|s| s.as_str()), Some("100"));
+            assert_eq!(rect.attr("width"), Some("100"));
         }
     }
 
@@ -387,14 +387,14 @@ mod tests {
         // Check rect
         if let Some(Node::Element(ref rect)) = doc.root.children.first() {
             assert_eq!(rect.attr("fill"), None);
-            assert_eq!(rect.attr("stroke").map(|s| s.as_str()), Some("#00ff00"));
+            assert_eq!(rect.attr("stroke"), Some("#00ff00"));
         }
 
         // Check circle
         if let Some(Node::Element(ref circle)) = doc.root.children.get(1) {
             assert_eq!(circle.attr("id"), None);
             assert_eq!(circle.attr("stroke"), None);
-            assert_eq!(circle.attr("cx").map(|s| s.as_str()), Some("50"));
+            assert_eq!(circle.attr("cx"), Some("50"));
         }
     }
 
@@ -436,7 +436,7 @@ mod tests {
         if let Some(Node::Element(ref rect)) = doc.root.children.first() {
             assert_eq!(rect.attr("fill"), None);
             assert_eq!(
-                rect.attr("class").map(|s| s.as_str()),
+                rect.attr("class"),
                 Some("remove-me another-class")
             );
         }

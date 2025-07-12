@@ -294,7 +294,7 @@ mod tests {
 
         // Check that the group now has the fill attribute
         if let Node::Element(ref group) = document.root.children[0] {
-            assert_eq!(group.attr("fill").map(|s| s.as_str()), Some("red"));
+            assert_eq!(group.attr("fill"), Some("red"));
 
             // Check that children no longer have the fill attribute
             for child in &group.children {
@@ -327,10 +327,10 @@ mod tests {
 
             // Children should still have their original fill attributes
             if let Node::Element(ref rect) = result_group.children[0] {
-                assert_eq!(rect.attr("fill").map(|s| s.as_str()), Some("red"));
+                assert_eq!(rect.attr("fill"), Some("red"));
             }
             if let Node::Element(ref circle) = result_group.children[1] {
-                assert_eq!(circle.attr("fill").map(|s| s.as_str()), Some("blue"));
+                assert_eq!(circle.attr("fill"), Some("blue"));
             }
         }
     }
@@ -359,9 +359,9 @@ mod tests {
 
         // Check that the group has all common attributes
         if let Node::Element(ref group) = document.root.children[0] {
-            assert_eq!(group.attr("fill").map(|s| s.as_str()), Some("red"));
-            assert_eq!(group.attr("stroke").map(|s| s.as_str()), Some("blue"));
-            assert_eq!(group.attr("opacity").map(|s| s.as_str()), Some("0.5"));
+            assert_eq!(group.attr("fill"), Some("red"));
+            assert_eq!(group.attr("stroke"), Some("blue"));
+            assert_eq!(group.attr("opacity"), Some("0.5"));
 
             // Check that children no longer have these attributes
             for child in &group.children {
@@ -392,7 +392,7 @@ mod tests {
 
         // Group should keep its original fill attribute
         if let Node::Element(ref group) = document.root.children[0] {
-            assert_eq!(group.attr("fill").map(|s| s.as_str()), Some("green"));
+            assert_eq!(group.attr("fill"), Some("green"));
 
             // Children should not have fill attribute removed since group already had different value
             for child in &group.children {
@@ -424,7 +424,7 @@ mod tests {
             assert!(!result_group.has_attr("fill"));
 
             if let Node::Element(ref rect) = result_group.children[0] {
-                assert_eq!(rect.attr("fill").map(|s| s.as_str()), Some("red"));
+                assert_eq!(rect.attr("fill"), Some("red"));
             }
         }
     }
