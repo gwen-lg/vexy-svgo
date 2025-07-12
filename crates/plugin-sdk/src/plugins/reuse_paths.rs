@@ -53,7 +53,7 @@ impl ReusePathsPlugin {
     /// Generates a unique key for grouping paths with identical attributes
     fn generate_path_key(element: &Element) -> Option<String> {
         let d = element.attr("d")?;
-        let fill = element.attr("fill").map(|s| s.as_str()).unwrap_or("");
+        let fill = element.attr("fill").map(|s| s.as_ref()).unwrap_or("");
         let stroke = element.attr("stroke").map(|s| s.as_ref()).unwrap_or("");
 
         Some(format!("{};s:{};f:{}", d, stroke, fill))
@@ -197,7 +197,7 @@ impl Plugin for ReusePathsPlugin {
     }
 
     fn apply<'a>(&self, document: &mut Document<'a>) -> Result<()> {
-        let mut changed = false;
+        let mut _changed = false;
 
         // Collect existing href references
         let mut existing_hrefs = HashSet::new();
@@ -238,7 +238,7 @@ impl Plugin for ReusePathsPlugin {
         for (_key, mut paths) in groups_to_process {
             // If we created a new defs at index 0, adjust all path indices
             if created_new_defs {
-                for (path, elem) in &mut paths {
+                for (path, _elem) in &mut paths {
                     if path.starts_with("/") {
                         let parts: Vec<String> = path.split('/').filter(|s| !s.is_empty()).map(|s| s.to_string()).collect();
                         if let Some(first) = parts.first() {
@@ -284,9 +284,9 @@ impl Plugin for ReusePathsPlugin {
             }
 
             // Handle ID assignment for the definition
-            let original_id = first_path.attr("id").map(|s| s.as_ref());
+            let original_id = first_path.attr("id");
             let definition_id = if let Some(id) = original_id {
-                if existing_hrefs.contains(id) {
+                if existing_hrefs.contains(&id.to_string()) {
                     // ID is already referenced, create new one
                     let new_id = format!("reuse-{}", reuse_index);
                     reuse_index += 1;
@@ -314,7 +314,7 @@ impl Plugin for ReusePathsPlugin {
             for (path, _) in &paths {
                 if self.replace_path_with_use(&mut document.root, path, &definition_id) {
                     has_created_uses = true;
-                    changed = true;
+                    _changed = true;
                 }
             }
         }

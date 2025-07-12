@@ -197,9 +197,9 @@ impl ApplyTransformsPlugin {
                         // Apply to path data
                         if let Some(d) = element.attributes.get("d") {
                             let transformed = self.transform_path_data(d, &matrix);
-                            element.attributes.insert("d".to_string(), transformed);
+                            element.attributes.insert("d".into(), transformed.into());
                             // Remove transform attribute after applying
-                            element.attributes.remove("transform");
+                            element.attributes.shift_remove("transform");
                         }
                     }
                 }

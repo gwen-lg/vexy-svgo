@@ -192,13 +192,13 @@ impl EditorsNSDataRemovalVisitor {
             // Find xmlns declarations that match editor namespaces
             for (name, value) in &element.attributes {
                 if name.starts_with("xmlns:") {
-                    if self.state.namespaces_to_remove.contains(value) {
+                    if self.state.namespaces_to_remove.contains(value.as_ref()) {
                         // Extract the prefix
                         let prefix = &name[6..];
                         self.state.prefixes_to_remove.insert(prefix.to_string());
-                        attrs_to_remove.push(name.to_string());
+                        attrs_to_remove.push(name.clone());
                     }
-                } else if name == "xmlns" && self.state.namespaces_to_remove.contains(value) {
+                } else if name == "xmlns" && self.state.namespaces_to_remove.contains(value.as_ref()) {
                     // Default namespace is an editor namespace
                     attrs_to_remove.push(name.clone());
                 }
@@ -206,7 +206,7 @@ impl EditorsNSDataRemovalVisitor {
 
             // Remove the xmlns declarations
             for attr in attrs_to_remove {
-                element.attributes.remove(&attr);
+                element.attributes.shift_remove(&attr);
             }
         }
     }
@@ -218,7 +218,7 @@ impl EditorsNSDataRemovalVisitor {
         for name in element.attributes.keys() {
             if let Some(colon_pos) = name.find(':') {
                 let prefix = &name[..colon_pos];
-                if self.state.prefixes_to_remove.contains(prefix.as_ref()) {
+                if self.state.prefixes_to_remove.contains(prefix) {
                     attrs_to_remove.push(name.clone());
                 }
             }
@@ -226,7 +226,7 @@ impl EditorsNSDataRemovalVisitor {
 
         // Remove the editor attributes
         for attr in attrs_to_remove {
-            element.attributes.remove(&attr);
+            element.attributes.shift_remove(&attr);
         }
     }
 
@@ -234,7 +234,7 @@ impl EditorsNSDataRemovalVisitor {
     fn should_remove_element(&self, element: &Element) -> bool {
         if let Some(colon_pos) = element.name.find(':') {
             let prefix = &element.name[..colon_pos];
-            return self.state.prefixes_to_remove.contains(prefix.as_ref());
+            return self.state.prefixes_to_remove.contains(prefix);
         }
         false
     }

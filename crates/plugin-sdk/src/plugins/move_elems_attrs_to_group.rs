@@ -125,7 +125,7 @@ impl MoveElemsAttrsToGroupPlugin {
                     // Keep only attributes that match between elements
                     let mut intersection = HashMap::new();
                     for (name, value) in existing {
-                        if let Some(elem_value) = elem_attrs.get(name.as_ref()) {
+                        if let Some(elem_value) = elem_attrs.get(name) {
                             if elem_value == value {
                                 intersection.insert(name.clone(), value.clone());
                             }

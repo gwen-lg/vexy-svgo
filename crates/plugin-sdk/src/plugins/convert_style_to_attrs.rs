@@ -149,7 +149,7 @@ impl ConvertStyleToAttrsPlugin {
 
     /// Parse configuration from JSON
     fn parse_config(params: &Value) -> Result<ConvertStyleToAttrsConfig> {
-        if let Some(obj) = params.as_object() {
+        if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
                 .map_err(|e| anyhow!("Invalid configuration: {}", e))
         } else {
@@ -266,12 +266,12 @@ impl ConvertStyleToAttrsVisitor {
 
             // Add new attributes
             for (name, value) in new_attributes {
-                element.attributes.insert(name, value);
+                element.attributes.insert(name.into(), value.into());
             }
 
             // Update or remove style attribute
             if remaining_styles.is_empty() {
-                element.attributes.remove("style");
+                element.attributes.shift_remove("style");
             } else {
                 element
                     .attributes

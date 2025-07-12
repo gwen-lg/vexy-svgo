@@ -268,9 +268,7 @@ impl RemoveUselessStrokeAndFillPlugin {
 
         let no_stroke = stroke.map_or(true, |s| s == "none")
             || element.attr("stroke").is_some_and(|s| s == "none");
-        let no_fill =
-            let no_fill =
-            let no_fill = fill.map_or(true, |f| f == "none") || element.attr("fill").map_or(false, |f| f == "none");
+        let no_fill = fill.map_or(true, |f| f == "none") || element.attr("fill").map_or(false, |f| f == "none");
 
         no_stroke && no_fill
     }

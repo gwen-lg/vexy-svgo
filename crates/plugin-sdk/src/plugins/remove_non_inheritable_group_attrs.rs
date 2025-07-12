@@ -222,13 +222,13 @@ impl RemoveNonInheritableGroupAttrsPlugin {
                         .presentation_non_inheritable_group_attrs
                         .contains(attr_name.as_ref())
                 {
-                    attrs_to_remove.push(attr_name.to_string());
+                    attrs_to_remove.push(attr_name.clone());
                 }
             }
 
             // Remove the identified attributes
             for attr_name in attrs_to_remove {
-                element.attributes.remove(&attr_name);
+                element.attributes.shift_remove(&attr_name);
             }
         }
 

@@ -186,7 +186,7 @@ impl MinifyStylesPlugin {
 
         // Collect ID
         if let Some(id) = element.attributes.get("id") {
-            ids.insert(id.clone());
+            ids.insert(id.to_string());
         }
 
         // Collect classes
@@ -286,11 +286,12 @@ impl MinifyStylesPlugin {
                             let cleaned = minified
                                 .trim_start_matches('{')
                                 .trim_end_matches('}')
-                                .trim();
+                                .trim()
+                                .to_string();
                             if !cleaned.is_empty() {
                                 child_elem
                                     .attributes
-                                    .insert("style".to_string(), cleaned.to_string());
+                                    .insert("style".into(), cleaned.into());
                             } else {
                                 child_elem.attributes.shift_remove("style");
                             }

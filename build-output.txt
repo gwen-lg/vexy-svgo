@@ -1,0 +1,42 @@
+[0;32m[INFO][0m Running complete build process...
+[0;32m[INFO][0m Generating code snapshot in ./llms.txt...
+╭──────────────────────────── CodeToPrompt (Local) ────────────────────────────╮
+│ Configuration for this run:                                                  │
+│ Root Directory: /Users/adam/Developer/vcs/github.vexyart/vexy-svgo           │
+│ Include Patterns: ['*']                                                      │
+│ Exclude Patterns: ['*.svg', '.specstory', 'ref', 'testdata', '*.lock',       │
+│ 'llms*.txt', '*.d', '*.json', '*.html', '*.svg', '.specstory', 'ref',        │
+│ 'testdata', '*.lock', '*.svg', '*.css', '*.txt']                             │
+│ Respect .gitignore: True                                                     │
+│ Show Line Numbers: False                                                     │
+│ Count Tokens: True                                                           │
+│ Compress Code: True                                                          │
+│ Max Tokens: Unlimited                                                        │
+│ Tree Depth: 5                                                                │
+│ Output Format: cxml                                                          │
+│ Interactive Mode: False                                                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭──────────────────────────── Processing Complete ─────────────────────────────╮
+│ Summary:                                                                     │
+│ Files Processed: 323                                                         │
+│ Total Tokens: 609,551                                                        │
+│ Output Destination: ./llms.txt                                               │
+│                                                                              │
+│ Top 3 Files by Tokens:                                                       │
+│   - docs/assets/javascripts/bundle.56ea9cef.min.js.map (292,339 tokens)      │
+│   - docs/assets/javascripts/workers/search.d50fe291.min.js.map (74,498       │
+│ tokens)                                                                      │
+│   - docs/assets/stylesheets/main.342714a4.min.css.map (25,848 tokens)        │
+│                                                                              │
+│ Top 5 Extensions by Tokens:                                                  │
+│   - .map (394,635 tokens)                                                    │
+│   - .md (67,951 tokens)                                                      │
+│   - .rs (65,529 tokens)                                                      │
+│   - .ts (32,154 tokens)                                                      │
+│   - .sh (26,195 tokens)                                                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+[0;32m[INFO][0m Cleaning build artifacts...
+     Removed 4588 files, 1.1GiB total
+[0;32m[INFO][0m Clean complete
+[0;32m[INFO][0m Building release version...

@@ -65,7 +65,7 @@ impl ConvertEllipseToCirclePlugin {
                 .attributes
                 .get("rx")
                 .cloned()
-                .unwrap_or_else(|| "0".to_string());
+                .unwrap_or_else(|| "0".into());
             let ry = element
                 .attributes
                 .get("ry")
@@ -80,8 +80,8 @@ impl ConvertEllipseToCirclePlugin {
                 let radius = if rx == "auto" { ry } else { rx };
 
                 // Remove rx and ry attributes
-                element.attributes.remove("rx");
-                element.attributes.remove("ry");
+                element.attributes.shift_remove("rx");
+                element.attributes.shift_remove("ry");
 
                 // Add r attribute
                 element.attributes.insert("r".into(), radius.into());

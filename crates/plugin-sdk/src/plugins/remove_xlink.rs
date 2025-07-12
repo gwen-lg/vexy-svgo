@@ -145,7 +145,7 @@ impl RemoveXlinkPlugin {
                     .iter()
                     .any(|prefix| *key == &format!("{}:href", prefix))
             })
-            .cloned()
+            .map(|k| k.to_string())
             .collect();
 
         for href_attr in href_attrs {
@@ -169,14 +169,14 @@ impl RemoveXlinkPlugin {
                     .iter()
                     .any(|prefix| *key == &format!("{}:show", prefix))
             })
-            .cloned()
+            .map(|k| k.to_string())
             .collect();
 
         for show_attr in show_attrs {
             if let Some(show_value) = element.attr(&show_attr) {
                 // Convert to target attribute if no target exists
                 if !element.has_attr("target") {
-                    let target_value = match show_value.as_str() {
+                    let target_value = match show_value.as_ref() {
                         "new" => "_blank",
                         "replace" => "_self",
                         _ => {
@@ -202,7 +202,7 @@ impl RemoveXlinkPlugin {
                     .iter()
                     .any(|prefix| *key == &format!("{}:title", prefix))
             })
-            .cloned()
+            .map(|k| k.to_string())
             .collect();
 
         for title_attr in title_attrs {
@@ -247,7 +247,7 @@ impl RemoveXlinkPlugin {
                     false
                 }
             })
-            .cloned()
+            .map(|k| k.to_string())
             .collect();
 
         for attr in attrs_to_remove {

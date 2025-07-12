@@ -135,7 +135,7 @@ impl Visitor<'_> for UnknownsAndDefaultsRemovalVisitor {
         let _parent_element_name = self.get_parent_element_name();
 
         // Remove unknown and default attributes
-        let plugin = RemoveUnknownsAndDefaultsPlugin::with_config(self.config.clone());
+        let _plugin = RemoveUnknownsAndDefaultsPlugin::with_config(self.config.clone());
 
         // Collect attributes to remove to avoid borrowing issues
         let mut attrs_to_remove = Vec::new();
@@ -158,7 +158,7 @@ impl Visitor<'_> for UnknownsAndDefaultsRemovalVisitor {
         self.element_stack.pop();
 
         // Remove unknown child elements
-        let plugin = RemoveUnknownsAndDefaultsPlugin::with_config(self.config.clone());
+        let _plugin = RemoveUnknownsAndDefaultsPlugin::with_config(self.config.clone());
 
         element.children.retain(|child| {
             match child {

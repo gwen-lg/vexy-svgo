@@ -129,7 +129,7 @@ impl CollapseGroupsPlugin {
     }
 
     /// Move attributes from group to child element
-    fn move_attributes(group: &Element, child: &mut Element) {
+    fn move_attributes<'a>(group: &Element<'a>, child: &mut Element<'a>) {
         for (attr_name, attr_value) in &group.attributes {
             match attr_name.as_ref() {
                 "transform" => {

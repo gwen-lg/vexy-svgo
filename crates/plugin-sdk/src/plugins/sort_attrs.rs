@@ -167,7 +167,7 @@ impl SortAttrsPlugin {
             let mut attrs: Vec<(String, String)> = element
                 .attributes
                 .iter()
-                .map(|(k, v)| (k.clone(), v.clone()))
+                .map(|(k, v)| (k.to_string(), v.to_string()))
                 .collect();
 
             attrs.sort_by(|a, b| self.compare_attrs(&a.0, &b.0));
@@ -175,7 +175,7 @@ impl SortAttrsPlugin {
             // Rebuild attributes map in sorted order
             let mut sorted_attributes = IndexMap::new();
             for (name, value) in attrs {
-                sorted_attributes.insert(name, value);
+                sorted_attributes.insert(name.into(), value.into());
             }
             element.attributes = sorted_attributes;
         }

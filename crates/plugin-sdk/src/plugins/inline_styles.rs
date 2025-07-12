@@ -92,7 +92,7 @@ impl InlineStylesPlugin {
 
     /// Parse configuration from JSON
     fn parse_config(params: &Value) -> Result<InlineStylesConfig> {
-        if let Some(obj) = params.as_object() {
+        if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
                 .map_err(|e| anyhow!("Invalid configuration: {}", e))
         } else {
@@ -363,7 +363,7 @@ impl InlineStylesVisitor {
         if !styles_to_apply.is_empty() {
             let existing_style = element.attributes.get("style").cloned().unwrap_or_default();
             let new_style = merge_styles(&existing_style, &styles_to_apply);
-            element.attributes.insert("style".to_string(), new_style);
+            element.attributes.insert("style".into(), new_style.into());
         }
     }
 

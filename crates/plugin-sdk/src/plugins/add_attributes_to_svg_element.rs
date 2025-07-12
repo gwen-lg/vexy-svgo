@@ -76,14 +76,14 @@ impl AddAttributesToSVGElementPlugin {
         match attr {
             AttributeValue::String(name) => {
                 // Add attribute name with empty value if it doesn't exist
-                if !element.attributes.contains_key(name.as_ref()) {
+                if !element.attributes.contains_key(name.as_str()) {
                     element.attributes.insert(name.clone().into(), String::new().into());
                 }
             }
             AttributeValue::Object(attrs) => {
                 // Add each attribute-value pair if the attribute doesn't exist
                 for (name, value) in attrs {
-                    if !element.attributes.contains_key(name.as_ref()) {
+                    if !element.attributes.contains_key(name.as_str()) {
                         element.attributes.insert(name.clone().into(), value.clone().into());
                     }
                 }

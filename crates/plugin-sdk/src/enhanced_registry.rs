@@ -264,7 +264,7 @@ impl EnhancedPluginRegistry {
         // Check cache first
         if self.config.enable_caching {
             let cache = self.cache.read().unwrap();
-            if let Some(cached_plugin) = cache.get(&resolved_name) {
+            if let Some(_cached_plugin) = cache.get(&resolved_name) {
                 // Clone the plugin (assuming plugins implement Clone or provide a clone method)
                 // For now, we'll create a new instance since cloning plugins is complex
             }
@@ -455,7 +455,7 @@ impl EnhancedPluginRegistry {
         aliases.get(name).cloned().unwrap_or_else(|| name.to_string())
     }
 
-    fn add_to_cache(&self, name: String, plugin: &dyn Plugin) {
+    fn add_to_cache(&self, _name: String, _plugin: &dyn Plugin) {
         // This is a simplified version - in reality, we'd need a way to clone plugins
         // or use a different caching strategy
     }

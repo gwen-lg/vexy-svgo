@@ -22,9 +22,9 @@ categories = ["command-line-utilities", "multimedia::images", "template-engine",
 rust-version = "1.58.0"
 
 [workspace.dependencies]
-vexy-svgo-core = { path = "./crates/core", version = "1.3.0" }
-vexy-svgo-plugin-sdk = { path = "./crates/plugin-sdk", version = "1.3.0" }
-vexy-svgo-test-utils = { path = "./crates/test-utils", version = "1.3.0" }
+vexy-svgo-core = { path = "./crates/core", version = "1.5.1" }
+vexy-svgo-plugin-sdk = { path = "./crates/plugin-sdk", version = "1.5.1" }
+vexy-svgo-test-utils = { path = "./crates/test-utils", version = "1.5.1" }
 anyhow = "1.0"
 assert_cmd = "2.0"
 camino = "1.1"

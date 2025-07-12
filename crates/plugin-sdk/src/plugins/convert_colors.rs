@@ -448,7 +448,7 @@ impl ConvertColorsPlugin {
         // Convert color name keyword to long hex
         if self.config.names2hex {
             let color_name = val.to_lowercase();
-            if let Some(hex_value) = Self::color_names().get(color_name.as_ref()) {
+            if let Some(hex_value) = Self::color_names().get(color_name.as_str()) {
                 val = hex_value.to_string();
             }
         }
@@ -482,7 +482,7 @@ impl ConvertColorsPlugin {
         // Convert hex to short name (but not inside masks)
         if self.config.shortname && !in_mask {
             let color_name = val.to_lowercase();
-            if let Some(short_name) = Self::color_short_names().get(color_name.as_ref()) {
+            if let Some(short_name) = Self::color_short_names().get(color_name.as_str()) {
                 val = short_name.to_string();
             }
         }
@@ -596,7 +596,7 @@ impl Visitor<'_> for ColorConversionVisitor {
         let mut attrs_to_update = Vec::new();
 
         for (attr_name, attr_value) in &element.attributes {
-            if ConvertColorsPlugin::color_props().contains(attr_name.as_str()) {
+            if ConvertColorsPlugin::color_props().contains(attr_name.as_ref()) {
                 let converted_value = plugin.convert_color_value(attr_value, self.mask_counter > 0);
                 if converted_value != *attr_value {
                     attrs_to_update.push((attr_name.clone(), converted_value));
@@ -606,7 +606,7 @@ impl Visitor<'_> for ColorConversionVisitor {
 
         // Update attributes
         for (attr_name, new_value) in attrs_to_update {
-            element.attributes.insert(attr_name, new_value);
+            element.attributes.insert(attr_name, new_value.into());
         }
 
         Ok(())

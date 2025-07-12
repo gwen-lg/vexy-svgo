@@ -287,7 +287,7 @@ impl CleanupIdsVisitor {
                     .or_insert_with(Vec::new)
                     .push(Reference {
                         path: self.current_path.clone(),
-                        attr_name: attr_name.clone(),
+                        attr_name: attr_name.to_string(),
                     });
             }
         }
@@ -364,11 +364,11 @@ impl Visitor<'_> for IdApplierVisitor<'_> {
 
         // Process ID attribute
         if let Some(id) = element.attributes.get("id").cloned() {
-            if let Some(new_id) = self.id_mappings.get(&id) {
+            if let Some(new_id) = self.id_mappings.get(id.as_ref()) {
                 // Update to minified ID
-                element.attributes.insert("id".to_string(), new_id.clone());
+                element.attributes.insert("id".into(), new_id.clone().into());
             } else if self.config.remove
-                && !self.used_ids.contains(&id)
+                && !self.used_ids.contains(id.as_ref())
                 && !self.is_id_preserved(&id)
             {
                 // Remove unused ID
@@ -394,7 +394,7 @@ impl Visitor<'_> for IdApplierVisitor<'_> {
 
         // Apply updates
         for (attr_name, new_value) in updates {
-            element.attributes.insert(attr_name, new_value);
+            element.attributes.insert(attr_name, new_value.into());
         }
 
         Ok(())
