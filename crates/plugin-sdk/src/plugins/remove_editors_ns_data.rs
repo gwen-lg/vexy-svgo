@@ -196,7 +196,7 @@ impl EditorsNSDataRemovalVisitor {
                         // Extract the prefix
                         let prefix = &name[6..];
                         self.state.prefixes_to_remove.insert(prefix.to_string());
-                        attrs_to_remove.push(name.clone());
+                        attrs_to_remove.push(name.to_string());
                     }
                 } else if name == "xmlns" && self.state.namespaces_to_remove.contains(value) {
                     // Default namespace is an editor namespace
@@ -226,7 +226,7 @@ impl EditorsNSDataRemovalVisitor {
 
         // Remove the editor attributes
         for attr in attrs_to_remove {
-            element.attributes.shift_remove(&attr);
+            element.attributes.remove(&attr);
         }
     }
 
@@ -234,7 +234,7 @@ impl EditorsNSDataRemovalVisitor {
     fn should_remove_element(&self, element: &Element) -> bool {
         if let Some(colon_pos) = element.name.find(':') {
             let prefix = &element.name[..colon_pos];
-            return self.state.prefixes_to_remove.contains(prefix);
+            return self.state.prefixes_to_remove.contains(prefix.as_ref());
         }
         false
     }

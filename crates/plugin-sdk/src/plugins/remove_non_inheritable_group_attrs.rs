@@ -216,13 +216,13 @@ impl RemoveNonInheritableGroupAttrsPlugin {
                 // 1. It's a presentation attribute AND
                 // 2. It's NOT inheritable AND
                 // 3. It's NOT allowed as a group attribute
-                if self.presentation_attrs.contains(attr_name.as_str())
-                    && !self.inheritable_attrs.contains(attr_name.as_str())
+                if self.presentation_attrs.contains(attr_name.as_ref())
+                    && !self.inheritable_attrs.contains(attr_name.as_ref())
                     && !self
                         .presentation_non_inheritable_group_attrs
-                        .contains(attr_name.as_str())
+                        .contains(attr_name.as_ref())
                 {
-                    attrs_to_remove.push(attr_name.clone());
+                    attrs_to_remove.push(attr_name.to_string());
                 }
             }
 

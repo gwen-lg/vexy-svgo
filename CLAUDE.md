@@ -1,6 +1,3 @@
-
-After every iteration, /report and mark completed items as done in @PLAN.md and @TODO.md. Then run `./build.sh` and then check the `./build_logs`. If needed read the `./llms.txt` code snapshot. Then /work on items from @TODO.md consulting on @PLAN.md. Then review reflect refine revise, and then continue to /work on @PLAN.md and @TODO.md until every single item and issue has been fixed. Iterate iterate iterate! Do not stop, do not ask for confirmation. Work! When you're finishing one task or item, say "Wait, but..." and go on to the next task/item. It’s CRUCIAL that we get to a solution that BUILDS everything correctly!
-
 # Claude Development Guide for vexy_svgo
 
 This document provides the necessary context and guidelines for developing `vexy_svgo`, a high-performance SVG optimizer written in Rust. It is an API-compatible port of the popular Node.js-based tool, `svgo`.
