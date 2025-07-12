@@ -2159,6 +2159,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "vexy-svgo-core",
+ "vexy-svgo-test-utils",
 ]
 
 [[package]]

@@ -614,4 +614,4 @@ mod tests {
 }
 
 // Uncomment when ready to enable fixture tests
-// crate::plugin_fixture_tests!(ConvertShapeToPathPlugin, "convertShapeToPath");
+// plugin_fixture_tests!(ConvertShapeToPathPlugin, "convertShapeToPath");

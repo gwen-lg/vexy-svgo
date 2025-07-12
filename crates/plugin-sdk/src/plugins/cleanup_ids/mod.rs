@@ -703,4 +703,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(CleanupIdsPlugin, "cleanupIds");
+plugin_fixture_tests!(CleanupIdsPlugin, "cleanupIds");

@@ -443,7 +443,7 @@ fn process_string(
                     format_bytes(original_size).yellow(),
                     "→".cyan(),
                     format_bytes(optimized_size).green(),
-                    format!("{:.1}%", percent).bright_green()
+                    format!("{percent:.1}%").bright_green()
                 );
             }
         }
@@ -507,7 +507,7 @@ fn process_files(
                     format_bytes(original_size).yellow(),
                     "→".cyan(),
                     format_bytes(optimized_size).green(),
-                    format!("{:.1}%", percent).bright_green()
+                    format!("{percent:.1}%").bright_green()
                 );
             }
         }
@@ -731,7 +731,7 @@ fn process_folder(
             format_bytes(total_original).yellow(),
             "→".cyan(),
             format_bytes(total_optimized).green(),
-            format!("{:.1}%", total_percent).bright_green()
+            format!("{total_percent:.1}%").bright_green()
         );
     }
 

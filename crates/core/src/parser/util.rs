@@ -1,7 +1,6 @@
 // this_file: crates/core/src/parser/util.rs
 
 use std::collections::HashSet;
-use std::collections::HashSet;
 use std::sync::LazyLock;
 
 /// Elements where whitespace should be preserved

@@ -680,4 +680,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(MergePathsPlugin, "mergePaths");
+plugin_fixture_tests!(MergePathsPlugin, "mergePaths");

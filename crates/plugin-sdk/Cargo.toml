@@ -86,3 +86,4 @@ workspace = true
 
 [dev-dependencies]
 proptest = "1.0"
+vexy-svgo-test-utils = { path = "../test-utils" }

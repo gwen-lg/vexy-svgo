@@ -10,14 +10,21 @@ use serde_json::Value;
 use std::error::Error;
 use std::fmt;
 use vexy_svgo_core::ast::Document;
+
+#[macro_use]
+
 // Visitor is no longer needed with the simplified core Plugin trait
 
 pub mod plugins;
 pub mod registry;
 pub mod enhanced_registry;
-pub mod test_framework;
-pub mod selector;
-pub mod test_utils;
+
+#[macro_use] pub mod plugin_test_macros;
+
+
+
+
+
 #[cfg(test)]
 pub mod property_tests;
 

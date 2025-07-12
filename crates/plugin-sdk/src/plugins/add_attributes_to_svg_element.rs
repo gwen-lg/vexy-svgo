@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use vexy_svgo_core::ast::{Document, Element};
-use vexy_svgo_core::PluginAPI;
+use vexy_svgo_core::Plugin;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -98,7 +98,7 @@ impl Default for AddAttributesToSVGElementPlugin {
     }
 }
 
-impl PluginAPI for AddAttributesToSVGElementPlugin {
+impl Plugin for AddAttributesToSVGElementPlugin {
     fn name(&self) -> &'static str {
         "addAttributesToSVGElement"
     }
@@ -373,4 +373,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests_with_params!(AddAttributesToSVGElementPlugin, "addAttributesToSVGElement");
+plugin_fixture_tests_with_params!(AddAttributesToSVGElementPlugin, "addAttributesToSVGElement");

@@ -1,25 +1,14 @@
 ---
 # Site settings
-title: vexy-svgo
-description: SVG optimizer, API-compatible Rust port of svgo
-url: https://twardoch.github.io
+title: Vexy SVGO
+description: High-performance SVG optimizer - Native Rust port of SVGO
+url: https://vexyart.github.io
 baseurl: /vexy-svgo
 
 # Theme configuration
 remote_theme: just-the-docs/just-the-docs
 color_scheme: light
 enable_copy_code_button: true
-
-# Collections
-collections:
-  benchmarks:
-    nav_order: 7
-    output: true
-  data:
-    output: true
-  tools:
-    output: true
-    permalink: /tools/:name/
 
 # Navigation
 nav_sort: case_insensitive
@@ -35,7 +24,7 @@ aux_links:
     - https://github.com/vexyart/vexy-svgo
 
 # Footer
-footer_content: Copyright &copy; 2024 Adam Twardoch. Distributed under the MIT License.
+footer_content: "Copyright &copy; 2024 Vexy SVGO Contributors. Distributed under the MIT License."
 
 # GitHub Pages plugins
 plugins:
@@ -45,6 +34,22 @@ plugins:
 
 # Search settings
 search_enabled: true
+search:
+  button: false
+  heading_level: 2
+  preview_words_after: 10
+  preview_words_before: 5
+  previews: 3
+  rel_url: true
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - package.json
+  - package-lock.json
+  - _build.sh
+  - _serve.sh
+  - "*.orig"
 search:
   button: false
   heading_level: 2

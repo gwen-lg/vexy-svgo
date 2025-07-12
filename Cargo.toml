@@ -19,7 +19,7 @@ homepage = "https://github.com/vexyart/vexy-svgo"
 documentation = "https://docs.rs/vexy-svgo"
 keywords = ["svg", "svgo", "optimizer", "vector", "graphics"]
 categories = ["command-line-utilities", "multimedia::images", "template-engine", "web-programming", "wasm"]
-rust-version = "1.75"
+rust-version = "1.80"
 
 [workspace.dependencies]
 vexy-svgo-core = { path = "./crates/core", version = "2.1.0" }

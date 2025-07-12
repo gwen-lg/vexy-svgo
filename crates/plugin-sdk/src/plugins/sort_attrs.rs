@@ -474,4 +474,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(SortAttrsPlugin, "sortAttrs");
+plugin_fixture_tests!(SortAttrsPlugin, "sortAttrs");

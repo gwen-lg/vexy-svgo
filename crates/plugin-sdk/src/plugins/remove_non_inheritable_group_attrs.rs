@@ -596,4 +596,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(RemoveNonInheritableGroupAttrsPlugin, "removeNonInheritableGroupAttrs");
+plugin_fixture_tests!(RemoveNonInheritableGroupAttrsPlugin, "removeNonInheritableGroupAttrs");

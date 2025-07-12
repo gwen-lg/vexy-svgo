@@ -518,4 +518,4 @@ mod tests {
 }
 
 // Use parameterized testing framework for SVGO fixture tests
-crate::plugin_fixture_tests!(ConvertStyleToAttrsPlugin, "convertStyleToAttrs");
+plugin_fixture_tests!(ConvertStyleToAttrsPlugin, "convertStyleToAttrs");

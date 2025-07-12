@@ -28,7 +28,7 @@ pub fn create_migrated_plugin_registry() -> PluginRegistry {
     registry.register(RemoveEmptyContainersPlugin::new());
     registry.register(RemoveHiddenElemsPlugin::new());
     registry.register(RemoveEditorsNSDataPlugin::new());
-    registry.register(RemoveElementsByAttrPlugin::new());
+    registry.register(RemoveElementsByAttrPlugin::new().name(), || Box::new(RemoveElementsByAttrPlugin::new()));
     registry.register(RemoveUnusedNSPlugin::new());
     registry.register(CleanupAttrsPlugin::new());
     registry.register(CleanupEnableBackgroundPlugin::new());
@@ -65,16 +65,16 @@ pub fn create_migrated_plugin_registry() -> PluginRegistry {
     registry.register(RemoveXlinkPlugin::new());
     registry.register(RemoveXmlnsPlugin::new());
     registry.register(PrefixIdsPlugin::new());
-    registry.register(ReusePathsPlugin::new());
-    registry.register(RemoveAttributesBySelectorPlugin::new());
+    registry.register(ReusePathsPlugin::new().name(), || ReusePathsPlugin::new());
+    registry.register("removeAttributesBySelector", || RemoveAttributesBySelectorPlugin::new());
 
     registry
 }
 
 /// Get the default plugin configuration for migrated plugins
-pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::plugin_registry::PluginConfig> {
+pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::PluginConfig> {
     use serde_json::json;
-    use vexy_svgo_core::plugin_registry::PluginConfig;
+    use vexy_svgo_core::parser::config::PluginConfig;
 
     vec![
         PluginConfig {
@@ -428,11 +428,7 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::plugin_registry::Plug
             params: json!({}),
             enabled: false, // Disabled by default as not in SVGO default preset
         },
-        PluginConfig {
-            name: "removeAttributesBySelector".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default since it requires configuration
-        },
+        PluginConfig::Name("removeAttributesBySelector".to_string()).disabled().into(),
     ]
 }
 
