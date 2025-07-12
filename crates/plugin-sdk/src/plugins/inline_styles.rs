@@ -377,7 +377,7 @@ impl InlineStylesVisitor {
         // Handle ID selector
         if selector.starts_with('#') {
             let id = &selector[1..];
-            return element.attributes.get("id") == Some(&id.to_string());
+            return element.attributes.get("id") == Some(&id.into());
         }
 
         // Handle class selector

@@ -55,7 +55,7 @@ impl AddClassesToSVGElementPlugin {
     }
 
     /// Parse configuration from JSON
-    fn parse_config(params: &Value) -> Result<AddClassesToSVGElementConfig> {
+    fn parse_config(params: &Value) -> Result<AddClassesToSVGElementConfig, anyhow::Error> {
         if params.is_null() {
             Ok(AddClassesToSVGElementConfig::default())
         } else if params.is_object() {
@@ -102,7 +102,7 @@ impl AddClassesToSVGElementPlugin {
         // Update class attribute
         if !class_set.is_empty() {
             let class_string = class_set.into_iter().collect::<Vec<_>>().join(" ");
-            element.attributes.insert("class".to_string(), class_string);
+            element.attributes.insert("class".into(), class_string.into());
         }
     }
 }
@@ -122,7 +122,7 @@ impl Plugin for AddClassesToSVGElementPlugin {
         "adds classnames to an outer <svg> element"
     }
 
-    fn validate_params(&self, params: &Value) -> Result<()> {
+    fn validate_params(&self, params: &Value) -> anyhow::Result<()> {
         let config = Self::parse_config(params)?;
 
         // Validate that at least one of className or classNames is specified
@@ -138,7 +138,7 @@ impl Plugin for AddClassesToSVGElementPlugin {
         Ok(())
     }
 
-    fn apply(&self, document: &mut Document) -> Result<()> {
+    fn apply(&self, document: &mut Document) -> anyhow::Result<()> {
         // Only apply to root SVG element
         if document.root.name == "svg" {
             self.apply_classes(&mut document.root);

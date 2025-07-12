@@ -1,5 +1,7 @@
 # Vexy SVGO TODO List - Linearized Action Items
 
+PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.toml
+
 ## 1. Phase 1: Code Cleanup (Immediate)
 
 ### 1.1. Remove unused code

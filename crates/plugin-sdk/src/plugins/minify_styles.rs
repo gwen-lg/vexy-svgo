@@ -292,7 +292,7 @@ impl MinifyStylesPlugin {
                                     .attributes
                                     .insert("style".to_string(), cleaned.to_string());
                             } else {
-                                child_elem.attributes.remove("style");
+                                child_elem.attributes.shift_remove("style");
                             }
                         }
                         Err(_) => {

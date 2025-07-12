@@ -290,7 +290,7 @@ impl PathMergeVisitor {
 
                     // Update the first path with the merged data
                     if let Some(Node::Element(ref mut first_path)) = element.children.get_mut(i) {
-                        first_path.attributes.insert("d".to_string(), merged_data);
+                        first_path.attributes.insert("d".into(), merged_data.into());
                     }
 
                     // Remove the merged paths (remove in reverse order to maintain indices)

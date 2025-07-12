@@ -53,7 +53,7 @@ impl AddAttributesToSVGElementPlugin {
         Self { config }
     }
 
-    pub fn parse_config(params: &Value) -> Result<AddAttributesToSVGElementConfig> {
+    pub fn parse_config(params: &Value) -> Result<AddAttributesToSVGElementConfig, anyhow::Error> {
         let config: AddAttributesToSVGElementConfig = serde_json::from_value(params.clone())?;
         Ok(config)
     }
@@ -76,15 +76,17 @@ impl AddAttributesToSVGElementPlugin {
         match attr {
             AttributeValue::String(name) => {
                 // Add attribute name with empty value if it doesn't exist
-                if !element.attributes.contains_key(name) {
-                    element.attributes.insert(name.clone(), String::new());
+                if !element.attributes.contains_key(name.as_ref()) {
+                    element.attributes.insert(name.clone().into(), String::new().into());
                 }
             }
             AttributeValue::Object(attrs) => {
                 // Add each attribute-value pair if the attribute doesn't exist
                 for (name, value) in attrs {
-                    if !element.attributes.contains_key(name) {
-                        element.attributes.insert(name.clone(), value.clone());
+                    if !element.attributes.contains_key(name.as_str()) {
+                        element.attributes.insert(name.clone().into(), value.clone().into());
+                    }
+                        element.attributes.insert(name.clone().into(), value.clone().into());
                     }
                 }
             }
@@ -107,7 +109,7 @@ impl Plugin for AddAttributesToSVGElementPlugin {
         "adds attributes to an outer <svg> element"
     }
 
-    fn validate_params(&self, params: &Value) -> Result<()> {
+    fn validate_params(&self, params: &Value) -> anyhow::Result<()> {
         let config = Self::parse_config(params)?;
 
         // Validate that at least one of attribute or attributes is specified
@@ -121,7 +123,7 @@ impl Plugin for AddAttributesToSVGElementPlugin {
         Ok(())
     }
 
-    fn apply(&self, document: &mut Document) -> Result<()> {
+    fn apply(&self, document: &mut Document) -> anyhow::Result<()> {
         // Only apply to root SVG element
         if document.root.name == "svg" {
             self.apply_attributes(&mut document.root);

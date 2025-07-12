@@ -10,7 +10,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "1.0.18"
+version = "1.0.19"
 authors = ["Adam Twardoch <adam+github@twardoch.com>"]
 edition = "2021"
 license = "MIT"
@@ -19,7 +19,7 @@ homepage = "https://github.com/vexyart/vexy-svgo"
 documentation = "https://docs.rs/vexy-svgo"
 keywords = ["svg", "svgo", "optimizer", "vector", "graphics"]
 categories = ["command-line-utilities", "multimedia::images", "template-engine", "web-programming", "wasm"]
-rust-version = "1.56.0"
+rust-version = "1.58.0"
 
 [workspace.dependencies]
 vexy-svgo-core = { path = "./crates/core", version = "1.3.0" }

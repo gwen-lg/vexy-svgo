@@ -275,7 +275,7 @@ impl ConvertStyleToAttrsVisitor {
             } else {
                 element
                     .attributes
-                    .insert("style".to_string(), remaining_styles.join("; "));
+                    .insert("style".into(), remaining_styles.join("; ").into());
             }
         }
     }

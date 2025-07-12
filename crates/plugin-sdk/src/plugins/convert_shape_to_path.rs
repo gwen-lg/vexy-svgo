@@ -167,7 +167,7 @@ impl ConvertShapeToPathPlugin {
             Some(x) => x,
             None => return,
         };
-        let y2 = match Self::parse_coord(element.attr("y2").map(|s| s.as_str()).unwrap_or("0")) {
+        let y2 = match Self::parse_coord(element.attr("y2").map(|s| s.as_ref()).unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };
@@ -265,7 +265,7 @@ impl ConvertShapeToPathPlugin {
             Some(y) => y,
             None => return,
         };
-        let r = match Self::parse_coord(element.attr("r").map(|s| s.as_str()).unwrap_or("0")) {
+        let r = match Self::parse_coord(element.attr("r").map(|s| s.as_ref()).unwrap_or("0")) {
             Some(r) => r,
             None => return,
         };
