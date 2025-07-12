@@ -9,7 +9,7 @@
 //! Reference: SVGO's addClassesToSVGElement plugin
 
 use crate::Plugin;
-use anyhow::Result;
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashSet;

@@ -29,8 +29,7 @@ workspace = true
 [package.categories]
 workspace = true
 
-[package.rust-version]
-workspace = true
+
 
 [[bin]]
 name = "vexy-svgo"

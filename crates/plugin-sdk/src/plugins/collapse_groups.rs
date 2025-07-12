@@ -136,18 +136,18 @@ impl CollapseGroupsPlugin {
                     // Concatenate transforms: parent transform comes first
                     if let Some(child_transform) = child.attributes.get("transform") {
                         let combined = format!("{} {}", attr_value, child_transform);
-                        child.attributes.insert("transform".to_string(), combined);
+                        child.attributes.insert("transform".into(), combined.into());
                     } else {
                         child
                             .attributes
-                            .insert(attr_name.clone(), attr_value.clone());
+                            .insert(attr_name.clone().into(), attr_value.clone().into());
                     }
                 }
                 _ => {
                     // Handle inheritance: replace "inherit" with parent's value
                     if let Some(existing_value) = child.attributes.get(attr_name) {
                         if existing_value == "inherit"
-                            && Self::inheritable_attributes().contains(attr_name.as_str())
+                            && Self::inheritable_attributes().contains(attr_name.as_ref())
                         {
                             child
                                 .attributes
@@ -158,7 +158,7 @@ impl CollapseGroupsPlugin {
                         // Child doesn't have this attribute, so add it
                         child
                             .attributes
-                            .insert(attr_name.clone(), attr_value.clone());
+                            .insert(attr_name.clone().into(), attr_value.clone().into());
                     }
                 }
             }

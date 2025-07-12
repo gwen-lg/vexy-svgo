@@ -2,8 +2,7 @@
 name = "vexy-svgo-core"
 description = "Core library for vexy-svgo SVG optimizer"
 
-[package.version]
-workspace = true
+version = "1.3.0"
 
 [package.authors]
 workspace = true

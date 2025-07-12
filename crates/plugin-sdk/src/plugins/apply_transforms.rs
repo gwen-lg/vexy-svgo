@@ -199,7 +199,7 @@ impl ApplyTransformsPlugin {
                             let transformed = self.transform_path_data(d, &matrix);
                             element.attributes.insert("d".to_string(), transformed);
                             // Remove transform attribute after applying
-                            element.attributes.shift_remove("transform");
+                            element.attributes.remove("transform");
                         }
                     }
                 }

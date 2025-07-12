@@ -311,7 +311,7 @@ impl Visitor<'_> for CleanupIdsVisitor {
         // Collect ID if present
         if let Some(id) = element.attributes.get("id") {
             self.node_by_id.insert(
-                id.clone(),
+                id.to_string(),
                 ElementInfo {
                     path: self.current_path.clone(),
                     element_name: element.name.to_string(),
