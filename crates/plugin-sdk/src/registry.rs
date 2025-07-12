@@ -12,60 +12,60 @@ use vexy_svgo_core::plugin_registry::PluginRegistry;
 pub fn create_migrated_plugin_registry() -> PluginRegistry {
     let mut registry = PluginRegistry::new();
 
-    // Register all migrated plugins
-    registry.register(RemoveCommentsPlugin::new());
-    registry.register(RemoveEmptyAttrsPlugin::new());
-    registry.register(RemoveUselessDefsPlugin::new());
-    registry.register(CollapseGroupsPlugin::new());
-    registry.register(MoveGroupAttrsToElemsPlugin::new());
-    registry.register(RemoveUnknownsAndDefaultsPlugin::new());
-    registry.register(ConvertColorsPlugin::new());
-    registry.register(RemoveViewBoxPlugin::new());
-    registry.register(MergePathsPlugin::new());
-    registry.register(InlineStylesPlugin::new());
-    registry.register(CleanupIdsPlugin::new());
-    registry.register(ConvertStyleToAttrsPlugin::new());
-    registry.register(RemoveEmptyContainersPlugin::new());
-    registry.register(RemoveHiddenElemsPlugin::new());
-    registry.register(RemoveEditorsNSDataPlugin::new());
-    registry.register(RemoveElementsByAttrPlugin::new().name(), || Box::new(RemoveElementsByAttrPlugin::new()));
-    registry.register(RemoveUnusedNSPlugin::new());
-    registry.register(CleanupAttrsPlugin::new());
-    registry.register(CleanupEnableBackgroundPlugin::new());
-    registry.register(CleanupListOfValuesPlugin::new());
-    registry.register(MergeStylesPlugin::new());
-    registry.register(RemoveDoctypePlugin::new());
-    registry.register(RemoveDimensionsPlugin::new());
-    registry.register(RemoveXMLProcInstPlugin::new());
-    registry.register(RemoveMetadataPlugin::new());
-    registry.register(RemoveEmptyTextPlugin::new());
-    registry.register(ConvertEllipseToCirclePlugin::new());
-    registry.register(ConvertOneStopGradientsPlugin::new());
-    registry.register(ConvertShapeToPathPlugin::new());
-    registry.register(ConvertPathDataPlugin::new());
-    registry.register(ConvertTransformPlugin::new());
-    registry.register(ApplyTransformsPlugin::new());
-    registry.register(CleanupNumericValuesPlugin::new());
-    registry.register(MinifyStylesPlugin::new());
-    registry.register(RemoveNonInheritableGroupAttrsPlugin::new());
-    registry.register(SortAttrsPlugin::new());
-    registry.register(SortDefsChildrenPlugin::new());
-    registry.register(RemoveTitlePlugin::new());
-    registry.register(RemoveDescPlugin::new());
-    registry.register(AddAttributesToSVGElementPlugin::new());
-    registry.register(AddClassesToSVGElementPlugin::new());
-    registry.register(RemoveScriptsPlugin::new());
-    registry.register(RemoveStyleElementPlugin::new());
-    registry.register(RemoveRasterImagesPlugin::new());
-    registry.register(RemoveOffCanvasPathsPlugin::new());
-    registry.register(RemoveAttrsPlugin::new());
-    registry.register(RemoveDeprecatedAttrsPlugin::new());
-    registry.register(RemoveUselessTransformsPlugin::new());
-    registry.register(RemoveUselessStrokeAndFillPlugin::new());
-    registry.register(RemoveXlinkPlugin::new());
-    registry.register(RemoveXmlnsPlugin::new());
-    registry.register(PrefixIdsPlugin::new());
-    registry.register(ReusePathsPlugin::new().name(), || ReusePathsPlugin::new());
+    // Register all migrated plugins using the new API
+    registry.register("removeComments", || RemoveCommentsPlugin::new());
+    registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
+    registry.register("removeUselessDefs", || RemoveUselessDefsPlugin::new());
+    registry.register("collapseGroups", || CollapseGroupsPlugin::new());
+    registry.register("moveGroupAttrsToElems", || MoveGroupAttrsToElemsPlugin::new());
+    registry.register("removeUnknownsAndDefaults", || RemoveUnknownsAndDefaultsPlugin::new());
+    registry.register("convertColors", || ConvertColorsPlugin::new());
+    registry.register("removeViewBox", || RemoveViewBoxPlugin::new());
+    registry.register("mergePaths", || MergePathsPlugin::new());
+    registry.register("inlineStyles", || InlineStylesPlugin::new());
+    registry.register("cleanupIds", || CleanupIdsPlugin::new());
+    registry.register("convertStyleToAttrs", || ConvertStyleToAttrsPlugin::new());
+    registry.register("removeEmptyContainers", || RemoveEmptyContainersPlugin::new());
+    registry.register("removeHiddenElems", || RemoveHiddenElemsPlugin::new());
+    registry.register("removeEditorsNSData", || RemoveEditorsNSDataPlugin::new());
+    registry.register("removeElementsByAttr", || RemoveElementsByAttrPlugin::new());
+    registry.register("removeUnusedNS", || RemoveUnusedNSPlugin::new());
+    // registry.register("cleanupAttrs", || CleanupAttrsPlugin::new()); // Not implemented yet
+    // registry.register("cleanupEnableBackground", || CleanupEnableBackgroundPlugin::new()); // Not implemented yet
+    // registry.register("cleanupListOfValues", || CleanupListOfValuesPlugin::new()); // Not implemented yet
+    registry.register("mergeStyles", || MergeStylesPlugin::new());
+    registry.register("removeDoctype", || RemoveDoctypePlugin::new());
+    registry.register("removeDimensions", || RemoveDimensionsPlugin::new());
+    registry.register("removeXMLProcInst", || RemoveXMLProcInstPlugin::new());
+    registry.register("removeMetadata", || RemoveMetadataPlugin::new());
+    registry.register("removeEmptyText", || RemoveEmptyTextPlugin::new());
+    registry.register("convertEllipseToCircle", || ConvertEllipseToCirclePlugin::new());
+    registry.register("convertOneStopGradients", || ConvertOneStopGradientsPlugin::new());
+    registry.register("convertShapeToPath", || ConvertShapeToPathPlugin::new());
+    registry.register("convertPathData", || ConvertPathDataPlugin::new());
+    registry.register("convertTransform", || ConvertTransformPlugin::new());
+    registry.register("applyTransforms", || ApplyTransformsPlugin::new());
+    // registry.register("cleanupNumericValues", || CleanupNumericValuesPlugin::new()); // Not implemented yet
+    registry.register("minifyStyles", || MinifyStylesPlugin::new());
+    registry.register("removeNonInheritableGroupAttrs", || RemoveNonInheritableGroupAttrsPlugin::new());
+    registry.register("sortAttrs", || SortAttrsPlugin::new());
+    registry.register("sortDefsChildren", || SortDefsChildrenPlugin::new());
+    registry.register("removeTitle", || RemoveTitlePlugin::new());
+    registry.register("removeDesc", || RemoveDescPlugin::new());
+    registry.register("addAttributesToSVGElement", || AddAttributesToSVGElementPlugin::new());
+    registry.register("addClassesToSVGElement", || AddClassesToSVGElementPlugin::new());
+    registry.register("removeScripts", || RemoveScriptsPlugin::new());
+    registry.register("removeStyleElement", || RemoveStyleElementPlugin::new());
+    registry.register("removeRasterImages", || RemoveRasterImagesPlugin::new());
+    registry.register("removeOffCanvasPaths", || RemoveOffCanvasPathsPlugin::new());
+    registry.register("removeAttrs", || RemoveAttrsPlugin::new());
+    registry.register("removeDeprecatedAttrs", || RemoveDeprecatedAttrsPlugin::new());
+    registry.register("removeUselessTransforms", || RemoveUselessTransformsPlugin::new());
+    registry.register("removeUselessStrokeAndFill", || RemoveUselessStrokeAndFillPlugin::new());
+    registry.register("removeXlink", || RemoveXlinkPlugin::new());
+    registry.register("removeXMLNS", || RemoveXmlnsPlugin::new());
+    registry.register("prefixIds", || PrefixIdsPlugin::new());
+    registry.register("reusePaths", || ReusePathsPlugin::new());
     registry.register("removeAttributesBySelector", || RemoveAttributesBySelectorPlugin::new());
 
     registry
@@ -77,32 +77,15 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
     use vexy_svgo_core::parser::config::PluginConfig;
 
     vec![
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({"preservePatterns": true}),
-            enabled: true,
         },
-        PluginConfig {
-            name: "removeEmptyAttrs".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "removeUselessDefs".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "collapseGroups".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "moveGroupAttrsToElems".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeEmptyAttrs".to_string()),
+        PluginConfig::Name("removeUselessDefs".to_string()),
+        PluginConfig::Name("collapseGroups".to_string()),
+        PluginConfig::Name("moveGroupAttrsToElems".to_string()),
+        PluginConfig::WithParams {
             name: "removeUnknownsAndDefaults".to_string(),
             params: json!({
                 "unknownContent": true,
@@ -114,9 +97,8 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "keepAriaAttrs": true,
                 "keepRoleAttr": false
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "convertColors".to_string(),
             params: json!({
                 "currentColor": false,
@@ -126,23 +108,17 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "shorthex": true,
                 "shortname": true
             }),
-            enabled: true,
         },
-        PluginConfig {
-            name: "removeViewBox".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeViewBox".to_string()),
+        PluginConfig::WithParams {
             name: "mergePaths".to_string(),
             params: json!({
                 "force": false,
                 "floatPrecision": 3,
                 "noSpaceAfterFlags": false
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "inlineStyles".to_string(),
             params: json!({
                 "onlyMatchedOnce": true,
@@ -150,9 +126,8 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "useMqs": true,
                 "usePseudos": true
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "cleanupIds".to_string(),
             params: json!({
                 "remove": true,
@@ -161,21 +136,15 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "preservePrefixes": [],
                 "force": false
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "convertStyleToAttrs".to_string(),
             params: json!({
                 "keepImportant": false
             }),
-            enabled: true,
         },
-        PluginConfig {
-            name: "removeEmptyContainers".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeEmptyContainers".to_string()),
+        PluginConfig::WithParams {
             name: "removeHiddenElems".to_string(),
             params: json!({
                 "displayNone": true,
@@ -193,92 +162,56 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "polylineEmptyPoints": true,
                 "polygonEmptyPoints": true
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeEditorsNSData".to_string(),
             params: json!({
                 "additionalNamespaces": []
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeElementsByAttr".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default since it requires configuration
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
-            name: "removeUnusedNS".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeUnusedNS".to_string()),
+        PluginConfig::WithParams {
             name: "cleanupAttrs".to_string(),
             params: json!({
                 "newlines": true,
                 "trim": true,
                 "spaces": true
             }),
-            enabled: true,
         },
-        PluginConfig {
-            name: "cleanupEnableBackground".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "mergeStyles".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "removeDoctype".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("cleanupEnableBackground".to_string()),
+        PluginConfig::Name("mergeStyles".to_string()),
+        PluginConfig::Name("removeDoctype".to_string()),
+        PluginConfig::WithParams {
             name: "removeDimensions".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default as it conflicts with removeViewBox
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
-            name: "removeXMLProcInst".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "removeMetadata".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeXMLProcInst".to_string()),
+        PluginConfig::Name("removeMetadata".to_string()),
+        PluginConfig::WithParams {
             name: "removeEmptyText".to_string(),
             params: json!({
                 "text": true,
                 "tspan": true,
                 "tref": true
             }),
-            enabled: true,
         },
-        PluginConfig {
-            name: "convertEllipseToCircle".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("convertEllipseToCircle".to_string()),
+        PluginConfig::WithParams {
             name: "convertOneStopGradients".to_string(),
-            params: json!({}),
-            enabled: false, // Not in SVGO default preset
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "convertShapeToPath".to_string(),
             params: json!({
                 "convertArcs": false,
                 "floatPrecision": null
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "convertPathData".to_string(),
             params: json!({
                 "floatPrecision": 3,
@@ -289,9 +222,8 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "leadingZero": true,
                 "negativeExtraSpace": true
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "convertTransform".to_string(),
             params: json!({
                 "convertToShorts": true,
@@ -306,9 +238,8 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "leadingZero": true,
                 "negativeExtraSpace": false
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "cleanupNumericValues".to_string(),
             params: json!({
                 "floatPrecision": 3,
@@ -316,9 +247,8 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "defaultPx": true,
                 "convertToPx": true
             }),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "minifyStyles".to_string(),
             params: json!({
                 "restructure": true,
@@ -326,109 +256,75 @@ pub fn get_default_plugin_configs() -> Vec<vexy_svgo_core::parser::config::Plugi
                 "comments": false,
                 "usage": null
             }),
-            enabled: true,
         },
-        PluginConfig {
-            name: "removeNonInheritableGroupAttrs".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeNonInheritableGroupAttrs".to_string()),
+        PluginConfig::WithParams {
             name: "sortAttrs".to_string(),
             params: json!({
                 "order": ["id", "width", "height", "x", "x1", "x2", "y", "y1", "y2", "cx", "cy", "r", "fill", "stroke", "marker", "d", "points"],
                 "xmlnsOrder": "front"
             }),
-            enabled: true,
         },
-        PluginConfig {
-            name: "sortDefsChildren".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "removeTitle".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "removeDesc".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("sortDefsChildren".to_string()),
+        PluginConfig::Name("removeTitle".to_string()),
+        PluginConfig::Name("removeDesc".to_string()),
+        PluginConfig::WithParams {
             name: "addAttributesToSVGElement".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default since it requires configuration
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "addClassesToSVGElement".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default since it requires configuration
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeScripts".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default for security reasons
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeStyleElement".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeRasterImages".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeOffCanvasPaths".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default (as stated in original plugin description)
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeAttrs".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default since it requires configuration
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeDeprecatedAttrs".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default to preserve backward compatibility
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
-            name: "removeUselessTransforms".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
-            name: "removeUselessStrokeAndFill".to_string(),
-            params: json!({}),
-            enabled: true,
-        },
-        PluginConfig {
+        PluginConfig::Name("removeUselessTransforms".to_string()),
+        PluginConfig::Name("removeUselessStrokeAndFill".to_string()),
+        PluginConfig::WithParams {
             name: "removeXlink".to_string(),
             params: json!({
+                "enabled": false,
                 "includeLegacy": true
             }),
-            enabled: false, // Disabled by default
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeXmlns".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default as mentioned in the description
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "prefixIds".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default since it requires configuration
+            params: json!({"enabled": false}),
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "reusePaths".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled by default as not in SVGO default preset
+            params: json!({"enabled": false}),
         },
-        PluginConfig::Name("removeAttributesBySelector".to_string()).disabled().into(),
+        PluginConfig::WithParams {
+            name: "removeAttributesBySelector".to_string(),
+            params: json!({"enabled": false}),
+        },
     ]
 }
 
@@ -502,7 +398,7 @@ mod tests {
         // Check that all migrated plugins are registered
         for plugin_name in get_migrated_plugin_names() {
             assert!(
-                registry.get_plugin(plugin_name).is_some(),
+                registry.create_plugin(plugin_name).is_some(),
                 "Plugin {} should be registered",
                 plugin_name
             );
@@ -545,10 +441,9 @@ mod tests {
         let registry = create_migrated_plugin_registry();
 
         // Test valid parameters
-        let valid_config = vexy_svgo_core::plugin_registry::PluginConfig {
+        let valid_config = vexy_svgo_core::parser::config::PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({"preservePatterns": false}),
-            enabled: true,
         };
 
         let mut doc = vexy_svgo_core::ast::Document::new();
@@ -556,10 +451,9 @@ mod tests {
         assert!(result.is_ok(), "Valid parameters should be accepted");
 
         // Test invalid parameters
-        let invalid_config = vexy_svgo_core::plugin_registry::PluginConfig {
+        let invalid_config = vexy_svgo_core::parser::config::PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({"preservePatterns": "invalid"}),
-            enabled: true,
         };
 
         let mut doc2 = vexy_svgo_core::ast::Document::new();

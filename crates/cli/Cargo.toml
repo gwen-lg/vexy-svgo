@@ -37,7 +37,7 @@ name = "vexy-svgo"
 path = "src/main.rs"
 
 [dependencies]
-vexy-svgo-core = { path = "../core", version = "2.1.0" }
+vexy-svgo-core = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 clap_complete = { workspace = true }

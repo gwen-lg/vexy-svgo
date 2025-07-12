@@ -2,6 +2,7 @@
 # Vexy SVGO Release Script
 # Usage: ./release.sh [version]
 # Example: ./release.sh 2.1.0
+# If no version is provided, automatically increments from the last git tag
 
 set -euo pipefail
 
@@ -29,15 +30,55 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Function to increment version number
+increment_version() {
+    local version=$1
+    local part=${2:-patch}  # default to patch
+    
+    # Remove 'v' prefix if present
+    version=${version#v}
+    
+    # Split version into parts
+    IFS='.' read -ra PARTS <<< "$version"
+    local major=${PARTS[0]}
+    local minor=${PARTS[1]}
+    local patch=${PARTS[2]}
+    
+    case $part in
+        major)
+            ((major++))
+            minor=0
+            patch=0
+            ;;
+        minor)
+            ((minor++))
+            patch=0
+            ;;
+        patch|*)
+            ((patch++))
+            ;;
+    esac
+    
+    echo "$major.$minor.$patch"
+}
+
 # Check if version is provided
 if [ $# -eq 0 ]; then
-    log_error "Version number required"
-    echo "Usage: $0 <version>"
-    echo "Example: $0 2.1.0"
-    exit 1
+    # Get the latest git tag
+    LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+    
+    if [ "$LATEST_TAG" = "v0.0.0" ]; then
+        log_warning "No previous tags found. Starting with version 0.0.1"
+        VERSION="0.0.1"
+    else
+        # Increment the patch version by default
+        VERSION=$(increment_version "$LATEST_TAG" patch)
+        log_info "Auto-incrementing version from $LATEST_TAG to $VERSION"
+    fi
+else
+    VERSION=$1
 fi
 
-VERSION=$1
 VERSION_TAG="v$VERSION"
 
 # Validate version format (semantic versioning)

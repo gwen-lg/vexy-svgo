@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "docs:serve": "mkdocs serve --config-file ../mkdocs.yml",
+    "docs:build": "mkdocs build --config-file ../mkdocs.yml"
+  },
   "dependencies": {},
   "devDependencies": {
     "svgo": "^4.0.0"
