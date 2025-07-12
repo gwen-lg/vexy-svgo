@@ -978,3 +978,4 @@ error[E0463]: can't find crate for `svgn`
 For more information about this error, try `rustc --explain E0463`.
 error: could not compile `vexy-svgo-test-utils` (lib) due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
+warning: `vexy-svgo-plugin-sdk` (lib) generated 49 warnings (run `cargo fix --lib -p vexy-svgo-plugin-sdk` to apply 10 suggestions)
