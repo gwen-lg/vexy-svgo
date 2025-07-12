@@ -107,10 +107,29 @@ if git rev-parse "$VERSION_TAG" >/dev/null 2>&1; then
     exit 1
 fi
 
-# Update version in Cargo.toml
-log_info "Updating version in Cargo.toml"
+# Update version in Cargo.toml files
+log_info "Updating version in workspace Cargo.toml"
 # Only update the workspace.package.version line, not rust-version or dependency versions
 sed -i.bak "/^\[workspace.package\]/,/^\[/ s/^version = \"[^\"]*\"/version = \"$VERSION\"/" Cargo.toml
+rm Cargo.toml.bak
+
+# Update versions in individual crate Cargo.toml files
+log_info "Updating version in crate Cargo.toml files"
+for crate_dir in crates/*/; do
+    if [ -f "$crate_dir/Cargo.toml" ]; then
+        crate_name=$(basename "$crate_dir")
+        log_info "  - Updating $crate_name"
+        # Update version in [package] section, but only if it's not using workspace inheritance
+        sed -i.bak "/^\[package\]/,/^\[/ s/^version = \"[0-9.]*\"/version = \"$VERSION\"/" "$crate_dir/Cargo.toml"
+        rm "$crate_dir/Cargo.toml.bak"
+    fi
+done
+
+# Update workspace dependency versions
+log_info "Updating workspace dependency versions"
+sed -i.bak "s/vexy-svgo-core = { path = \"\.\/crates\/core\", version = \"[^\"]*\" }/vexy-svgo-core = { path = \".\/crates\/core\", version = \"$VERSION\" }/" Cargo.toml
+sed -i.bak "s/vexy-svgo-plugin-sdk = { path = \"\.\/crates\/plugin-sdk\", version = \"[^\"]*\" }/vexy-svgo-plugin-sdk = { path = \".\/crates\/plugin-sdk\", version = \"$VERSION\" }/" Cargo.toml
+sed -i.bak "s/vexy-svgo-test-utils = { path = \"\.\/crates\/test-utils\", version = \"[^\"]*\" }/vexy-svgo-test-utils = { path = \".\/crates\/test-utils\", version = \"$VERSION\" }/" Cargo.toml
 rm Cargo.toml.bak
 
 # Run tests to ensure everything is working
@@ -136,7 +155,7 @@ fi
 
 # Commit version change
 log_info "Committing version change"
-git add Cargo.toml Cargo.lock
+git add Cargo.toml Cargo.lock crates/*/Cargo.toml
 git commit -m "Release version $VERSION"
 
 # Create and push tag
