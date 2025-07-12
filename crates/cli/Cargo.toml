@@ -28,7 +28,7 @@ workspace = true
 
 
 [[bin]]
-name = "vexy-svgo"
+name = "vexy_svgo"
 path = "src/main.rs"
 
 
@@ -58,6 +58,14 @@ workspace = true
 
 
 [dependencies.regex]
+workspace = true
+
+
+[dependencies.indicatif]
+workspace = true
+
+
+[dependencies.colored]
 workspace = true
 
 

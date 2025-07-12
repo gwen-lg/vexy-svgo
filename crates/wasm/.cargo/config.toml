@@ -1,21 +1,5 @@
-# this_file: crates/wasm/.cargo/config.toml
-
-[build]
-target = "wasm32-unknown-unknown"
-
 [target.wasm32-unknown-unknown]
-# Use unstable options for better optimization
 rustflags = [
-    "-C", "target-feature=+bulk-memory,+mutable-globals,+nontrapping-fptoint,+sign-ext,+simd128",
-    "-C", "opt-level=z",
-    "-C", "lto=fat",
-    "-C", "embed-bitcode=yes",
-    "-Z", "mir-opt-level=4",
+    "-C", "target-feature=+crt-static",
+    "--cfg", "getrandom_backend=\"wasm_js\"",
 ]
-
-[unstable]
-# Enable parallel front-end for faster builds
-parallel-front-end = true
-# Enable optimized stdarch intrinsics
-build-std = ["std", "panic_abort"]
-build-std-features = ["panic_immediate_abort"]

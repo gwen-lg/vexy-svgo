@@ -1,8 +1,5 @@
 
-# this_file: CLAUDE.md
-
-IMPORTANT: After each change review reflect refine revise, then /report , and then /work on @PLAN.md and @TODO.md , then review reflect refine revise, and then continue to /work on @PLAN.md and @TODO.md until every single item and issue has been fixed. Do not stop, do not ask for confirmation. Work!
-
+After every iteration, /report and mark completed items as done in @PLAN.md and @TODO.md. Then run `./build.sh` and then check the `./build_logs`. If needed read the @llms.txt code snapshot. Then /work on items from @TODO.md consulting on @PLAN.md. Then review reflect refine revise, and then continue to /work on @PLAN.md and @TODO.md until every single item and issue has been fixed. Iterate iterate iterate! Do not stop, do not ask for confirmation. Work! When you're finishing one task or item, say "Wait, but..." and go on to the next task/item. It’s CRUCIAL that we get to a solution that BUILDS everything correctly!
 
 # Claude Development Guide for vexy_svgo
 

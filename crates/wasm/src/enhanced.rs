@@ -18,6 +18,7 @@ use vexy_svgo_core::{
     optimize_with_config, parse_svg_string, stringify,
     ast::Document,
     features::{Feature, enable_feature, is_feature_enabled},
+    create_default_registry,
 };
 
 /// Advanced configuration with full control over optimization
@@ -389,17 +390,15 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
             plugins_applied: config.inner.plugins.len() as u32,
             optimization_passes: if config.inner.multipass { 2 } else { 1 },
             elements_processed: 0, // Would need to count during optimization
-            memory_peak_kb: 0.0, // WebAssembly doesnPROTECTED_47_<PROTECTED_48_<PROTECTED_49_t auto-derive
-impl Clone for EnhancedConfig {
-    fn clone(&self) -> Self {
-        Self {
-            inner: self.inner.clone(),
-            plugin_params: self.plugin_params.clone(),
-            performance_mode: self.performance_mode,
-            error_handling: self.error_handling,
-        }
-    }
+            memory_peak_kb: 0.0, // WebAssembly doesn't provide easy memory profiling
+        },
+    })
 }
+
+/// Get list of available plugins with metadata
+#[wasm_bindgen(js_name = getPlugins)]
+pub fn get_plugins() -> Result<Vec<JsValue>, JsError> {
+    let registry = create_default_registry();
     let plugins: Vec<JsValue> = registry
         .list_plugins()
         .into_iter()

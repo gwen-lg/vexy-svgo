@@ -6,6 +6,8 @@
 //! options for SVG optimization.
 
 use clap::{Arg, ArgAction, ArgMatches, Command};
+use colored::*;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::fs;
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
@@ -172,6 +174,13 @@ fn main() {
                 .action(ArgAction::SetTrue),
         )
         .arg(
+            Arg::new("verbose")
+                .help("Enable verbose output with detailed logging")
+                .short('v')
+                .long("verbose")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("parallel")
                 .help("Number of threads for parallel processing (0 = auto)")
                 .long("parallel")
@@ -195,34 +204,60 @@ fn main() {
     let result = run_cli(matches);
 
     if let Err(e) = result {
-        eprintln!("Error: {e}");
+        eprintln!("{} Error: {}", "❌".bright_red(), e.to_string().red());
         std::process::exit(1);
     }
 }
 
 fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
     let quiet = matches.get_flag("quiet");
+    let verbose = matches.get_flag("verbose");
     let no_color = matches.get_flag("no-color") || std::env::var("NO_COLOR").is_ok();
+    
+    // Configure colored output
+    if no_color {
+        colored::control::set_override(false);
+    }
 
     // Load configuration
     let mut config = if let Some(config_path) = matches.get_one::<String>("config") {
+        if verbose {
+            println!("{} Loading configuration from: {}", "📋".bright_cyan(), config_path.bright_blue());
+        }
         Config::from_file(config_path)?
     } else {
+        if verbose {
+            println!("{} Attempting to load configuration from current directory", "📋".bright_cyan());
+        }
         // Try to load from current directory
         vexy_svgo_core::load_config_from_directory(".")
-            .unwrap_or_else(|_| Config::with_default_preset())
+            .unwrap_or_else(|e| {
+                if verbose {
+                    println!("{} No configuration found, using defaults: {}", "ℹ".bright_yellow(), e.to_string().yellow());
+                }
+                Config::with_default_preset()
+            })
     };
 
     // Apply CLI overrides
     if matches.get_flag("pretty") {
+        if verbose {
+            println!("{} Enabling pretty printing", "⚙️".bright_magenta());
+        }
         config.js2svg.pretty = true;
     }
 
     if let Some(indent) = matches.get_one::<usize>("indent") {
+        if verbose {
+            println!("{} Setting indentation to {} spaces", "⚙️".bright_magenta(), indent.to_string().bright_white());
+        }
         config.js2svg.indent = indent.to_string();
     }
 
     if let Some(threads) = matches.get_one::<usize>("parallel") {
+        if verbose {
+            println!("{} Setting parallel threads to {}", "⚙️".bright_magenta(), threads.to_string().bright_white());
+        }
         config.parallel = Some(*threads);
     }
 
@@ -279,13 +314,13 @@ fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
         InputMode::Stdin => {
             let mut buffer = String::new();
             io::stdin().read_to_string(&mut buffer)?;
-            process_string(&buffer, output_mode, &config, quiet)?;
+            process_string(&buffer, output_mode, &config, quiet, verbose)?;
         }
         InputMode::String(content) => {
-            process_string(&content, output_mode, &config, quiet)?;
+            process_string(&content, output_mode, &config, quiet, verbose)?;
         }
         InputMode::Files(files) => {
-            process_files(&files, output_mode, &config, quiet, no_color)?;
+            process_files(&files, output_mode, &config, quiet, verbose, no_color)?;
         }
         InputMode::Folder(folder) => {
             let recursive = matches.get_flag("recursive");
@@ -293,7 +328,7 @@ fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
                 .get_many::<String>("exclude")
                 .map(|v| v.map(|s| s.as_str()).collect())
                 .unwrap_or_default();
-            process_folder(&folder, &config, quiet, recursive, &exclude_patterns)?;
+            process_folder(&folder, &config, quiet, verbose, recursive, &exclude_patterns)?;
         }
     }
 
@@ -355,8 +390,19 @@ fn process_string(
     output_mode: OutputMode,
     config: &Config,
     quiet: bool,
+    verbose: bool,
 ) -> Result<(), VexySvgoError> {
+    if verbose {
+        println!("{} Optimizing SVG content ({} bytes)", "🔧".bright_cyan(), content.len().to_string().bright_white());
+    }
     let result = optimize_with_config(content, config.clone())?;
+    
+    if verbose {
+        println!("{} Optimization complete: {} {} {} bytes", "✅".bright_green(), 
+                 content.len().to_string().yellow(), 
+                 "→".cyan(), 
+                 result.data.len().to_string().green());
+    }
 
     match output_mode {
         OutputMode::Stdout => {
@@ -375,11 +421,12 @@ fn process_string(
                     0.0
                 };
                 println!(
-                    "{}: {} → {} ({:.1}%)",
-                    path,
-                    format_bytes(original_size),
-                    format_bytes(optimized_size),
-                    percent
+                    "{}: {} {} {} ({})",
+                    path.bright_blue(),
+                    format_bytes(original_size).yellow(),
+                    "→".cyan(),
+                    format_bytes(optimized_size).green(),
+                    format!("{:.1}%", percent).bright_green()
                 );
             }
         }
@@ -394,8 +441,16 @@ fn process_files(
     output_mode: OutputMode,
     config: &Config,
     quiet: bool,
+    verbose: bool,
     _no_color: bool,
 ) -> Result<(), VexySvgoError> {
+    if verbose {
+        println!("{} Processing {} file(s)", "📁".bright_cyan(), files.len().to_string().bright_white());
+        for file in files {
+            println!("  {} {}", "📄".cyan(), file.bright_blue());
+        }
+    }
+    
     match output_mode {
         OutputMode::Stdout => {
             if files.len() > 1 {
@@ -423,12 +478,14 @@ fn process_files(
                     0.0
                 };
                 println!(
-                    "{} → {}: {} → {} ({:.1}%)",
-                    files[0],
-                    output_path,
-                    format_bytes(original_size),
-                    format_bytes(optimized_size),
-                    percent
+                    "{} {} {}: {} {} {} ({})",
+                    files[0].bright_blue(),
+                    "→".cyan(),
+                    output_path.bright_blue(),
+                    format_bytes(original_size).yellow(),
+                    "→".cyan(),
+                    format_bytes(optimized_size).green(),
+                    format!("{:.1}%", percent).bright_green()
                 );
             }
         }
@@ -502,6 +559,7 @@ fn process_folder(
     folder: &str,
     config: &Config,
     quiet: bool,
+    verbose: bool,
     recursive: bool,
     exclude_patterns: &[&str],
 ) -> Result<(), VexySvgoError> {
@@ -520,19 +578,38 @@ fn process_folder(
 
     if svg_files.is_empty() {
         if !quiet {
-            println!("No SVG files found in '{folder}'");
+            println!("{} No SVG files found in '{}'", "ℹ".bright_yellow(), folder.bright_blue());
         }
         return Ok(());
     }
 
     if !quiet {
-        println!("Processing {} SVG files...", svg_files.len());
+        println!("{} Processing {} SVG files...", "🔄".bright_cyan(), svg_files.len().to_string().bright_white());
     }
 
     let mut total_original = 0;
     let mut total_optimized = 0;
 
-    for svg_file in &svg_files {
+    // Create progress bar if processing multiple files and not in quiet mode
+    let progress_bar = if !quiet && svg_files.len() > 1 {
+        let pb = ProgressBar::new(svg_files.len() as u64);
+        pb.set_style(
+            ProgressStyle::default_bar()
+                .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+                .unwrap()
+                .progress_chars("##-"),
+        );
+        Some(pb)
+    } else {
+        None
+    };
+
+    for svg_file in svg_files.iter() {
+        // Update progress bar message
+        if let Some(ref pb) = progress_bar {
+            pb.set_message(format!("Processing {}", svg_file.file_name().unwrap_or_default().to_string_lossy()));
+        }
+
         match fs::read_to_string(svg_file) {
             Ok(content) => {
                 match optimize_with_config(&content, config.clone()) {
@@ -550,24 +627,48 @@ fn process_folder(
                             } else {
                                 0.0
                             };
-                            println!(
-                                "{}: {} → {} ({:.1}%)",
-                                svg_file.display(),
-                                format_bytes(original_size),
-                                format_bytes(optimized_size),
-                                percent
-                            );
+                            
+                            // If we have a progress bar, just log to it, otherwise use println
+                            if progress_bar.is_some() {
+                                // Don't print individual file results when using progress bar
+                            } else {
+                                println!(
+                                    "{}: {} → {} ({:.1}%)",
+                                    svg_file.display(),
+                                    format_bytes(original_size),
+                                    format_bytes(optimized_size),
+                                    percent
+                                );
+                            }
                         }
                     }
                     Err(e) => {
-                        eprintln!("Error optimizing '{}': {}", svg_file.display(), e);
+                        if let Some(ref pb) = progress_bar {
+                            pb.println(format!("{} Error optimizing '{}': {}", "❌".bright_red(), svg_file.display().to_string().bright_blue(), e.to_string().red()));
+                        } else {
+                            eprintln!("{} Error optimizing '{}': {}", "❌".bright_red(), svg_file.display().to_string().bright_blue(), e.to_string().red());
+                        }
                     }
                 }
             }
             Err(e) => {
-                eprintln!("Error reading '{}': {}", svg_file.display(), e);
+                if let Some(ref pb) = progress_bar {
+                    pb.println(format!("{} Error reading '{}': {}", "❌".bright_red(), svg_file.display().to_string().bright_blue(), e.to_string().red()));
+                } else {
+                    eprintln!("{} Error reading '{}': {}", "❌".bright_red(), svg_file.display().to_string().bright_blue(), e.to_string().red());
+                }
             }
         }
+
+        // Update progress bar
+        if let Some(ref pb) = progress_bar {
+            pb.inc(1);
+        }
+    }
+
+    // Finish the progress bar
+    if let Some(pb) = progress_bar {
+        pb.finish_with_message("Processing complete");
     }
 
     if !quiet && svg_files.len() > 1 {
@@ -578,10 +679,12 @@ fn process_folder(
             0.0
         };
         println!(
-            "\nTotal: {} → {} ({:.1}%)",
-            format_bytes(total_original),
-            format_bytes(total_optimized),
-            total_percent
+            "\n{} Total: {} {} {} ({})",
+            "✨".bright_yellow(),
+            format_bytes(total_original).yellow(),
+            "→".cyan(),
+            format_bytes(total_optimized).green(),
+            format!("{:.1}%", total_percent).bright_green()
         );
     }
 

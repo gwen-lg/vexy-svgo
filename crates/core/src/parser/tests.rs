@@ -2,7 +2,8 @@
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::parser::main::Parser;
+    use crate::ast::Node;
 
     #[test]
     fn test_parse_simple_svg() {

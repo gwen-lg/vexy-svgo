@@ -1,7 +1,7 @@
 // this_file: crates/test-utils/tests/compat.rs
 
 //! SVGO compatibility tests - comprehensive test suite inspired by SVGO patterns
-//! These tests verify that VEXYSVGO is feature-compatible with SVGO
+//! These tests verify that Vexy SVGO is feature-compatible with SVGO
 
 use serde_json::json;
 use vexy_svgo_core::config::{Js2SvgOptions, LineEnding};

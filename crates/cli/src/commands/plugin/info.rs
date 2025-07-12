@@ -29,7 +29,7 @@ pub async fn info_plugin_command(
             rating, plugin.review_count
         );
     }
-    println!("🔧 VEXYSVGO Version: {}", plugin.vexy_svgo_version);
+    println!("🔧 Vexy SVGO Version: {}", plugin.vexy_svgo_version);
 
     if !plugin.keywords.is_empty() {
         println!("🏷️  Keywords: {}", plugin.keywords.join(", "));

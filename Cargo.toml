@@ -2,10 +2,8 @@
 members = [
 "crates/core",
 "crates/cli",
-"crates/plugin-sdk",
-"crates/wasm",
 "crates/ffi",
-"crates/test-utils"
+"crates/wasm"
 ]
 default-members = [ "crates/cli" ]
 resolver = "2"
@@ -39,6 +37,8 @@ toml = "0.8"
 lyon = "1.0"
 nalgebra = "0.33"
 rayon = "1.10"
+indicatif = "0.17"
+colored = "2.0"
 assert_cmd = "2.0"
 predicates = "3.0"
 tempfile = "3.8"

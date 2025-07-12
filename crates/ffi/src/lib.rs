@@ -209,7 +209,7 @@ pub unsafe extern "C" fn vexy_svgo_get_default_config() -> *mut c_char {
 ///
 /// # Safety
 ///
-/// This function must only be called with results returned from VEXYSVGO functions.
+/// This function must only be called with results returned from Vexy SVGO functions.
 /// The result should not be used after calling this function.
 #[no_mangle]
 pub unsafe extern "C" fn vexy_svgo_free_result(result: VexySvgoResult) {
@@ -221,11 +221,11 @@ pub unsafe extern "C" fn vexy_svgo_free_result(result: VexySvgoResult) {
     }
 }
 
-/// Free a string returned by VEXYSVGO functions
+/// Free a string returned by Vexy SVGO functions
 ///
 /// # Safety
 ///
-/// This function must only be called with strings returned from VEXYSVGO functions.
+/// This function must only be called with strings returned from Vexy SVGO functions.
 /// The string should not be used after calling this function.
 #[no_mangle]
 pub unsafe extern "C" fn vexy_svgo_free_string(s: *mut c_char) {

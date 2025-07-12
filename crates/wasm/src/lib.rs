@@ -1,8 +1,8 @@
 // this_file: crates/wasm/src/lib.rs
 
-//! WebAssembly bindings for VEXYSVGO
+//! WebAssembly bindings for Vexy SVGO
 //!
-//! This module provides JavaScript-friendly exports for using VEXYSVGO in web browsers
+//! This module provides JavaScript-friendly exports for using Vexy SVGO in web browsers
 //! and Node.js environments through WebAssembly.
 
 #[cfg(feature = "size-optimization")]
@@ -199,7 +199,7 @@ pub mod wasm_impl {
         optimize(svg, None)
     }
 
-    /// Get the version of the VEXYSVGO library
+    /// Get the version of the Vexy SVGO library
     #[wasm_bindgen(js_name = getVersion)]
     pub fn get_version() -> String {
         env!("CARGO_PKG_VERSION").to_string()
