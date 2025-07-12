@@ -192,7 +192,7 @@ mod tests {
         // Width and height should be removed, viewBox should remain unchanged
         assert!(!doc.root.has_attr("width"));
         assert!(!doc.root.has_attr("height"));
-        assert_eq!(doc.root.attr("viewBox").map(|s| s.as_str()), Some("0 0 200 100"));
+        assert_eq!(doc.root.attr("viewBox"), Some("0 0 200 100"));
     }
 
     #[test]
@@ -210,7 +210,7 @@ mod tests {
         // Width and height should be removed, viewBox should be created
         assert!(!doc.root.has_attr("width"));
         assert!(!doc.root.has_attr("height"));
-        assert_eq!(doc.root.attr("viewBox").map(|s| s.as_str()), Some("0 0 100 50"));
+        assert_eq!(doc.root.attr("viewBox"), Some("0 0 100 50"));
     }
 
     #[test]
@@ -228,7 +228,7 @@ mod tests {
         // Width and height should be removed, viewBox should be created with decimals
         assert!(!doc.root.has_attr("width"));
         assert!(!doc.root.has_attr("height"));
-        assert_eq!(doc.root.attr("viewBox").map(|s| s.as_str()), Some("0 0 100.5 50.25"));
+        assert_eq!(doc.root.attr("viewBox"), Some("0 0 100.5 50.25"));
     }
 
     #[test]
@@ -244,8 +244,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Width and height should remain since they're not both valid numbers
-        assert_eq!(doc.root.attr("width").map(|s| s.as_str()), Some("invalid"));
-        assert_eq!(doc.root.attr("height").map(|s| s.as_str()), Some("50"));
+        assert_eq!(doc.root.attr("width"), Some("invalid"));
+        assert_eq!(doc.root.attr("height"), Some("50"));
         assert!(!doc.root.has_attr("viewBox"));
     }
 
@@ -261,7 +261,7 @@ mod tests {
         assert!(result.is_ok());
 
         // Width should remain since height is missing
-        assert_eq!(doc.root.attr("width").map(|s| s.as_str()), Some("100"));
+        assert_eq!(doc.root.attr("width"), Some("100"));
         assert!(!doc.root.has_attr("viewBox"));
     }
 
@@ -289,8 +289,8 @@ mod tests {
 
         // Rect dimensions should remain unchanged
         if let Node::Element(rect) = &doc.root.children[0] {
-            assert_eq!(rect.attr("width").map(|s| s.as_str()), Some("100"));
-            assert_eq!(rect.attr("height").map(|s| s.as_str()), Some("50"));
+            assert_eq!(rect.attr("width"), Some("100"));
+            assert_eq!(rect.attr("height"), Some("50"));
             assert!(!rect.has_attr("viewBox"));
         } else {
             panic!("Expected rect element");
@@ -324,13 +324,13 @@ mod tests {
         // Root SVG should have viewBox and no dimensions
         assert!(!doc.root.has_attr("width"));
         assert!(!doc.root.has_attr("height"));
-        assert_eq!(doc.root.attr("viewBox").map(|s| s.as_str()), Some("0 0 200 100"));
+        assert_eq!(doc.root.attr("viewBox"), Some("0 0 200 100"));
 
         // Nested SVG should also be processed
         if let Node::Element(nested_svg) = &doc.root.children[0] {
             assert!(!nested_svg.has_attr("width"));
             assert!(!nested_svg.has_attr("height"));
-            assert_eq!(nested_svg.attr("viewBox").map(|s| s.as_str()), Some("0 0 100 50"));
+            assert_eq!(nested_svg.attr("viewBox"), Some("0 0 100 50"));
         } else {
             panic!("Expected nested SVG element");
         }
@@ -351,7 +351,7 @@ mod tests {
         // Should still create viewBox even with zero dimensions
         assert!(!doc.root.has_attr("width"));
         assert!(!doc.root.has_attr("height"));
-        assert_eq!(doc.root.attr("viewBox").map(|s| s.as_str()), Some("0 0 0 0"));
+        assert_eq!(doc.root.attr("viewBox"), Some("0 0 0 0"));
     }
 
     #[test]

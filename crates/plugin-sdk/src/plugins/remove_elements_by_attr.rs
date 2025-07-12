@@ -389,7 +389,7 @@ mod tests {
         assert_eq!(doc.root.children.len(), 1);
         if let Node::Element(element) = &doc.root.children[0] {
             assert_eq!(element.name, "circle");
-            assert_eq!(element.attr("id").map(|s| s.as_str()), Some("elementToKeep"));
+            assert_eq!(element.attr("id"), Some("elementToKeep"));
         } else {
             panic!("Expected element");
         }
@@ -432,7 +432,7 @@ mod tests {
         if let Node::Element(element) = &doc.root.children[0] {
             assert_eq!(element.name, "circle");
             assert_eq!(
-                element.attr("class").map(|s| s.as_str()),
+                element.attr("class"),
                 Some("some-class keep-me another-class")
             );
         } else {

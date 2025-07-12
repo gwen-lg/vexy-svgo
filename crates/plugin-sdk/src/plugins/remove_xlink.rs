@@ -373,7 +373,7 @@ mod tests {
         // xlink:href should be converted to href
         if let Node::Element(ref use_elem) = document.root.children[0] {
             assert!(!use_elem.has_attr("xlink:href"));
-            assert_eq!(use_elem.attr("href").map(|s| s.as_str()), Some("#symbol1"));
+            assert_eq!(use_elem.attr("href"), Some("#symbol1"));
         } else {
             panic!("Expected use element");
         }
@@ -406,7 +406,7 @@ mod tests {
         // Should preserve existing href and remove xlink:href
         if let Node::Element(ref elem) = document.root.children[0] {
             assert!(!elem.has_attr("xlink:href"));
-            assert_eq!(elem.attr("href").map(|s| s.as_str()), Some("#existing"));
+            assert_eq!(elem.attr("href"), Some("#existing"));
         } else {
             panic!("Expected element");
         }
@@ -435,7 +435,7 @@ mod tests {
         // xlink:show="new" should become target="_blank"
         if let Node::Element(ref elem) = document.root.children[0] {
             assert!(!elem.has_attr("xlink:show"));
-            assert_eq!(elem.attr("target").map(|s| s.as_str()), Some("_blank"));
+            assert_eq!(elem.attr("target"), Some("_blank"));
         } else {
             panic!("Expected element");
         }
@@ -542,7 +542,7 @@ mod tests {
         // With includeLegacy=true, should convert even legacy elements
         if let Node::Element(ref filter) = document.root.children[0] {
             assert!(!filter.has_attr("xlink:href"));
-            assert_eq!(filter.attr("href").map(|s| s.as_str()), Some("#filter1"));
+            assert_eq!(filter.attr("href"), Some("#filter1"));
         } else {
             panic!("Expected filter element");
         }

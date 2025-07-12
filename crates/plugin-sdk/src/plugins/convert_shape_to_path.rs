@@ -117,11 +117,11 @@ impl ConvertShapeToPathPlugin {
             None => return,
         };
 
-        let x = match Self::parse_coord(element.attr("x").map(|s| s.as_str()).unwrap_or("0")) {
+        let x = match Self::parse_coord(element.attr("x").unwrap_or("0")) {
             Some(x) => x,
             None => return,
         };
-        let y = match Self::parse_coord(element.attr("y").map(|s| s.as_str()).unwrap_or("0")) {
+        let y = match Self::parse_coord(element.attr("y").unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };
@@ -155,19 +155,19 @@ impl ConvertShapeToPathPlugin {
 
     /// Convert a line to a path
     fn convert_line(&self, element: &mut Element) {
-        let x1 = match Self::parse_coord(element.attr("x1").map(|s| s.as_str()).unwrap_or("0")) {
+        let x1 = match Self::parse_coord(element.attr("x1").unwrap_or("0")) {
             Some(x) => x,
             None => return,
         };
-        let y1 = match Self::parse_coord(element.attr("y1").map(|s| s.as_ref()).unwrap_or("0")) {
+        let y1 = match Self::parse_coord(element.attr("y1").unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };
-        let x2 = match Self::parse_coord(element.attr("x2").map(|s| s.as_ref()).unwrap_or("0")) {
+        let x2 = match Self::parse_coord(element.attr("x2").unwrap_or("0")) {
             Some(x) => x,
             None => return,
         };
-        let y2 = match Self::parse_coord(element.attr("y2").map(|s| s.as_ref()).unwrap_or("0")) {
+        let y2 = match Self::parse_coord(element.attr("y2").unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };
@@ -257,15 +257,15 @@ impl ConvertShapeToPathPlugin {
 
     /// Convert circle to a path using arc commands
     fn convert_circle(&self, element: &mut Element) {
-        let cx = match Self::parse_coord(element.attr("cx").map(|s| s.as_str()).unwrap_or("0")) {
+        let cx = match Self::parse_coord(element.attr("cx").unwrap_or("0")) {
             Some(x) => x,
             None => return,
         };
-        let cy = match Self::parse_coord(element.attr("cy").map(|s| s.as_str()).unwrap_or("0")) {
+        let cy = match Self::parse_coord(element.attr("cy").unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };
-        let r = match Self::parse_coord(element.attr("r").map(|s| s.as_ref()).unwrap_or("0")) {
+        let r = match Self::parse_coord(element.attr("r").unwrap_or("0")) {
             Some(r) => r,
             None => return,
         };
@@ -295,11 +295,11 @@ impl ConvertShapeToPathPlugin {
 
     /// Convert ellipse to a path using arc commands
     fn convert_ellipse(&self, element: &mut Element) {
-        let cx = match Self::parse_coord(element.attr("cx").map(|s| s.as_str()).unwrap_or("0")) {
+        let cx = match Self::parse_coord(element.attr("cx").unwrap_or("0")) {
             Some(x) => x,
             None => return,
         };
-        let cy = match Self::parse_coord(element.attr("cy").map(|s| s.as_str()).unwrap_or("0")) {
+        let cy = match Self::parse_coord(element.attr("cy").unwrap_or("0")) {
             Some(y) => y,
             None => return,
         };

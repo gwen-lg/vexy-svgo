@@ -308,8 +308,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Should still have original attributes
-        assert_eq!(document.root.attr("width").map(|s| s.as_str()), Some("100"));
-        assert_eq!(document.root.attr("height").map(|s| s.as_str()), Some("100"));
+        assert_eq!(document.root.attr("width"), Some("100"));
+        assert_eq!(document.root.attr("height"), Some("100"));
     }
 
     #[test]
