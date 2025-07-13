@@ -60,15 +60,15 @@ pub struct Element<'a> {
 /// in the SVG document tree.
 /// 
 /// Memory optimization notes:
-/// - Using Box<str> for strings where possible to reduce memory overhead
+/// - Using `Box<str>` for strings where possible to reduce memory overhead
 /// - Considering compact representations for common node types
 #[derive(Debug, Clone, PartialEq)]
 pub enum Node<'a> {
     /// An XML element, represented by the `Element` struct.
     Element(Element<'a>),
-    /// A text node - using String for now, could be optimized to Box<str>
+    /// A text node - using String for now, could be optimized to `Box<str>`
     Text(String),
-    /// An XML comment - using String for now, could be optimized to Box<str>
+    /// An XML comment - using String for now, could be optimized to `Box<str>`
     Comment(String),
     /// An XML processing instruction.
     ProcessingInstruction {

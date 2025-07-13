@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "crates/benchmarks",
     "crates/cli",
     "crates/core",
     "crates/ffi",
@@ -36,6 +37,7 @@ indoc = "2.0"
 log = "0.4"
 lyon = "1.0"
 pretty_assertions = "1.4"
+predicates = "3.0"
 rayon = "1.10"
 roxmltree = "0.20"
 serde = { version = "1.0", features = ["derive"] }
@@ -63,6 +65,7 @@ quick-xml = "0.31"
 parking_lot = "0.12"
 colored = "2.1"
 indicatif = "0.17"
+criterion = { version = "0.5", features = ["html_reports"] }
 
 
 [profile.release]

@@ -1,0 +1,22 @@
+[package]
+name = "vexy-svgo-benchmarks"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+publish = false
+
+[[bench]]
+name = "optimization"
+harness = false
+
+[[bench]]
+name = "parser"
+harness = false
+
+[[bench]]
+name = "stringifier"
+harness = false
+
+[dependencies]
+vexy-svgo-core = { workspace = true }
+criterion = { version = "0.5", features = ["html_reports"] }

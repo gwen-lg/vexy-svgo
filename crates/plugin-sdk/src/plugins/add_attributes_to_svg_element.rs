@@ -2,7 +2,7 @@
 
 //! Add attributes to SVG element plugin implementation
 //!
-//! This plugin adds attributes to the outer <svg> element.
+//! This plugin adds attributes to the outer `<svg>` element.
 //! It can add either attribute names (with empty values) or
 //! attribute name-value pairs.
 //!

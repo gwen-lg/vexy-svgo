@@ -777,6 +777,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#parallel-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parallel Processing
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1272,6 +1281,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#parallel-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parallel Processing
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1704,6 +1722,9 @@ vexy-svgo<span class="w"> </span>*.svg<span class="w">  </span><span class="c1">
 <span class="c1"># vs</span>
 <span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>*.svg<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>vexy-svgo<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$f</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="w">  </span><span class="c1"># ❌ Slow</span>
 
+<span class="c1"># Enable parallel processing for large files (if feature enabled)</span>
+vexy-svgo<span class="w"> </span>--parallel<span class="w"> </span>large-complex.svg
+
 <span class="c1"># Disable unnecessary plugins for simple files</span>
 vexy-svgo<span class="w"> </span>--disable<span class="w"> </span>removeMetadata<span class="w"> </span>--disable<span class="w"> </span>removeTitle<span class="w"> </span>simple.svg
 </code></pre></div>
@@ -1713,6 +1734,20 @@ vexy-svgo<span class="w"> </span>--stream<span class="w"> </span>large-file.svg
 
 <span class="c1"># Process large batches in chunks</span>
 find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.svg&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>-n<span class="w"> </span><span class="m">50</span><span class="w"> </span>vexy-svgo
+
+<span class="c1"># Configure parallel processing for optimal performance</span>
+vexy-svgo<span class="w"> </span>--parallel<span class="w"> </span>--parallel-threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>massive-file.svg
+</code></pre></div>
+<h3 id="parallel-processing">Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permanent link">&para;</a></h3>
+<p>When working with large SVG files (&gt;1MB or &gt;1000 elements), Vexy SVGO can automatically enable parallel processing:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Automatic parallel activation for large files</span>
+vexy-svgo<span class="w"> </span>huge-map.svg<span class="w">  </span><span class="c1"># Automatically uses parallel if file is large</span>
+
+<span class="c1"># Force parallel processing</span>
+vexy-svgo<span class="w"> </span>--parallel<span class="w"> </span>icon-set.svg
+
+<span class="c1"># Configure parallel thresholds</span>
+vexy-svgo<span class="w"> </span>--parallel-size-threshold<span class="w"> </span><span class="m">512000</span><span class="w"> </span>--parallel-element-threshold<span class="w"> </span><span class="m">500</span><span class="w"> </span>file.svg
 </code></pre></div>
 <hr />
 <h2 id="integration-examples">Integration Examples<a class="headerlink" href="#integration-examples" title="Permanent link">&para;</a></h2>

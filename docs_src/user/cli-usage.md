@@ -253,6 +253,9 @@ vexy-svgo *.svg  # ✅ Fast
 # vs
 for f in *.svg; do vexy-svgo "$f"; done  # ❌ Slow
 
+# Enable parallel processing for large files (if feature enabled)
+vexy-svgo --parallel large-complex.svg
+
 # Disable unnecessary plugins for simple files
 vexy-svgo --disable removeMetadata --disable removeTitle simple.svg
 ```
@@ -265,6 +268,24 @@ vexy-svgo --stream large-file.svg
 
 # Process large batches in chunks
 find . -name "*.svg" | xargs -n 50 vexy-svgo
+
+# Configure parallel processing for optimal performance
+vexy-svgo --parallel --parallel-threads 4 massive-file.svg
+```
+
+### Parallel Processing
+
+When working with large SVG files (>1MB or >1000 elements), Vexy SVGO can automatically enable parallel processing:
+
+```bash
+# Automatic parallel activation for large files
+vexy-svgo huge-map.svg  # Automatically uses parallel if file is large
+
+# Force parallel processing
+vexy-svgo --parallel icon-set.svg
+
+# Configure parallel thresholds
+vexy-svgo --parallel-size-threshold 512000 --parallel-element-threshold 500 file.svg
 ```
 
 ---

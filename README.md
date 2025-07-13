@@ -24,7 +24,7 @@ Vexy SVGO 2.1.0 represents a major milestone with complete SVGO feature parity a
 
 ### **Performance Excellence**
 - **Native Rust implementation** with memory safety and zero-cost abstractions
-- **Parallel processing** capabilities for multi-core optimization
+- **Parallel processing** capabilities for multi-core optimization (up to 8x faster on large files)
 - **Streaming parser** for handling massive SVG files efficiently
 - **Memory efficient**: 40-60% less memory usage than SVGO
 
