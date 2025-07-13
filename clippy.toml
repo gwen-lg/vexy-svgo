@@ -1,0 +1,26 @@
+# Vexy SVGO Clippy Configuration
+# this_file: clippy.toml
+
+# Maximum allowed cyclomatic complexity
+cognitive-complexity-threshold = 30
+
+# Maximum number of lines allowed in a single function
+too-many-lines-threshold = 100
+
+# Maximum number of arguments allowed in a function
+too-many-arguments-threshold = 7
+
+# Maximum size of types in bytes
+type-complexity-threshold = 250
+
+# Enforce documentation on public items
+missing-docs-in-crate-items = true
+
+# Disallowed types
+disallowed-types = [
+    # Use specific error types instead of generic strings
+    { path = "std::boxed::Box<dyn std::error::Error>", reason = "Use specific error types" },
+]
+
+# Configure MSRV (Minimum Supported Rust Version)
+msrv = "1.58.0"

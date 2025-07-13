@@ -13,4 +13,8 @@ target/
 # Generated files
 llms.txt
 build.log.txt
+build.err.txt
 build_remove_scripts.log
+dist/
+release.log.txt
+release.err.txt
