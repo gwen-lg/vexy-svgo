@@ -91,6 +91,7 @@ impl InlineStylesPlugin {
     }
 
     /// Parse configuration from JSON
+    #[allow(dead_code)]
     fn parse_config(params: &Value) -> Result<InlineStylesConfig> {
         if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
@@ -166,6 +167,7 @@ impl Plugin for InlineStylesPlugin {
 
 /// Represents a CSS rule with selector and declarations
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct CssRuleData {
     selector: String,
     declarations: Vec<(String, String)>,
@@ -179,6 +181,7 @@ struct InlineStylesVisitor {
     style_elements: Vec<(usize, String)>, // (element_id, css_content)
     element_counter: usize,
     css_rules: Vec<CssRuleData>,
+    #[allow(dead_code)]
     match_counts: HashMap<String, usize>,
     used_selectors: HashSet<String>,
 }
@@ -431,6 +434,7 @@ impl Visitor<'_> for StyleApplierVisitor<'_> {
 
 /// Visitor for cleaning up empty style elements
 struct StyleCleanerVisitor<'a> {
+    #[allow(dead_code)]
     used_selectors: &'a HashSet<String>,
     config: &'a InlineStylesConfig,
 }

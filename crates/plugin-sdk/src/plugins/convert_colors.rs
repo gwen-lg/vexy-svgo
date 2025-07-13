@@ -13,7 +13,7 @@ use crate::Plugin;
 use anyhow::Result;
 use regex::Regex;
 use std::collections::HashMap;
-use vexy_svgo_core::ast::{Document, Element, Node};
+use vexy_svgo_core::ast::{Document, Element};
 use vexy_svgo_core::visitor::Visitor;
 
 /// Configuration parameters for ConvertColors plugin
@@ -626,7 +626,7 @@ mod tests {
     use super::*;
     use serde_json::json;
     use std::borrow::Cow;
-    use vexy_svgo_core::ast::{Document, Element, Node};
+    use vexy_svgo_core::ast::{Document, Element};
 
     fn create_element(name: &'static str) -> Element<'static> {
         let mut element = Element::new(name);

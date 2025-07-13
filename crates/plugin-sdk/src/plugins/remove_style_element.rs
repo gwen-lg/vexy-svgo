@@ -28,6 +28,7 @@ impl Default for RemoveStyleElementConfig {
 
 /// Plugin that removes style elements
 pub struct RemoveStyleElementPlugin {
+    #[allow(dead_code)]
     config: RemoveStyleElementConfig,
 }
 
@@ -35,6 +36,7 @@ impl RemoveStyleElementPlugin {
     /// Create a new RemoveStyleElementPlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveStyleElementConfig::default(),
         }
     }

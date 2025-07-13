@@ -67,6 +67,7 @@ impl Default for RemoveEditorsNSDataConfig {
 
 /// Plugin that removes editor namespace data
 pub struct RemoveEditorsNSDataPlugin {
+    #[allow(dead_code)]
     config: RemoveEditorsNSDataConfig,
 }
 
@@ -74,6 +75,7 @@ impl RemoveEditorsNSDataPlugin {
     /// Create a new RemoveEditorsNSDataPlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveEditorsNSDataConfig::default(),
         }
     }
@@ -174,6 +176,7 @@ impl NamespaceState {
 
 /// Visitor implementation that removes editor namespace data
 struct EditorsNSDataRemovalVisitor {
+    #[allow(dead_code)]
     config: RemoveEditorsNSDataConfig,
     state: NamespaceState,
 }

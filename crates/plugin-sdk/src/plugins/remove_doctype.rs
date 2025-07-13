@@ -32,6 +32,7 @@ impl Default for RemoveDoctypeConfig {
 
 /// Plugin that removes DOCTYPE declarations
 pub struct RemoveDoctypePlugin {
+    #[allow(dead_code)]
     config: RemoveDoctypeConfig,
 }
 
@@ -39,6 +40,7 @@ impl RemoveDoctypePlugin {
     /// Create a new RemoveDoctypePlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveDoctypeConfig::default(),
         }
     }

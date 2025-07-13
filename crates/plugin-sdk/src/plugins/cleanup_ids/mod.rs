@@ -89,6 +89,7 @@ impl CleanupIdsPlugin {
     }
 
     /// Parse configuration from JSON
+    #[allow(dead_code)]
     fn parse_config(params: &Value) -> Result<CleanupIdsConfig> {
         if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
@@ -204,12 +205,14 @@ struct CleanupIdsVisitor {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct ElementInfo {
     path: Vec<usize>,
     element_name: String,
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct Reference {
     path: Vec<usize>,
     attr_name: String,
@@ -339,6 +342,7 @@ impl Visitor<'_> for CleanupIdsVisitor {
 /// Separate visitor for applying ID changes
 struct IdApplierVisitor<'a> {
     config: &'a CleanupIdsConfig,
+    #[allow(dead_code)]
     node_by_id: &'a HashMap<String, ElementInfo>,
     used_ids: &'a HashSet<String>,
     id_mappings: &'a HashMap<String, String>,

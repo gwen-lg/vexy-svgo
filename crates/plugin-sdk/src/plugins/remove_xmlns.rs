@@ -26,12 +26,14 @@ impl Default for RemoveXmlnsConfig {
 
 /// Plugin to remove xmlns attribute from SVG elements
 pub struct RemoveXmlnsPlugin {
+    #[allow(dead_code)]
     config: RemoveXmlnsConfig,
 }
 
 impl RemoveXmlnsPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveXmlnsConfig::default(),
         }
     }

@@ -15,7 +15,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cmp::Ordering;
 use vexy_svgo_core::ast::{Document, Element, Node};
-use vexy_svgo_core::utils::attributes::AttributeUtils;
 
 /// Configuration parameters for sort attributes plugin
 #[derive(Debug, Clone, Serialize, Deserialize)]

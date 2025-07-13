@@ -148,6 +148,7 @@ impl ConvertStyleToAttrsPlugin {
     }
 
     /// Parse configuration from JSON
+    #[allow(dead_code)]
     fn parse_config(params: &Value) -> Result<ConvertStyleToAttrsConfig> {
         if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())

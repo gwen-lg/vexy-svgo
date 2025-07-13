@@ -30,6 +30,7 @@ impl Default for SortDefsChildrenConfig {
 
 /// Plugin that sorts children of defs elements
 pub struct SortDefsChildrenPlugin {
+    #[allow(dead_code)]
     config: SortDefsChildrenConfig,
 }
 
@@ -37,6 +38,7 @@ impl SortDefsChildrenPlugin {
     /// Create a new SortDefsChildrenPlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: SortDefsChildrenConfig::default(),
         }
     }

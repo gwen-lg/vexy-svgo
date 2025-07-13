@@ -29,6 +29,7 @@ impl Default for MergeStylesConfig {
 
 /// Plugin that merges multiple style elements into one
 pub struct MergeStylesPlugin {
+    #[allow(dead_code)]
     config: MergeStylesConfig,
 }
 
@@ -46,6 +47,7 @@ impl MergeStylesPlugin {
     }
 
     /// Parse configuration from JSON
+    #[allow(dead_code)]
     fn parse_config(params: &Value) -> Result<MergeStylesConfig> {
         if params.is_object() {
             serde_json::from_value(params.clone())

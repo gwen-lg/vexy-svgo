@@ -34,12 +34,14 @@ struct ViewBox {
 
 /// Plugin to remove paths drawn outside viewBox
 pub struct RemoveOffCanvasPathsPlugin {
+    #[allow(dead_code)]
     config: RemoveOffCanvasPathsConfig,
 }
 
 impl RemoveOffCanvasPathsPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveOffCanvasPathsConfig::default(),
         }
     }

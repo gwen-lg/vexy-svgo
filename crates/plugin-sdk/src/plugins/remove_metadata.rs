@@ -29,6 +29,7 @@ impl Default for RemoveMetadataConfig {
 
 /// Plugin that removes metadata elements
 pub struct RemoveMetadataPlugin {
+    #[allow(dead_code)]
     config: RemoveMetadataConfig,
 }
 
@@ -36,6 +37,7 @@ impl RemoveMetadataPlugin {
     /// Create a new RemoveMetadataPlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveMetadataConfig::default(),
         }
     }

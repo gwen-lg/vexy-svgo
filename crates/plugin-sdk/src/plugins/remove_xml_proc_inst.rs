@@ -27,6 +27,7 @@ impl Default for RemoveXMLProcInstConfig {
 
 /// Plugin that removes XML processing instructions
 pub struct RemoveXMLProcInstPlugin {
+    #[allow(dead_code)]
     config: RemoveXMLProcInstConfig,
 }
 
@@ -34,6 +35,7 @@ impl RemoveXMLProcInstPlugin {
     /// Create a new RemoveXMLProcInstPlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveXMLProcInstConfig::default(),
         }
     }

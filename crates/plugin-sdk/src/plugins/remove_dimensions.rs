@@ -27,12 +27,14 @@ impl Default for RemoveDimensionsConfig {
 
 /// Removes width and height in presence of viewBox
 pub struct RemoveDimensionsPlugin {
+    #[allow(dead_code)]
     config: RemoveDimensionsConfig,
 }
 
 impl RemoveDimensionsPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveDimensionsConfig::default(),
         }
     }

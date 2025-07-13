@@ -27,12 +27,14 @@ impl Default for MoveElemsAttrsToGroupConfig {
 
 /// Plugin to move common attributes from elements to their group
 pub struct MoveElemsAttrsToGroupPlugin {
+    #[allow(dead_code)]
     config: MoveElemsAttrsToGroupConfig,
 }
 
 impl MoveElemsAttrsToGroupPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: MoveElemsAttrsToGroupConfig::default(),
         }
     }

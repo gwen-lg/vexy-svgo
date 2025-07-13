@@ -29,6 +29,7 @@ impl Default for ConvertEllipseToCircleConfig {
 
 /// Plugin that converts ellipse elements to circle elements when appropriate
 pub struct ConvertEllipseToCirclePlugin {
+    #[allow(dead_code)]
     config: ConvertEllipseToCircleConfig,
 }
 

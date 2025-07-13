@@ -26,12 +26,14 @@ impl Default for MoveGroupAttrsToElemsConfig {
 
 /// Plugin to move group attributes to children when the group only has one child
 pub struct MoveGroupAttrsToElemsPlugin {
+    #[allow(dead_code)]
     config: MoveGroupAttrsToElemsConfig,
 }
 
 impl MoveGroupAttrsToElemsPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: MoveGroupAttrsToElemsConfig::default(),
         }
     }

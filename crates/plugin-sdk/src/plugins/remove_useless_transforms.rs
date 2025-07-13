@@ -25,12 +25,14 @@ impl Default for RemoveUselessTransformsConfig {
 
 /// Main plugin struct
 pub struct RemoveUselessTransformsPlugin {
+    #[allow(dead_code)]
     config: RemoveUselessTransformsConfig,
 }
 
 impl RemoveUselessTransformsPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveUselessTransformsConfig::default(),
         }
     }

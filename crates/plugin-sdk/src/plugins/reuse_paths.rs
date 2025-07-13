@@ -27,12 +27,14 @@ impl Default for ReusePathsConfig {
 
 /// Plugin that deduplicates path elements by converting identical paths to <use> elements
 pub struct ReusePathsPlugin {
+    #[allow(dead_code)]
     config: ReusePathsConfig,
 }
 
 impl ReusePathsPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: ReusePathsConfig::default(),
         }
     }

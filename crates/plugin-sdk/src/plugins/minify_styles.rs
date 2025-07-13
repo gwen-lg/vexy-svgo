@@ -88,6 +88,7 @@ impl Default for MinifyStylesConfig {
 
 /// Plugin that minifies CSS content in style elements and attributes
 pub struct MinifyStylesPlugin {
+    #[allow(dead_code)]
     config: MinifyStylesConfig,
 }
 
@@ -95,6 +96,7 @@ impl MinifyStylesPlugin {
     /// Create a new MinifyStylesPlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: MinifyStylesConfig::default(),
         }
     }

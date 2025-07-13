@@ -29,6 +29,7 @@ impl Default for RemoveTitleConfig {
 
 /// Plugin that removes title elements
 pub struct RemoveTitlePlugin {
+    #[allow(dead_code)]
     config: RemoveTitleConfig,
 }
 
@@ -36,6 +37,7 @@ impl RemoveTitlePlugin {
     /// Create a new RemoveTitlePlugin
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveTitleConfig::default(),
         }
     }

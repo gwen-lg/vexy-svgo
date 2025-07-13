@@ -52,6 +52,7 @@ impl MergePathsPlugin {
     }
 
     /// Parse configuration from JSON
+    #[allow(dead_code)]
     fn parse_config(params: &Value) -> Result<MergePathsConfig> {
         let mut config = MergePathsConfig::default();
 
@@ -71,6 +72,7 @@ impl MergePathsPlugin {
     }
 
     /// Check if two path elements can be merged
+    #[allow(dead_code)]
     fn can_merge_paths(&self, path1: &Element, path2: &Element) -> bool {
         // Basic checks for mergeability
 
@@ -149,6 +151,7 @@ impl MergePathsPlugin {
     }
 
     /// Merge two path elements' path data
+    #[allow(dead_code)]
     fn merge_path_data(&self, d1: &str, d2: &str) -> String {
         if d1.is_empty() {
             return d2.to_string();
@@ -219,6 +222,7 @@ impl Plugin for MergePathsPlugin {
 
 /// Visitor implementation that merges path elements
 struct PathMergeVisitor {
+    #[allow(dead_code)]
     config: MergePathsConfig,
 }
 

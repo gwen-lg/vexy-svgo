@@ -8,7 +8,7 @@
 use crate::Plugin;
 use anyhow::Result;
 use std::collections::HashSet;
-use vexy_svgo_core::ast::{Document, Element, Node};
+use vexy_svgo_core::ast::{Document, Element};
 use vexy_svgo_core::visitor::Visitor;
 
 /// Plugin that removes viewBox attribute when possible
@@ -145,7 +145,7 @@ mod tests {
     use super::*;
     use serde_json::json;
     use std::borrow::Cow;
-    use vexy_svgo_core::ast::{Document, Element, Node};
+    use vexy_svgo_core::ast::{Document, Element};
 
     fn create_element(name: &'static str) -> Element<'static> {
         let mut element = Element::new(name);

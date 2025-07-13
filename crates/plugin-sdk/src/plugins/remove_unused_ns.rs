@@ -27,12 +27,14 @@ impl Default for RemoveUnusedNSConfig {
 
 /// Plugin to remove unused namespace declarations
 pub struct RemoveUnusedNSPlugin {
+    #[allow(dead_code)]
     config: RemoveUnusedNSConfig,
 }
 
 impl RemoveUnusedNSPlugin {
     pub fn new() -> Self {
         Self {
+            #[allow(dead_code)]
             config: RemoveUnusedNSConfig::default(),
         }
     }

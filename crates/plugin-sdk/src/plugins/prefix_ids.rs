@@ -14,7 +14,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use vexy_svgo_core::ast::{Document, Element, Node};
 use vexy_svgo_core::collections::REFERENCES_PROPS;
-use indexmap::IndexMap;
 
 /// Configuration for the prefix IDs plugin
 #[derive(Debug, Clone, Serialize, Deserialize)]

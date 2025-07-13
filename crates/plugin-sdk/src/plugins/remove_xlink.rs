@@ -11,7 +11,6 @@ use crate::Plugin;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
 use vexy_svgo_core::ast::{Document, Element, Node};
 
 /// XLink namespace URI

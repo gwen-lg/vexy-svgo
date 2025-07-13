@@ -14,7 +14,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
 use vexy_svgo_core::ast::{Document, Element, Node};
-use indexmap::IndexMap;
 use vexy_svgo_core::collections::COLORS_PROPS;
 
 /// Configuration for the convertOneStopGradients plugin
@@ -30,6 +29,7 @@ impl Default for ConvertOneStopGradientsConfig {
 
 /// Main plugin struct
 pub struct ConvertOneStopGradientsPlugin {
+    #[allow(dead_code)]
     config: ConvertOneStopGradientsConfig,
 }
 

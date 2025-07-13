@@ -9,14 +9,14 @@
 //! - Performance monitoring and metrics
 //! - Plugin hot-reloading (feature gated)
 
-use std::collections::{HashMap, BTreeMap};
+use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{Plugin, PluginError, PluginResult};
+use crate::Plugin;
 
 /// Plugin metadata with extended information
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -419,7 +419,6 @@ impl EnhancedPluginRegistry {
     }
 
     /// Discover and load plugins from search paths
-    #[cfg(feature = "dynamic-loading")]
     pub fn discover_plugins(&self) -> Result<usize> {
         let mut loaded_count = 0;
         
@@ -492,7 +491,6 @@ impl EnhancedPluginRegistry {
         Ok(())
     }
 
-    #[cfg(feature = "dynamic-loading")]
     fn load_plugins_from_path(&self, path: &str) -> Result<usize> {
         // Implementation for dynamic plugin loading
         // This would typically involve:
