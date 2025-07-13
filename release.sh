@@ -110,7 +110,8 @@ fi
 # Update version in Cargo.toml files
 log_info "Updating version in workspace Cargo.toml"
 # Only update the workspace.package.version line, not rust-version or dependency versions
-sed -i.bak "/^\[workspace.package\]/,/^\[/ s/^version = \"[^\"]*\"/version = \"$VERSION\"/" Cargo.toml
+# Use more specific regex to avoid matching rust-version = "..."
+sed -i.bak "/^\[workspace.package\]/,/^\[/ s/^version = \"[0-9.]*\"/version = \"$VERSION\"/" Cargo.toml
 rm Cargo.toml.bak
 
 # Update versions in individual crate Cargo.toml files
@@ -127,9 +128,9 @@ done
 
 # Update workspace dependency versions
 log_info "Updating workspace dependency versions"
-sed -i.bak "s/vexy-svgo-core = { path = \"\.\/crates\/core\", version = \"[^\"]*\" }/vexy-svgo-core = { path = \".\/crates\/core\", version = \"$VERSION\" }/" Cargo.toml
-sed -i.bak "s/vexy-svgo-plugin-sdk = { path = \"\.\/crates\/plugin-sdk\", version = \"[^\"]*\" }/vexy-svgo-plugin-sdk = { path = \".\/crates\/plugin-sdk\", version = \"$VERSION\" }/" Cargo.toml
-sed -i.bak "s/vexy-svgo-test-utils = { path = \"\.\/crates\/test-utils\", version = \"[^\"]*\" }/vexy-svgo-test-utils = { path = \".\/crates\/test-utils\", version = \"$VERSION\" }/" Cargo.toml
+sed -i.bak "s/vexy-svgo-core = { path = \"\.\/crates\/core\", version = \"[0-9.]*\" }/vexy-svgo-core = { path = \".\/crates\/core\", version = \"$VERSION\" }/" Cargo.toml
+sed -i.bak "s/vexy-svgo-plugin-sdk = { path = \"\.\/crates\/plugin-sdk\", version = \"[0-9.]*\" }/vexy-svgo-plugin-sdk = { path = \".\/crates\/plugin-sdk\", version = \"$VERSION\" }/" Cargo.toml
+sed -i.bak "s/vexy-svgo-test-utils = { path = \"\.\/crates\/test-utils\", version = \"[0-9.]*\" }/vexy-svgo-test-utils = { path = \".\/crates\/test-utils\", version = \"$VERSION\" }/" Cargo.toml
 rm Cargo.toml.bak
 
 # Run tests to ensure everything is working

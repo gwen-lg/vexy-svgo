@@ -1,6 +1,6 @@
 [package]
 name = "vexy-svgo-core"
-version = "1.5.1"
+version = "1.0.26"
 description = "Core library for vexy-svgo SVG optimizer"
 
 [package.authors]
