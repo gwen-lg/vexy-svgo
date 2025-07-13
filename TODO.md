@@ -2,25 +2,38 @@
 
 PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.toml
 
-## 0. Critical Fixes (IMMEDIATE - Fix Before Next Build)
+## 0. Release Blockers (IMMEDIATE - Fix Before Release)
 
-### 0.1. Fix Test Build Failure
+### 0.1. Clean Git Working Directory
 
-- [ ] Fix `vexy-svgo-test-utils` compilation error: replace 'svgn' crate reference with 'vexy-svgo'
-- [ ] Search for any remaining 'svgn' references in the codebase
+- [ ] Commit or revert changes to: TODO.md, build.err.txt, dist/vexy-svgo-1.5.1-macos-universal.tar.gz, issues/121.txt
+- [ ] Ensure build artifacts are in .gitignore
 
-### 0.2. Fix Version Inconsistency
+### 0.2. Fix Version Consistency
 
-- [ ] Align version numbers across all crates (currently 1.5.1 vs 1.0.x mismatch)
-- [ ] Update release script to use consistent versioning
+- [ ] Decide on correct version: 1.0.24 or 1.5.1
+- [ ] Update all version references consistently
+- [ ] Fix release script to use correct version (currently trying 1.0.23 -> 1.0.24 but build shows 1.5.1)
 
-### 0.3. Add Missing LICENSE File
+### 0.3. Build Process Issues
 
-- [ ] Create LICENSE file in repository root (Apache-2.0 as specified in Cargo.toml)
+- [ ] WASM build timeout - consider increasing timeout or separating WASM build
+- [ ] Install optional WASM optimization tools (wasm-opt, wasm-snip) - low priority
 
-## 1. Phase 1: Code Cleanup (Immediate)
+## 1. Critical Fixes (Fix Before Next Build)
 
-### 1.1. Remove unused code
+### 1.1. Fix Test Build Failure
+
+- [x] Fix `vexy-svgo-test-utils` compilation error: replace 'svgn' crate reference with 'vexy-svgo'
+- [x] Search for any remaining 'svgn' references in the codebase
+
+### 1.2. Add Missing LICENSE File
+
+- [x] Create LICENSE file in repository root (MIT license already exists)
+
+## 2. Phase 1: Code Cleanup (After Release)
+
+### 2.1. Remove unused code
 
 - [ ] Clean up all unused imports (49 warnings in plugin-sdk)
 - [ ] Remove or implement unused functions
@@ -30,22 +43,22 @@ PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.tom
 - [ ] Remove or use `StreamingState::Error` variant in WASM enhanced.rs
 - [ ] Fix unexpected cfg condition for "dynamic-loading" feature
 
-### 1.2. Fix structural issues
+### 2.2. Fix structural issues
 
 - [ ] Consolidate PluginConfig types into a single, well-designed type
 - [ ] Implement proper plugin cloning or factory pattern
 - [ ] Complete the streaming parser implementation
 
-### 1.3. Improve error handling
+### 2.3. Improve error handling
 
 - [ ] Create typed error enums for different error categories
 - [ ] Replace string errors with proper error types
 - [ ] Add context to errors for better debugging
 - [ ] Implement `std::error::Error` trait for all error types
 
-## 2. Phase 2: Feature Completion (Short-term)
+## 3. Phase 2: Feature Completion (Short-term)
 
-### 2.1. Complete parallel processing
+### 3.1. Complete parallel processing
 
 - [ ] Verify parallel feature implementation
 - [ ] Fix Rayon imports and usage
@@ -53,30 +66,30 @@ PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.tom
 - [ ] Document thread pool configuration
 - [ ] Document performance benefits
 
-### 2.2. Plugin system improvements
+### 3.2. Plugin system improvements
 
 - [ ] Implement plugin factory pattern
 - [ ] Add plugin validation
 - [ ] Create plugin testing framework
 - [ ] Document plugin API
 
-### 2.3. CLI enhancements
+### 3.3. CLI enhancements
 
 - [ ] Add progress indicators for folder processing
 - [ ] Implement proper color output support
 - [ ] Add verbose logging options
 - [ ] Add `--dry-run` option
 
-## 3. Phase 3: Testing & Documentation (Medium-term)
+## 4. Phase 3: Testing & Documentation (Medium-term)
 
-### 3.1. Comprehensive testing
+### 4.1. Comprehensive testing
 
 - [ ] Unit tests for all core functionality (AST, parser, optimizer modules)
 - [ ] Integration tests for CLI
 - [ ] Performance benchmarks
 - [ ] Compatibility tests with SVGO configs
 
-### 3.2. Documentation
+### 4.2. Documentation
 
 - [ ] API documentation for all public types (generate with rustdoc)
 - [ ] Plugin development guide
@@ -84,74 +97,74 @@ PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.tom
 - [ ] Performance tuning guide
 - [ ] Add inline documentation for all public APIs
 
-### 3.3. Examples
+### 4.3. Examples
 
 - [ ] CLI usage examples
 - [ ] Plugin development examples
 - [ ] Integration examples (Node.js, Python, etc.)
 - [ ] Create WebAssembly usage examples
 
-## 4. Phase 4: Performance Optimization (Long-term)
+## 5. Phase 4: Performance Optimization (Long-term)
 
-### 4.1. Memory optimization
+### 5.1. Memory optimization
 
 - [ ] Profile memory usage for large SVG files
 - [ ] Implement memory-efficient parsing strategies (including streaming for very large files)
 - [ ] Add memory usage limits and controls
 - [ ] Optimize AST memory layout
 
-### 4.2. Speed optimization
+### 5.2. Speed optimization
 
 - [ ] Benchmark against SVGO (create comprehensive benchmarks)
 - [ ] Optimize hot paths (profile and optimize)
 - [ ] Implement SIMD optimizations where applicable (for path data)
 - [ ] Add parallel path processing
 
-### 4.3. Streaming improvements
+### 5.3. Streaming improvements
 
 - [ ] Complete streaming parser implementation
 - [ ] Add streaming output support
 - [ ] Implement incremental optimization
 - [ ] Add chunked processing for large files
 
-## 5. Technical Debt Items
+## 6. Technical Debt Items
 
-### 5.1. Build verification
+### 6.1. Build verification
 
 - [ ] Add build verification steps
 - [ ] Create reproducible builds
 
-### 5.2. Import/Export organization
+### 6.2. Import/Export organization
 
 - [ ] Review and reorganize public API exports
 - [ ] Ensure consistent naming conventions
 - [ ] Clean up module structure
 - [ ] Remove duplicate code
 
-### 5.3. Configuration system
+### 6.3. Configuration system
 
 - [ ] Validate configuration loading and merging
 - [ ] Add configuration schema validation
 - [ ] Support for .svgo.config.js compatibility
 - [ ] Add configuration migration tool
 
-## 6. Quality Assurance
+## 7. Quality Assurance
 
-### 6.1. Continuous Integration
+### 7.1. Continuous Integration
 
 - [ ] Set up GitHub Actions for automated testing
 - [ ] Add coverage reporting (with codecov/coveralls)
 - [ ] Implement automated benchmarking
 - [ ] Add cross-platform testing
 
-### 6.2. Code quality tools
+### 7.2. Code quality tools
 
 - [ ] Configure clippy with strict lints
 - [ ] Add rustfmt configuration (with project style)
 - [ ] Set up pre-commit hooks
 - [ ] Add commit message linting
 
-### 6.3. Release process
+### 7.3. Release process
 
 - [ ] Automated version bumping
 - [ ] Changelog generation
@@ -160,7 +173,7 @@ PRIORITY TOP: `release.sh` must not touch `rust-version = "1.58.0"` in Cargo.tom
 - [ ] Create Homebrew formula
 - [ ] Create npm package wrapper
 
-## 7. Nice-to-Have Features
+## 8. Nice-to-Have Features
 
 - [ ] Add SVG validation before optimization
 - [ ] Implement SVG diff tool

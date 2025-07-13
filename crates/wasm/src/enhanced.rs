@@ -454,10 +454,18 @@ impl StreamingOptimizer {
     pub fn finalize(&mut self) -> Result<EnhancedResult, JsError> {
         match &self.state {
             StreamingState::Processing => {
-                let result = optimize_enhanced(&self.buffer, self.config.clone());
-                self.state = StreamingState::Complete;
-                self.buffer.clear(); // Free memory
-                result
+                match optimize_enhanced(&self.buffer, self.config.clone()) {
+                    Ok(result) => {
+                        self.state = StreamingState::Complete;
+                        self.buffer.clear(); // Free memory
+                        Ok(result)
+                    }
+                    Err(e) => {
+                        self.state = StreamingState::Error(e.to_string());
+                        self.buffer.clear(); // Free memory
+                        Err(e)
+                    }
+                }
             }
             StreamingState::Ready => {
                 Err(JsError::new("No data to optimize"))

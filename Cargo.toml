@@ -79,3 +79,47 @@ lto = true
 strip = true
 panic = "abort"
 overflow-checks = false
+
+[workspace.lints.clippy]
+# Deny
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+unimplemented = "deny"
+todo = "deny"
+
+# Warn - Correctness
+correctness = "warn"
+suspicious = "warn"
+complexity = "warn"
+perf = "warn"
+style = "warn"
+pedantic = "warn"
+
+# Warn - Specific lints
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+missing_safety_doc = "warn"
+unsafe_code = "warn"
+missing_const_for_fn = "warn"
+must_use_candidate = "warn"
+pub_enum_variant_names = "warn"
+cast_possible_truncation = "warn"
+cast_sign_loss = "warn"
+cast_possible_wrap = "warn"
+cast_precision_loss = "warn"
+
+# Allow - Acceptable patterns
+module_name_repetitions = "allow"
+struct_excessive_bools = "allow"
+too_many_arguments = "allow"
+type_complexity = "allow"
+too_many_lines = "allow"
+cognitive_complexity = "allow"
+similar_names = "allow"
+
+[workspace.lints.rust]
+missing_docs = "warn"
+unreachable_pub = "warn"
+unused_must_use = "deny"
+rust_2018_idioms = "warn"

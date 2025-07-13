@@ -240,3 +240,32 @@ The Vexy SVGO project has a solid foundation but needs systematic improvements t
 3. **Version Management** (High Priority)
    - Version mismatch between build (1.5.1) and release (1.0.x)
    - Need consistent versioning strategy
+
+## 7. Release Blockers (2025-07-12)
+
+### 7.1. Critical Issues to Fix Before Release
+
+1. **Git Working Directory Must Be Clean**
+   - Files modified: TODO.md, build.err.txt, dist/vexy-svgo-1.5.1-macos-universal.tar.gz, issues/121.txt
+   - Need to either commit or revert these changes before release
+
+2. **Version Consistency**
+   - Cargo.toml shows version 1.5.1
+   - Release script trying to increment from 1.0.23 to 1.0.24
+   - Need to align version numbering across all files
+
+### 7.2. Immediate Action Items
+
+1. **Clean Git Status**
+   - [ ] Review and commit necessary changes
+   - [ ] Ensure all build artifacts are in .gitignore
+
+2. **Fix Version Numbering**
+   - [ ] Decide on correct version (1.0.24 or 1.5.1)
+   - [ ] Update all version references consistently
+   - [ ] Ensure release script uses correct version
+
+3. **Build Process**
+   - [ ] The build.sh script completed successfully
+   - [ ] WASM build started but was cut off (may need timeout increase)
+   - [ ] Consider separating WASM build from main build process
