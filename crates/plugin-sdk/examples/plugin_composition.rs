@@ -8,7 +8,7 @@
 use serde_json::json;
 use std::borrow::Cow;
 use vexy_svgo_core::ast::{Document, Element, Node};
-use vexy_svgo_core::plugin_registry::{PluginConfig, PluginRegistry};
+use vexy_svgo_core::{PluginConfig, PluginRegistry};
 use vexy_svgo_plugin_sdk::{Plugin, plugins::{RemoveCommentsPlugin, RemoveEmptyAttrsPlugin}};
 
 fn main() -> anyhow::Result<()> {
@@ -23,20 +23,18 @@ fn main() -> anyhow::Result<()> {
 
     // Create plugin registry and register plugins
     let mut registry = PluginRegistry::new();
-    registry.register(RemoveCommentsPlugin::new());
-    registry.register(RemoveEmptyAttrsPlugin::new());
+    registry.register("removeComments", || RemoveCommentsPlugin::new());
+    registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
 
     // Configure plugins
     let plugin_configs = vec![
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({"preservePatterns": true}),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeEmptyAttrs".to_string(),
             params: json!({"preserveClass": false, "preserveId": false}),
-            enabled: true,
         },
     ];
 

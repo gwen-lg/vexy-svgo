@@ -413,7 +413,7 @@ mod tests {
         assert_eq!(configs.len(), get_migrated_plugin_names().len());
 
         // Check that we have a config for each plugin name
-        let config_names: Vec<&str> = configs.iter().map(|c| c.name.as_str()).collect();
+        let config_names: Vec<&str> = configs.iter().map(|c| c.name()).collect();
         for plugin_name in get_migrated_plugin_names() {
             assert!(
                 config_names.contains(&plugin_name),

@@ -5,7 +5,7 @@
 use serde_json::json;
 use std::borrow::Cow;
 use vexy_svgo_core::ast::{Document, Element, Node};
-use vexy_svgo_core::plugin_registry::{PluginConfig, PluginRegistry};
+use vexy_svgo_core::{PluginConfig, PluginRegistry};
 use vexy_svgo_plugin_sdk::{Plugin, plugins::{CollapseGroupsPlugin, RemoveCommentsPlugin, RemoveEmptyAttrsPlugin}};
 
 #[test]
@@ -13,9 +13,9 @@ fn test_registry_with_multiple_plugins() {
     let mut registry = PluginRegistry::new();
 
     // Register multiple plugins
-    registry.register(RemoveCommentsPlugin::new());
-    registry.register(RemoveEmptyAttrsPlugin::new());
-    registry.register(CollapseGroupsPlugin::new());
+    registry.register("removeComments", || RemoveCommentsPlugin::new());
+    registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
+    registry.register("collapseGroups", || CollapseGroupsPlugin::new());
 
     // Verify plugins are registered
     assert!(registry.get_plugin("removeComments").is_some());
@@ -33,8 +33,8 @@ fn test_registry_with_multiple_plugins() {
 #[test]
 fn test_plugin_pipeline_execution() {
     let mut registry = PluginRegistry::new();
-    registry.register(RemoveCommentsPlugin::new());
-    registry.register(RemoveEmptyAttrsPlugin::new());
+    registry.register("removeComments", || RemoveCommentsPlugin::new());
+    registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
     registry.register(CollapseGroupsPlugin::new());
 
     // Create test document
@@ -48,15 +48,13 @@ fn test_plugin_pipeline_execution() {
 
     // Configure plugins
     let configs = vec![
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({"preservePatterns": true}),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeEmptyAttrs".to_string(),
             params: json!({}),
-            enabled: true,
         },
     ];
 
@@ -79,24 +77,18 @@ fn test_plugin_pipeline_execution() {
 #[test]
 fn test_disabled_plugins() {
     let mut registry = PluginRegistry::new();
-    registry.register(RemoveCommentsPlugin::new());
-    registry.register(RemoveEmptyAttrsPlugin::new());
+    registry.register("removeComments", || RemoveCommentsPlugin::new());
+    registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
 
     let mut doc = create_complex_test_document();
     let initial_comments = count_comments(&doc.root);
     let initial_empty_attrs = count_empty_attributes(&doc.root);
 
-    // Configure with disabled plugins
+    // Configure with disabled plugins - NOTE: Using empty vec to disable removeComments
     let configs = vec![
-        PluginConfig {
-            name: "removeComments".to_string(),
-            params: json!({}),
-            enabled: false, // Disabled
-        },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeEmptyAttrs".to_string(),
             params: json!({}),
-            enabled: true,
         },
     ];
 
@@ -110,25 +102,23 @@ fn test_disabled_plugins() {
 #[test]
 fn test_plugin_parameter_validation() {
     let mut registry = PluginRegistry::new();
-    registry.register(RemoveCommentsPlugin::new());
+    registry.register("removeComments", || RemoveCommentsPlugin::new());
 
     let mut doc = Document::new();
 
     // Valid parameters should work
-    let valid_config = PluginConfig {
+    let valid_config = PluginConfig::WithParams {
         name: "removeComments".to_string(),
         params: json!({"preservePatterns": true}),
-        enabled: true,
     };
 
     let result = registry.apply_plugin(&mut doc, &valid_config);
     assert!(result.is_ok());
 
     // Invalid parameters should fail
-    let invalid_config = PluginConfig {
+    let invalid_config = PluginConfig::WithParams {
         name: "removeComments".to_string(),
         params: json!({"preservePatterns": "invalid"}),
-        enabled: true,
     };
 
     let result = registry.apply_plugin(&mut doc, &invalid_config);
@@ -140,10 +130,9 @@ fn test_nonexistent_plugin() {
     let registry = PluginRegistry::new();
     let mut doc = Document::new();
 
-    let config = PluginConfig {
+    let config = PluginConfig::WithParams {
         name: "nonexistentPlugin".to_string(),
         params: json!({}),
-        enabled: true,
     };
 
     // Should succeed but do nothing for nonexistent plugins
@@ -154,8 +143,8 @@ fn test_nonexistent_plugin() {
 #[test]
 fn test_plugin_order_matters() {
     let mut registry = PluginRegistry::new();
-    registry.register(RemoveCommentsPlugin::with_preserve_patterns(false));
-    registry.register(RemoveEmptyAttrsPlugin::new());
+    registry.register("removeComments", || RemoveCommentsPlugin::with_preserve_patterns(false));
+    registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
 
     // Create two identical documents
     let mut doc1 = create_complex_test_document();
@@ -163,28 +152,24 @@ fn test_plugin_order_matters() {
 
     // Apply plugins in different orders
     let configs1 = vec![
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({}),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeEmptyAttrs".to_string(),
             params: json!({}),
-            enabled: true,
         },
     ];
 
     let configs2 = vec![
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeEmptyAttrs".to_string(),
             params: json!({}),
-            enabled: true,
         },
-        PluginConfig {
+        PluginConfig::WithParams {
             name: "removeComments".to_string(),
             params: json!({}),
-            enabled: true,
         },
     ];
 
