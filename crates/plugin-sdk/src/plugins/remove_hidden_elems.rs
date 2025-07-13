@@ -138,7 +138,7 @@ impl RemoveHiddenElemsPlugin {
     }
 
     /// Parse configuration from JSON
-    fn parse_config(params: &Value) -> Result<RemoveHiddenElemsConfig> {
+    fn _parse_config(params: &Value) -> Result<RemoveHiddenElemsConfig> {
         if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
                 .map_err(|e| anyhow!("Invalid configuration: {}", e))
@@ -596,7 +596,7 @@ mod tests {
 
     #[test]
     fn test_config_parsing() {
-        let config = RemoveHiddenElemsPlugin::parse_config(&json!({
+        let config = RemoveHiddenElemsPlugin::_parse_config(&json!({
             "displayNone": false,
             "opacity0": true,
             "circleR0": false,

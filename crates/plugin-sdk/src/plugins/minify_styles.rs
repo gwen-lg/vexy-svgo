@@ -119,7 +119,7 @@ impl MinifyStylesPlugin {
     }
 
     /// Check if an element contains scripts
-    fn has_scripts(&self, element: &Element) -> bool {
+    fn _has_scripts(&self, element: &Element) -> bool {
         // Check if it's a script element
         if element.name == "script" && !element.children.is_empty() {
             return true;
@@ -162,7 +162,7 @@ impl MinifyStylesPlugin {
     }
 
     /// Collect usage information from the document
-    fn collect_usage(
+    fn _collect_usage(
         &self,
         element: &Element,
     ) -> (HashSet<String>, HashSet<String>, HashSet<String>) {
@@ -170,13 +170,13 @@ impl MinifyStylesPlugin {
         let mut ids = HashSet::new();
         let mut classes = HashSet::new();
 
-        self.collect_usage_recursive(element, &mut tags, &mut ids, &mut classes);
+        self._collect_usage_recursive(element, &mut tags, &mut ids, &mut classes);
 
         (tags, ids, classes)
     }
 
     /// Recursively collect usage information
-    fn collect_usage_recursive(
+    fn _collect_usage_recursive(
         &self,
         element: &Element,
         tags: &mut HashSet<String>,
@@ -201,21 +201,21 @@ impl MinifyStylesPlugin {
         // Process children
         for child in &element.children {
             if let Node::Element(child_elem) = child {
-                self.collect_usage_recursive(child_elem, tags, ids, classes);
+                self._collect_usage_recursive(child_elem, tags, ids, classes);
             }
         }
     }
 
     /// Check if the document is deoptimized (contains scripts)
-    fn is_deoptimized(&self, element: &Element) -> bool {
-        if self.has_scripts(element) {
+    fn _is_deoptimized(&self, element: &Element) -> bool {
+        if self._has_scripts(element) {
             return true;
         }
 
         // Check children recursively
         for child in &element.children {
             if let Node::Element(child_elem) = child {
-                if self.is_deoptimized(child_elem) {
+                if self._is_deoptimized(child_elem) {
                     return true;
                 }
             }
@@ -416,11 +416,11 @@ mod tests {
         button
             .attributes
             .insert("onclick".to_string(), "alert('test')".to_string());
-        assert!(plugin.has_scripts(&button));
+        assert!(plugin._has_scripts(&button));
 
         // Test normal element
         let div = create_element("div");
-        assert!(!plugin.has_scripts(&div));
+        assert!(!plugin._has_scripts(&div));
     }
 
     #[test]
@@ -442,7 +442,7 @@ mod tests {
         div.children.push(Node::Element(span));
         doc.root.children.push(Node::Element(div));
 
-        let (tags, ids, classes) = plugin.collect_usage(&doc.root);
+        let (tags, ids, classes) = plugin._collect_usage(&doc.root);
 
         assert!(tags.contains("div"));
         assert!(tags.contains("span"));

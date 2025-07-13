@@ -51,7 +51,7 @@ impl RemoveDoctypePlugin {
     }
 
     /// Parse configuration from JSON
-    fn parse_config(params: &Value) -> Result<RemoveDoctypeConfig> {
+    fn _parse_config(params: &Value) -> Result<RemoveDoctypeConfig> {
         if params.is_object() {
             serde_json::from_value(params.clone())
                 .map_err(|e| anyhow::anyhow!("Invalid configuration: {}", e))
@@ -216,7 +216,7 @@ mod tests {
 
     #[test]
     fn test_config_parsing() {
-        let config = RemoveDoctypePlugin::parse_config(&json!({})).unwrap();
+        let config = RemoveDoctypePlugin::_parse_config(&json!({})).unwrap();
         // No fields to check since config is empty
         let _ = config;
     }

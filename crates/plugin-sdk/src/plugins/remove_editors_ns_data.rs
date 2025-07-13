@@ -86,7 +86,7 @@ impl RemoveEditorsNSDataPlugin {
     }
 
     /// Parse configuration from JSON
-    fn parse_config(params: &Value) -> Result<RemoveEditorsNSDataConfig> {
+    fn _parse_config(params: &Value) -> Result<RemoveEditorsNSDataConfig> {
         if let Some(_obj) = params.as_object() {
             serde_json::from_value(params.clone())
                 .map_err(|e| anyhow!("Invalid configuration: {}", e))
@@ -507,7 +507,7 @@ mod tests {
 
     #[test]
     fn test_config_parsing() {
-        let config = RemoveEditorsNSDataPlugin::parse_config(&json!({
+        let config = RemoveEditorsNSDataPlugin::_parse_config(&json!({
             "additionalNamespaces": ["http://example.com/ns1", "http://example.com/ns2"]
         }))
         .unwrap();

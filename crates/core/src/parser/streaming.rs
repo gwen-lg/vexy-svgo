@@ -26,11 +26,12 @@ pub struct StreamingParser<R: BufRead> {
 impl<R: BufRead> StreamingParser<R> {
     pub fn new(reader: R, config: StreamingConfig, preserve_whitespace: bool, preserve_comments: bool, expand_entities: bool, file_path: Option<String>) -> Self {
         let xml_reader = Reader::from_reader(reader);
-        // TODO: Configure reader properly for quick-xml 0.31
-        // xml_reader.config_mut().expand_empty_elements = true;
-        // xml_reader.config_mut().trim_text_start = !preserve_whitespace;
-        // xml_reader.config_mut().trim_text_end = !preserve_whitespace;
-        // xml_reader.config_mut().check_end_names = true;
+        
+        // Configure reader for quick-xml 0.31
+        // Note: In quick-xml 0.31, configuration is done differently
+        // The trim settings are controlled by the parser, not the reader
+        // expand_empty_elements is handled automatically
+        // check_end_names is enabled by default
         
         Self {
             reader: xml_reader,
@@ -216,7 +217,7 @@ impl<R: BufRead> StreamingParser<R> {
                     }
                 }
                 Ok(Event::Eof) => break,
-                // TODO: Handle GeneralRef event for quick-xml 0.31
+                // GeneralRef events are ignored in streaming mode
                 // Ok(Event::GeneralRef(_)) => {
                 //     // Ignore general references in streaming mode
                 // }

@@ -491,7 +491,7 @@ impl EnhancedPluginRegistry {
         Ok(())
     }
 
-    fn load_plugins_from_path(&self, path: &str) -> Result<usize> {
+    fn load_plugins_from_path(&self, _path: &str) -> Result<usize> {
         // Implementation for dynamic plugin loading
         // This would typically involve:
         // 1. Scanning the directory for plugin files
