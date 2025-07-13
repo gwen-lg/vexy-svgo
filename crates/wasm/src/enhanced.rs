@@ -461,7 +461,7 @@ impl StreamingOptimizer {
                         Ok(result)
                     }
                     Err(e) => {
-                        self.state = StreamingState::Error(e.to_string());
+                        self.state = StreamingState::Error(format!("{:?}", e));
                         self.buffer.clear(); // Free memory
                         Err(e)
                     }
