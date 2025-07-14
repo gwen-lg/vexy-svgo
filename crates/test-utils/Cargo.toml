@@ -6,7 +6,7 @@ name = "vexy-svgo-test-utils"
 description = "Shared testing utilities for vexy-svgo"
 
 
-version = "1.0.30"
+version = "1.0.31"
 
 
 [package.edition]

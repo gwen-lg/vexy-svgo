@@ -181,16 +181,16 @@ mod tests {
         let mut ellipse = create_element("ellipse");
         ellipse
             .attributes
-            .insert("rx".to_string(), "10".to_string());
+            .insert("rx".into(), "10".into());
         ellipse
             .attributes
-            .insert("ry".to_string(), "10".to_string());
+            .insert("ry".into(), "10".into());
         ellipse
             .attributes
-            .insert("cx".to_string(), "50".to_string());
+            .insert("cx".into(), "50".into());
         ellipse
             .attributes
-            .insert("cy".to_string(), "50".to_string());
+            .insert("cy".into(), "50".into());
         doc.root.children.push(Node::Element(ellipse));
 
         // Apply plugin
@@ -203,9 +203,9 @@ mod tests {
         // Check attributes
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.name, "circle");
-            assert_eq!(elem.attributes.get("r"), Some(&"10".to_string()));
-            assert_eq!(elem.attributes.get("cx"), Some(&"50".to_string()));
-            assert_eq!(elem.attributes.get("cy"), Some(&"50".to_string()));
+            assert_eq!(elem.attributes.get("r"), Some(&"10".into()));
+            assert_eq!(elem.attributes.get("cx"), Some(&"50".into()));
+            assert_eq!(elem.attributes.get("cy"), Some(&"50".into()));
             assert!(!elem.attributes.contains_key("rx"));
             assert!(!elem.attributes.contains_key("ry"));
         }
@@ -220,10 +220,10 @@ mod tests {
         let mut ellipse = create_element("ellipse");
         ellipse
             .attributes
-            .insert("rx".to_string(), "auto".to_string());
+            .insert("rx".into(), "auto".into());
         ellipse
             .attributes
-            .insert("ry".to_string(), "15".to_string());
+            .insert("ry".into(), "15".into());
         doc.root.children.push(Node::Element(ellipse));
 
         // Apply plugin
@@ -236,7 +236,7 @@ mod tests {
         // Check attributes
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.name, "circle");
-            assert_eq!(elem.attributes.get("r"), Some(&"15".to_string()));
+            assert_eq!(elem.attributes.get("r"), Some(&"15".into()));
             assert!(!elem.attributes.contains_key("rx"));
             assert!(!elem.attributes.contains_key("ry"));
         }
@@ -251,10 +251,10 @@ mod tests {
         let mut ellipse = create_element("ellipse");
         ellipse
             .attributes
-            .insert("rx".to_string(), "20".to_string());
+            .insert("rx".into(), "20".into());
         ellipse
             .attributes
-            .insert("ry".to_string(), "auto".to_string());
+            .insert("ry".into(), "auto".into());
         doc.root.children.push(Node::Element(ellipse));
 
         // Apply plugin
@@ -267,7 +267,7 @@ mod tests {
         // Check attributes
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.name, "circle");
-            assert_eq!(elem.attributes.get("r"), Some(&"20".to_string()));
+            assert_eq!(elem.attributes.get("r"), Some(&"20".into()));
             assert!(!elem.attributes.contains_key("rx"));
             assert!(!elem.attributes.contains_key("ry"));
         }
@@ -282,10 +282,10 @@ mod tests {
         let mut ellipse = create_element("ellipse");
         ellipse
             .attributes
-            .insert("rx".to_string(), "10".to_string());
+            .insert("rx".into(), "10".into());
         ellipse
             .attributes
-            .insert("ry".to_string(), "20".to_string());
+            .insert("ry".into(), "20".into());
         doc.root.children.push(Node::Element(ellipse));
 
         // Apply plugin
@@ -298,8 +298,8 @@ mod tests {
         // Check attributes unchanged
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.name, "ellipse");
-            assert_eq!(elem.attributes.get("rx"), Some(&"10".to_string()));
-            assert_eq!(elem.attributes.get("ry"), Some(&"20".to_string()));
+            assert_eq!(elem.attributes.get("rx"), Some(&"10".into()));
+            assert_eq!(elem.attributes.get("ry"), Some(&"20".into()));
         }
     }
 
@@ -322,7 +322,7 @@ mod tests {
         // Check attributes
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.name, "circle");
-            assert_eq!(elem.attributes.get("r"), Some(&"0".to_string()));
+            assert_eq!(elem.attributes.get("r"), Some(&"0".into()));
         }
     }
 
@@ -333,7 +333,7 @@ mod tests {
 
         // Create ellipse with only rx (ry defaults to 0)
         let mut ellipse = create_element("ellipse");
-        ellipse.attributes.insert("rx".to_string(), "0".to_string());
+        ellipse.attributes.insert("rx".into(), "0".into());
         doc.root.children.push(Node::Element(ellipse));
 
         // Apply plugin
@@ -346,7 +346,7 @@ mod tests {
         // Check attributes
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.name, "circle");
-            assert_eq!(elem.attributes.get("r"), Some(&"0".to_string()));
+            assert_eq!(elem.attributes.get("r"), Some(&"0".into()));
         }
     }
 
@@ -362,20 +362,20 @@ mod tests {
         let mut ellipse1 = create_element("ellipse");
         ellipse1
             .attributes
-            .insert("rx".to_string(), "5".to_string());
+            .insert("rx".into(), "5".into());
         ellipse1
             .attributes
-            .insert("ry".to_string(), "5".to_string());
+            .insert("ry".into(), "5".into());
         group.children.push(Node::Element(ellipse1));
 
         // Ellipse that should remain unchanged
         let mut ellipse2 = create_element("ellipse");
         ellipse2
             .attributes
-            .insert("rx".to_string(), "5".to_string());
+            .insert("rx".into(), "5".into());
         ellipse2
             .attributes
-            .insert("ry".to_string(), "10".to_string());
+            .insert("ry".into(), "10".into());
         group.children.push(Node::Element(ellipse2));
 
         doc.root.children.push(Node::Element(group));

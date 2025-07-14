@@ -3,7 +3,7 @@ name = "vexy-svgo-plugin-sdk"
 description = "Plugin development SDK for vexy-svgo SVG optimizer"
 
 
-version = "1.0.30"
+version = "1.0.31"
 
 
 [package.edition]
