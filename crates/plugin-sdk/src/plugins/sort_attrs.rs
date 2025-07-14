@@ -268,11 +268,11 @@ mod tests {
         // Create element with attributes in random order
         let mut rect = create_element("rect");
         rect.attributes
-            .insert("height".to_string(), "100".to_string());
-        rect.attributes.insert("id".to_string(), "test".to_string());
+            .insert("height".into(), "100".into());
+        rect.attributes.insert("id".into(), "test".into());
         rect.attributes
-            .insert("width".to_string(), "200".to_string());
-        rect.attributes.insert("x".to_string(), "10".to_string());
+            .insert("width".into(), "200".into());
+        rect.attributes.insert("x".into(), "10".into());
         doc.root.children.push(Node::Element(rect));
 
         // Apply plugin
@@ -280,7 +280,7 @@ mod tests {
 
         // Check that attributes are sorted according to default order
         if let Node::Element(elem) = &doc.root.children[0] {
-            let attr_names: Vec<&String> = elem.attributes.keys().collect();
+            let attr_names: Vec<&str> = elem.attributes.keys().map(|k| k.as_ref()).collect();
             // id should come first, then width, height, x
             assert_eq!(attr_names.len(), 4);
             // Note: HashMap iteration order is not guaranteed, but we can check the comparison logic
@@ -295,16 +295,16 @@ mod tests {
         // Create element with xmlns attributes
         let mut svg = create_element("svg");
         svg.attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert("width".into(), "100".into());
         svg.attributes.insert(
-            "xmlns:xlink".to_string(),
-            "http://www.w3.org/1999/xlink".to_string(),
+            "xmlns:xlink".into(),
+            "http://www.w3.org/1999/xlink".into(),
         );
         svg.attributes.insert(
-            "xmlns".to_string(),
-            "http://www.w3.org/2000/svg".to_string(),
+            "xmlns".into(),
+            "http://www.w3.org/2000/svg".into(),
         );
-        svg.attributes.insert("id".to_string(), "test".to_string());
+        svg.attributes.insert("id".into(), "test".into());
         doc.root.children.push(Node::Element(svg));
 
         // Apply plugin
@@ -313,7 +313,7 @@ mod tests {
         // Check that xmlns attributes are sorted to front
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(elem.attributes.len(), 4);
-            let attr_names: Vec<&String> = elem.attributes.keys().collect();
+            let attr_names: Vec<&str> = elem.attributes.keys().map(|k| k.as_ref()).collect();
             // xmlns should come first, then xmlns:xlink, then id, then width
             assert_eq!(attr_names[0], "xmlns");
             assert_eq!(attr_names[1], "xmlns:xlink");
@@ -331,11 +331,11 @@ mod tests {
         // Create element with attributes not in default order
         let mut rect = create_element("rect");
         rect.attributes
-            .insert("z-index".to_string(), "1".to_string());
+            .insert("z-index".into(), "1".into());
         rect.attributes
-            .insert("data-custom".to_string(), "value".to_string());
+            .insert("data-custom".into(), "value".into());
         rect.attributes
-            .insert("aria-label".to_string(), "button".to_string());
+            .insert("aria-label".into(), "button".into());
         doc.root.children.push(Node::Element(rect));
 
         // Apply plugin
@@ -359,11 +359,11 @@ mod tests {
 
         // Create element with attributes
         let mut rect = create_element("rect");
-        rect.attributes.insert("id".to_string(), "test".to_string());
+        rect.attributes.insert("id".into(), "test".into());
         rect.attributes
-            .insert("height".to_string(), "100".to_string());
+            .insert("height".into(), "100".into());
         rect.attributes
-            .insert("width".to_string(), "200".to_string());
+            .insert("width".into(), "200".into());
         doc.root.children.push(Node::Element(rect));
 
         // Apply plugin
@@ -384,13 +384,13 @@ mod tests {
         // Create element with hyphenated attributes
         let mut rect = create_element("rect");
         rect.attributes
-            .insert("fill-opacity".to_string(), "0.5".to_string());
+            .insert("fill-opacity".into(), "0.5".into());
         rect.attributes
-            .insert("fill".to_string(), "red".to_string());
+            .insert("fill".into(), "red".into());
         rect.attributes
-            .insert("stroke-width".to_string(), "2".to_string());
+            .insert("stroke-width".into(), "2".into());
         rect.attributes
-            .insert("stroke".to_string(), "blue".to_string());
+            .insert("stroke".into(), "blue".into());
         doc.root.children.push(Node::Element(rect));
 
         // Apply plugin
@@ -412,17 +412,17 @@ mod tests {
         let mut group = create_element("g");
         group
             .attributes
-            .insert("transform".to_string(), "translate(10,20)".to_string());
+            .insert("transform".into(), "translate(10,20)".into());
         group
             .attributes
-            .insert("id".to_string(), "group1".to_string());
+            .insert("id".into(), "group1".into());
 
         let mut rect = create_element("rect");
         rect.attributes
-            .insert("height".to_string(), "100".to_string());
+            .insert("height".into(), "100".into());
         rect.attributes
-            .insert("width".to_string(), "200".to_string());
-        rect.attributes.insert("x".to_string(), "10".to_string());
+            .insert("width".into(), "200".into());
+        rect.attributes.insert("x".into(), "10".into());
 
         group.children.push(Node::Element(rect));
         doc.root.children.push(Node::Element(group));
