@@ -2260,7 +2260,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vexy-svgo-benchmarks"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "criterion",
  "vexy-svgo-core",
@@ -2268,7 +2268,7 @@ dependencies = [
 
 [[package]]
 name = "vexy-svgo-cli"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -2290,7 +2290,7 @@ dependencies = [
 
 [[package]]
 name = "vexy-svgo-core"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "anyhow",
  "indexmap 2.10.0",
@@ -2311,7 +2311,7 @@ dependencies = [
 
 [[package]]
 name = "vexy-svgo-ffi"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "anyhow",
  "cbindgen",
@@ -2322,7 +2322,7 @@ dependencies = [
 
 [[package]]
 name = "vexy-svgo-plugin-sdk"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "anyhow",
  "cssparser 0.35.0",
@@ -2344,7 +2344,7 @@ dependencies = [
 
 [[package]]
 name = "vexy-svgo-test-utils"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "serde",
  "serde_json",
@@ -2355,7 +2355,7 @@ dependencies = [
 
 [[package]]
 name = "vexy-svgo-wasm"
-version = "1.0.29"
+version = "1.0.30"
 dependencies = [
  "getrandom 0.2.16",
  "js-sys",

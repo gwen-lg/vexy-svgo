@@ -397,18 +397,18 @@ mod tests {
         let mut rect1 = create_element("rect");
         rect1
             .attributes
-            .insert("display".to_string(), "none".to_string());
+            .insert("display".into(), "none".into());
         rect1
             .attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert("width".into(), "100".into());
 
         let mut rect2 = create_element("rect");
         rect2
             .attributes
-            .insert("display".to_string(), "block".to_string());
+            .insert("display".into(), "block".into());
         rect2
             .attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert("width".into(), "100".into());
 
         doc.root.children.push(Node::Element(rect1));
         doc.root.children.push(Node::Element(rect2));
@@ -431,17 +431,17 @@ mod tests {
         let mut rect1 = create_element("rect");
         rect1
             .attributes
-            .insert("visibility".to_string(), "hidden".to_string());
+            .insert("visibility".into(), "hidden".into());
 
         let mut rect2 = create_element("rect");
         rect2
             .attributes
-            .insert("visibility".to_string(), "collapse".to_string());
+            .insert("visibility".into(), "collapse".into());
 
         let mut rect3 = create_element("rect");
         rect3
             .attributes
-            .insert("visibility".to_string(), "visible".to_string());
+            .insert("visibility".into(), "visible".into());
 
         doc.root.children.push(Node::Element(rect1));
         doc.root.children.push(Node::Element(rect2));
@@ -468,17 +468,17 @@ mod tests {
         let mut rect1 = create_element("rect");
         rect1
             .attributes
-            .insert("opacity".to_string(), "0".to_string());
+            .insert("opacity".into(), "0".into());
 
         let mut rect2 = create_element("rect");
         rect2
             .attributes
-            .insert("opacity".to_string(), "0.0".to_string());
+            .insert("opacity".into(), "0.0".into());
 
         let mut rect3 = create_element("rect");
         rect3
             .attributes
-            .insert("opacity".to_string(), "0.5".to_string());
+            .insert("opacity".into(), "0.5".into());
 
         doc.root.children.push(Node::Element(rect1));
         doc.root.children.push(Node::Element(rect2));
@@ -500,10 +500,10 @@ mod tests {
 
         // Add circles with different radii
         let mut circle1 = create_element("circle");
-        circle1.attributes.insert("r".to_string(), "0".to_string());
+        circle1.attributes.insert("r".into(), "0".into());
 
         let mut circle2 = create_element("circle");
-        circle2.attributes.insert("r".to_string(), "10".to_string());
+        circle2.attributes.insert("r".into(), "10".into());
 
         doc.root.children.push(Node::Element(circle1));
         doc.root.children.push(Node::Element(circle2));
@@ -526,26 +526,26 @@ mod tests {
         let mut rect1 = create_element("rect");
         rect1
             .attributes
-            .insert("width".to_string(), "0".to_string());
+            .insert("width".into(), "0".into());
         rect1
             .attributes
-            .insert("height".to_string(), "100".to_string());
+            .insert("height".into(), "100".into());
 
         let mut rect2 = create_element("rect");
         rect2
             .attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert("width".into(), "100".into());
         rect2
             .attributes
-            .insert("height".to_string(), "0".to_string());
+            .insert("height".into(), "0".into());
 
         let mut rect3 = create_element("rect");
         rect3
             .attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert("width".into(), "100".into());
         rect3
             .attributes
-            .insert("height".to_string(), "100".to_string());
+            .insert("height".into(), "100".into());
 
         doc.root.children.push(Node::Element(rect1));
         doc.root.children.push(Node::Element(rect2));
@@ -568,15 +568,15 @@ mod tests {
 
         // Add paths with different d attributes
         let mut path1 = create_element("path");
-        path1.attributes.insert("d".to_string(), "".to_string());
+        path1.attributes.insert("d".into(), "".into());
 
         let mut path2 = create_element("path");
-        path2.attributes.insert("d".to_string(), "   ".to_string());
+        path2.attributes.insert("d".into(), "   ".into());
 
         let mut path3 = create_element("path");
         path3
             .attributes
-            .insert("d".to_string(), "M10 10 L20 20".to_string());
+            .insert("d".into(), "M10 10 L20 20".into());
 
         let path4 = create_element("path"); // No d attribute
 
@@ -617,16 +617,16 @@ mod tests {
 
         // Add lines with same start/end points
         let mut line1 = create_element("line");
-        line1.attributes.insert("x1".to_string(), "10".to_string());
-        line1.attributes.insert("y1".to_string(), "10".to_string());
-        line1.attributes.insert("x2".to_string(), "10".to_string());
-        line1.attributes.insert("y2".to_string(), "10".to_string());
+        line1.attributes.insert("x1".into(), "10".into());
+        line1.attributes.insert("y1".into(), "10".into());
+        line1.attributes.insert("x2".into(), "10".into());
+        line1.attributes.insert("y2".into(), "10".into());
 
         let mut line2 = create_element("line");
-        line2.attributes.insert("x1".to_string(), "10".to_string());
-        line2.attributes.insert("y1".to_string(), "10".to_string());
-        line2.attributes.insert("x2".to_string(), "20".to_string());
-        line2.attributes.insert("y2".to_string(), "20".to_string());
+        line2.attributes.insert("x1".into(), "10".into());
+        line2.attributes.insert("y1".into(), "10".into());
+        line2.attributes.insert("x2".into(), "20".into());
+        line2.attributes.insert("y2".into(), "20".into());
 
         doc.root.children.push(Node::Element(line1));
         doc.root.children.push(Node::Element(line2));
@@ -654,12 +654,12 @@ mod tests {
         let mut rect1 = create_element("rect");
         rect1
             .attributes
-            .insert("display".to_string(), "none".to_string());
+            .insert("display".into(), "none".into());
 
         let mut rect2 = create_element("rect");
         rect2
             .attributes
-            .insert("opacity".to_string(), "0".to_string());
+            .insert("opacity".into(), "0".into());
 
         doc.root.children.push(Node::Element(rect1));
         doc.root.children.push(Node::Element(rect2));

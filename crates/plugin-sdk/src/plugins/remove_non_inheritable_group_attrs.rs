@@ -311,13 +311,13 @@ mod tests {
         // These should be removed (presentation, non-inheritable, not group-allowed)
         group
             .attributes
-            .insert("alignment-baseline".to_string(), "central".to_string());
+            .insert("alignment-baseline".into(), "central".into());
         group
             .attributes
-            .insert("baseline-shift".to_string(), "10px".to_string());
+            .insert("baseline-shift".into(), "10px".into());
         group
             .attributes
-            .insert("lighting-color".to_string(), "red".to_string());
+            .insert("lighting-color".into(), "red".into());
         doc.root.children.push(Node::Element(group));
 
         // Apply plugin
@@ -341,16 +341,16 @@ mod tests {
         // These should be preserved (presentation and inheritable)
         group
             .attributes
-            .insert("fill".to_string(), "red".to_string());
+            .insert("fill".into(), "red".into());
         group
             .attributes
-            .insert("stroke".to_string(), "blue".to_string());
+            .insert("stroke".into(), "blue".into());
         group
             .attributes
-            .insert("font-family".to_string(), "Arial".to_string());
+            .insert("font-family".into(), "Arial".into());
         group
             .attributes
-            .insert("color".to_string(), "green".to_string());
+            .insert("color".into(), "green".into());
         doc.root.children.push(Node::Element(group));
 
         // Apply plugin
@@ -358,13 +358,13 @@ mod tests {
 
         // Check that inheritable attributes were preserved
         if let Node::Element(elem) = &doc.root.children[0] {
-            assert_eq!(elem.attributes.get("fill"), Some(&"red".to_string()));
-            assert_eq!(elem.attributes.get("stroke"), Some(&"blue".to_string()));
+            assert_eq!(elem.attributes.get("fill"), Some(&"red".into()));
+            assert_eq!(elem.attributes.get("stroke"), Some(&"blue".into()));
             assert_eq!(
                 elem.attributes.get("font-family"),
-                Some(&"Arial".to_string())
+                Some(&"Arial".into())
             );
-            assert_eq!(elem.attributes.get("color"), Some(&"green".to_string()));
+            assert_eq!(elem.attributes.get("color"), Some(&"green".into()));
         }
     }
 
@@ -378,16 +378,16 @@ mod tests {
         // These should be preserved (non-inheritable but allowed on groups)
         group
             .attributes
-            .insert("opacity".to_string(), "0.5".to_string());
+            .insert("opacity".into(), "0.5".into());
         group
             .attributes
-            .insert("transform".to_string(), "translate(10,20)".to_string());
+            .insert("transform".into(), "translate(10,20)".into());
         group
             .attributes
-            .insert("clip-path".to_string(), "url(#clip)".to_string());
+            .insert("clip-path".into(), "url(#clip)".into());
         group
             .attributes
-            .insert("filter".to_string(), "url(#filter)".to_string());
+            .insert("filter".into(), "url(#filter)".into());
         doc.root.children.push(Node::Element(group));
 
         // Apply plugin
@@ -395,18 +395,18 @@ mod tests {
 
         // Check that allowed group attributes were preserved
         if let Node::Element(elem) = &doc.root.children[0] {
-            assert_eq!(elem.attributes.get("opacity"), Some(&"0.5".to_string()));
+            assert_eq!(elem.attributes.get("opacity"), Some(&"0.5".into()));
             assert_eq!(
                 elem.attributes.get("transform"),
-                Some(&"translate(10,20)".to_string())
+                Some(&"translate(10,20)".into())
             );
             assert_eq!(
                 elem.attributes.get("clip-path"),
-                Some(&"url(#clip)".to_string())
+                Some(&"url(#clip)".into())
             );
             assert_eq!(
                 elem.attributes.get("filter"),
-                Some(&"url(#filter)".to_string())
+                Some(&"url(#filter)".into())
             );
         }
     }
@@ -421,13 +421,13 @@ mod tests {
         // These should be preserved (not presentation attributes)
         group
             .attributes
-            .insert("id".to_string(), "mygroup".to_string());
+            .insert("id".into(), "mygroup".into());
         group
             .attributes
-            .insert("class".to_string(), "groupclass".to_string());
+            .insert("class".into(), "groupclass".into());
         group
             .attributes
-            .insert("data-custom".to_string(), "value".to_string());
+            .insert("data-custom".into(), "value".into());
         doc.root.children.push(Node::Element(group));
 
         // Apply plugin
@@ -435,14 +435,14 @@ mod tests {
 
         // Check that non-presentation attributes were preserved
         if let Node::Element(elem) = &doc.root.children[0] {
-            assert_eq!(elem.attributes.get("id"), Some(&"mygroup".to_string()));
+            assert_eq!(elem.attributes.get("id"), Some(&"mygroup".into()));
             assert_eq!(
                 elem.attributes.get("class"),
-                Some(&"groupclass".to_string())
+                Some(&"groupclass".into())
             );
             assert_eq!(
                 elem.attributes.get("data-custom"),
-                Some(&"value".to_string())
+                Some(&"value".into())
             );
         }
     }
@@ -455,9 +455,9 @@ mod tests {
         // Create non-group element with non-inheritable attributes
         let mut rect = create_element("rect");
         rect.attributes
-            .insert("alignment-baseline".to_string(), "central".to_string());
+            .insert("alignment-baseline".into(), "central".into());
         rect.attributes
-            .insert("baseline-shift".to_string(), "10px".to_string());
+            .insert("baseline-shift".into(), "10px".into());
         doc.root.children.push(Node::Element(rect));
 
         // Apply plugin
@@ -467,11 +467,11 @@ mod tests {
         if let Node::Element(elem) = &doc.root.children[0] {
             assert_eq!(
                 elem.attributes.get("alignment-baseline"),
-                Some(&"central".to_string())
+                Some(&"central".into())
             );
             assert_eq!(
                 elem.attributes.get("baseline-shift"),
-                Some(&"10px".to_string())
+                Some(&"10px".into())
             );
         }
     }
@@ -486,25 +486,25 @@ mod tests {
         // Should be removed
         group
             .attributes
-            .insert("alignment-baseline".to_string(), "central".to_string());
+            .insert("alignment-baseline".into(), "central".into());
         group
             .attributes
-            .insert("stop-color".to_string(), "red".to_string());
+            .insert("stop-color".into(), "red".into());
         // Should be preserved (inheritable)
         group
             .attributes
-            .insert("fill".to_string(), "blue".to_string());
+            .insert("fill".into(), "blue".into());
         group
             .attributes
-            .insert("stroke".to_string(), "green".to_string());
+            .insert("stroke".into(), "green".into());
         // Should be preserved (allowed group attribute)
         group
             .attributes
-            .insert("opacity".to_string(), "0.8".to_string());
+            .insert("opacity".into(), "0.8".into());
         // Should be preserved (non-presentation)
         group
             .attributes
-            .insert("id".to_string(), "test".to_string());
+            .insert("id".into(), "test".into());
         doc.root.children.push(Node::Element(group));
 
         // Apply plugin
@@ -516,10 +516,10 @@ mod tests {
             assert!(!elem.attributes.contains_key("stop-color"));
 
             // Preserved attributes
-            assert_eq!(elem.attributes.get("fill"), Some(&"blue".to_string()));
-            assert_eq!(elem.attributes.get("stroke"), Some(&"green".to_string()));
-            assert_eq!(elem.attributes.get("opacity"), Some(&"0.8".to_string()));
-            assert_eq!(elem.attributes.get("id"), Some(&"test".to_string()));
+            assert_eq!(elem.attributes.get("fill"), Some(&"blue".into()));
+            assert_eq!(elem.attributes.get("stroke"), Some(&"green".into()));
+            assert_eq!(elem.attributes.get("opacity"), Some(&"0.8".into()));
+            assert_eq!(elem.attributes.get("id"), Some(&"test".into()));
         }
     }
 
@@ -532,18 +532,18 @@ mod tests {
         let mut outer_group = create_element("g");
         outer_group
             .attributes
-            .insert("alignment-baseline".to_string(), "central".to_string());
+            .insert("alignment-baseline".into(), "central".into());
         outer_group
             .attributes
-            .insert("fill".to_string(), "red".to_string());
+            .insert("fill".into(), "red".into());
 
         let mut inner_group = create_element("g");
         inner_group
             .attributes
-            .insert("baseline-shift".to_string(), "10px".to_string());
+            .insert("baseline-shift".into(), "10px".into());
         inner_group
             .attributes
-            .insert("stroke".to_string(), "blue".to_string());
+            .insert("stroke".into(), "blue".into());
 
         outer_group.children.push(Node::Element(inner_group));
         doc.root.children.push(Node::Element(outer_group));
@@ -554,14 +554,14 @@ mod tests {
         if let Node::Element(outer_elem) = &doc.root.children[0] {
             // Outer group: removed non-inheritable, kept inheritable
             assert!(!outer_elem.attributes.contains_key("alignment-baseline"));
-            assert_eq!(outer_elem.attributes.get("fill"), Some(&"red".to_string()));
+            assert_eq!(outer_elem.attributes.get("fill"), Some(&"red".into()));
 
             if let Node::Element(inner_elem) = &outer_elem.children[0] {
                 // Inner group: removed non-inheritable, kept inheritable
                 assert!(!inner_elem.attributes.contains_key("baseline-shift"));
                 assert_eq!(
                     inner_elem.attributes.get("stroke"),
-                    Some(&"blue".to_string())
+                    Some(&"blue".into())
                 );
             }
         }
