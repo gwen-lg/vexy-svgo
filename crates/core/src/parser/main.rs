@@ -13,7 +13,7 @@
 use crate::ast::Document;
 use std::io::{BufRead, BufReader};
 use crate::parser::config::StreamingConfig;
-use crate::parser::error::ParseResult;
+use crate::error::VexyError;
 use crate::parser::streaming::StreamingParser;
 
 
@@ -79,14 +79,14 @@ impl Parser {
     }
 
     /// Parse an SVG string into a Document (static method for convenience)
-    pub fn parse_svg_string(input: &str) -> ParseResult<Document<'static>> {
+    pub fn parse_svg_string(input: &str) -> Result<Document<'static>, VexyError> {
         let parser = Self::new();
         parser.parse(input)
     }
 
     /// Parse an SVG string into a Document
     /// For large documents, consider using `parse_streaming` for better memory efficiency
-    pub fn parse(&self, input: &str) -> ParseResult<Document<'static>> {
+    pub fn parse(&self, input: &str) -> Result<Document<'static>, VexyError> {
         // For very large inputs, automatically use streaming parser
         if input.len() > self.streaming_config.buffer_size * 4 {
             return self.parse_streaming_from_str(input);
@@ -96,7 +96,7 @@ impl Parser {
     }
 
     /// Internal parsing implementation
-    fn parse_internal(&self, input: &str) -> ParseResult<Document<'static>> {
+    fn parse_internal(&self, input: &str) -> Result<Document<'static>, VexyError> {
         let mut streaming_parser = StreamingParser::new(
             BufReader::new(input.as_bytes()),
             self.streaming_config.clone(),
@@ -109,7 +109,7 @@ impl Parser {
     }
 
     /// Parse from a streaming source for memory efficiency with large files
-    pub fn parse_streaming<R: BufRead>(&self, reader: R) -> ParseResult<Document<'static>> {
+    pub fn parse_streaming<R: BufRead>(&self, reader: R) -> Result<Document<'static>, VexyError> {
         let mut streaming_parser = StreamingParser::new(
             reader,
             self.streaming_config.clone(),
@@ -122,7 +122,7 @@ impl Parser {
     }
 
     /// Parse from a large string using streaming approach
-    fn parse_streaming_from_str(&self, input: &str) -> ParseResult<Document<'static>> {
+    fn parse_streaming_from_str(&self, input: &str) -> Result<Document<'static>, VexyError> {
         let cursor = std::io::Cursor::new(input);
         let buf_reader = BufReader::with_capacity(self.streaming_config.buffer_size, cursor);
         self.parse_streaming(buf_reader)
@@ -136,17 +136,17 @@ impl Default for Parser {
 }
 
 /// Convenience function to parse an SVG string
-pub fn parse_svg(input: &str) -> ParseResult<Document<'static>> {
+pub fn parse_svg(input: &str) -> Result<Document<'static>, VexyError> {
     Parser::new().parse(input)
 }
 
 /// Convenience function to parse a large SVG with streaming
-pub fn parse_svg_streaming<R: BufRead>(reader: R) -> ParseResult<Document<'static>> {
+pub fn parse_svg_streaming<R: BufRead>(reader: R) -> Result<Document<'static>, VexyError> {
     Parser::new().parse_streaming(reader)
 }
 
 /// Parse SVG from a file with automatic streaming for large files
-pub fn parse_svg_file<P: AsRef<std::path::Path>>(path: P) -> ParseResult<Document<'static>> {
+pub fn parse_svg_file<P: AsRef<std::path::Path>>(path: P) -> Result<Document<'static>, VexyError> {
     let file = std::fs::File::open(&path)?;
     let metadata = file.metadata()?;
 

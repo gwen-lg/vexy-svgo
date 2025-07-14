@@ -192,7 +192,7 @@ pub fn prop_plugin_idempotent<P: Plugin + Clone>(plugin: P) -> impl Strategy<Val
 }
 
 /// Test invariants for optimization plugins
-pub fn test_optimization_invariants<P: Plugin + Clone>(plugin: P, test_cases: u32) -> Result<()> {
+pub fn test_optimization_invariants<P: Plugin + Clone>(plugin: P, _test_cases: u32) -> Result<()> {
     use proptest::test_runner::TestRunner;
     
     let mut runner = TestRunner::default();

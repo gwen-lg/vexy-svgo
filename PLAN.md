@@ -1,168 +1,153 @@
 # Vexy SVGO Improvement Plan
 
-## 1. Current Status (2025-07-13)
+This document outlines a series of proposed improvements for the Vexy SVGO codebase. These changes focus on enhancing robustness, efficiency, and maintainability through targeted, quality-of-life upgrades rather than new features.
 
-The Vexy SVGO project has completed Phase 1 code cleanup and achieved a stable, production-ready state. Version 1.0.27 represents a major milestone with zero compiler warnings and comprehensive feature implementation.
+## 1. Enhanced Build & CI Pipeline
 
-### 1.1. Completed Achievements
+### 1.1. Introduce Build Verification & Reproducibility
+**Goal:** Ensure that builds are consistent and verifiable, reducing the risk of environment-specific errors.
 
-#### 1.1.1. Code Quality (100% Complete)
+**Detailed Steps:**
+1.  **Add a build verification script:** Create a new script `scripts/verify-build.sh` that performs a clean build and then runs tests against the release artifacts. This script will be crucial for ensuring that what gets published is what was tested.
+    ```bash
+    #!/bin/bash
+    set -euo pipefail
+    
+    echo "--- Verifying clean release build ---"
+    cargo clean
+    cargo build --release
+    
+    echo "--- Running tests against release build ---"
+    cargo test --release
+    
+    echo "--- Build verification successful ---"
+    ```
+2.  **Integrate into CI:** Update the `.github/workflows/ci.yml` to include a new job that runs this verification script. This ensures that every pull request and push to `main` is verified.
+    ```yaml
+    jobs:
+      verify-build:
+        name: Verify Release Build
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/cache@v4
+            with:
+              path: |
+                ~/.cargo/bin/
+                ~/.cargo/registry/index/
+                ~/.cargo/registry/cache/
+                ~/.cargo/git/db/
+                target/
+              key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          - name: Run build verification script
+            run: ./scripts/verify-build.sh
+    ```
 
-- ✓ **All 49 compiler warnings resolved** - Zero-warning policy achieved
-- ✓ **Dead code elimination** - All unused functions removed or implemented
-- ✓ **Streaming parser** - Configuration fixed for quick-xml 0.31
-- ✓ **Error handling** - Complete typed error system with thiserror
-- ✓ **Plugin system** - Factory pattern fully implemented
+### 1.2. Refine Pre-Commit Hooks
+**Goal:** Catch more issues locally before they ever reach CI, speeding up the development cycle.
 
-#### 1.1.2. Release Process (100% Complete)
+**Detailed Steps:**
+1.  **Add `cargo-deny` to pre-commit:** Integrate `cargo-deny` to check for duplicate dependencies, security advisories, and license compatibility on every commit.
+    ```yaml
+    -   repo: https://github.com/EmbarkStudios/cargo-deny
+        rev: 0.14.0
+        hooks:
+          - id: cargo-deny
+            args: [ "check" ]
+    ```
+2.  **Add `codespell` for typo checking:** Integrate `codespell` to automatically fix common misspellings in the codebase.
+    ```yaml
+    -   repo: https://github.com/codespell-project/codespell
+        rev: v2.2.6
+        hooks:
+          - id: codespell
+            args: ["-w"]
+    ```
 
-- ✓ **Version consistency** - All crates aligned to 1.0.27
-- ✓ **Release automation** - Enhanced scripts with proper protection
-- ✓ **Documentation** - Migrated to modern MkDocs system
-- ✓ **Build system** - Working across all platforms
+## 2. Codebase & Module Organization
 
-#### 1.1.3. Features (95% Complete)
+### 2.1. Standardize Module Exports
+**Goal:** Create a more consistent and predictable public API by standardizing how modules export their functionality.
 
-- ✓ **Parallel processing** - Fully functional with rayon
-- ✓ **Plugin architecture** - 50+ plugins implemented
-- ✓ **CLI tools** - Complete with progress indicators and colors
-- ✓ **WASM support** - Building successfully
-- ✓ **Testing framework** - Property-based testing with 350+ tests
+**Detailed Steps:**
+1.  **Adopt `pub use` for re-exports:** In `crates/vexy_svgo/src/lib.rs`, refactor all public-facing modules to use `pub use` for re-exporting types and functions. This will create a flatter, more accessible API for consumers of the crate.
+    
+    *Example (before):*
+    ```rust
+    // In crates/vexy_svgo/src/lib.rs
+    pub mod config;
+    pub mod error;
+    pub mod optimizer;
+    ```
+    
+    *Example (after):*
+    ```rust
+    // In crates/vexy_svgo/src/lib.rs
+    pub use crate::config::{Config, OptimizerConfig};
+    pub use crate::error::VexyError;
+    pub use crate::optimizer::optimize;
+    ```
+2.  **Audit public APIs:** Systematically review every `pub` item in the library crates (`core`, `plugin-sdk`, `vexy_svgo`) to ensure that only intentionally public items are exposed. Add `#[doc(hidden)]` to items that are public for technical reasons but not part of the stable API.
 
-### 1.2. Active Development Areas
+### 2.2. Centralize Error Handling
+**Goal:** Improve error handling by creating a single, unified error type for the entire application.
 
-1. **Performance documentation**
+**Detailed Steps:**
+1.  **Create a top-level `Error` enum:** In `crates/vexy_svgo/src/error.rs`, define a comprehensive `Error` enum that encapsulates all possible failure modes, from I/O errors to parsing and optimization failures.
+    ```rust
+    use thiserror::Error;
+    
+    #[derive(Debug, Error)]
+    pub enum VexyError {
+        #[error("I/O error: {0}")]
+        Io(#[from] std::io::Error),
+    
+        #[error("XML parsing error: {0}")]
+        Parsing(#[from] roxmltree::Error),
+    
+        #[error("Plugin '{0}' failed: {1}")]
+        Plugin(String, String),
+    
+        #[error("Invalid configuration: {0}")]
+        Config(String),
+    }
+    ```
+2.  **Refactor crates to use the unified error type:** Replace all instances of custom error types in other crates with `VexyError`. Use `Result<T, VexyError>` as the standard return type for fallible operations.
 
-- [ ] Document parallel processing performance benefits
-- [ ] Create comprehensive benchmarks against SVGO
-- [ ] Add performance tuning guides
+## 3. Configuration Management
 
-### 1.3. Phase 3: Testing & Documentation (Medium-term)
+### 3.1. Implement Configuration Schema Validation
+**Goal:** Provide users with clear, immediate feedback on invalid configuration files.
 
-1. **Comprehensive testing**
+**Detailed Steps:**
+1.  **Introduce JSON Schema:** Create a `svgo.schema.json` file in the root of the project. This file will define the structure, types, and allowed values for `svgo.config.js`.
+2.  **Add validation logic:** In `crates/cli/src/config.rs`, use a library like `jsonschema` to validate loaded configurations against the schema. If validation fails, print a user-friendly error message that explains what is wrong and points to the documentation.
+    ```rust
+    // Example validation logic
+    let schema = load_schema("svgo.schema.json")?;
+    let instance = serde_json::to_value(config)?;
+    let result = jsonschema::validate(&instance, &schema);
+    
+    if let Err(errors) = result {
+        for error in errors {
+            eprintln!("Configuration error: {}", error);
+        }
+        return Err(VexyError::Config("Invalid configuration".to_string()));
+    }
+    ```
 
-- [ ] Unit tests for all core functionality (AST, parser, optimizer modules)
-- [ ] Integration tests for CLI
-- [ ] Performance benchmarks
-- [ ] Compatibility tests with SVGO configs
+## 4. Documentation & Examples
 
-2. **Documentation**
+### 4.1. Create a Plugin Development Example
+**Goal:** Lower the barrier to entry for new plugin developers by providing a clear, working example.
 
-- [ ] API documentation for all public types (generate with rustdoc)
-- [ ] Plugin development guide
-- [ ] Migration guide from SVGO
-- [ ] Performance tuning guide
-- [ ] Add inline documentation for all public APIs
+**Detailed Steps:**
+1.  **Create a new example crate:** Add a new crate under `examples/example-plugin`. This crate will demonstrate how to create a simple plugin that removes all `<g>` elements from an SVG.
+2.  **Write a tutorial:** Add a new page to the documentation (`docs_src/developer/creating-a-plugin.md`) that walks through the process of creating, testing, and using the example plugin.
 
-3. **Examples**
-- [ ] CLI usage examples
-- [ ] Plugin development examples
-- [ ] Integration examples (Node.js, Python, etc.)
-- [ ] Create WebAssembly usage examples
+### 4.2. Add Integration Examples
+**Goal:** Show users how to integrate `vexy-svgo` into their projects.
 
-### 1.4. Phase 4: Performance Optimization (Long-term)
-
-1. **Memory optimization**
-
-- [ ] Profile memory usage for large SVG files
-- [ ] Implement memory-efficient parsing strategies (including streaming for very large files)
-- [ ] Add memory usage limits and controls
-- [ ] Optimize AST memory layout
-
-2. **Speed optimization**
-
-- [ ] Benchmark against SVGO (create comprehensive benchmarks)
-- [ ] Optimize hot paths (profile and optimize)
-- [ ] Implement SIMD optimizations where applicable (for path data)
-- [ ] Add parallel path processing
-
-3. **Streaming improvements**
-- [ ] Complete streaming parser implementation
-- [ ] Add streaming output support
-- [ ] Implement incremental optimization
-- [ ] Add chunked processing for large files
-
-## 2. Remaining Development Areas
-
-### 2.1. Technical Debt Items
-
-1. **Build verification**
-
-- [ ] Add build verification steps
-- [ ] Create reproducible builds
-
-2. **Import/Export organization**
-
-- [ ] Review and reorganize public API exports
-- [ ] Ensure consistent naming conventions
-- [ ] Clean up module structure
-- [ ] Remove duplicate code
-
-3. **Configuration system**
-- [ ] Validate configuration loading and merging
-- [ ] Add configuration schema validation
-- [ ] Support for .svgo.config.js compatibility
-- [ ] Add configuration migration tool
-
-### 2.2. Quality Assurance
-
-1. **Continuous Integration**
-
-- [ ] Set up GitHub Actions for automated testing
-- [ ] Add coverage reporting (with codecov/coveralls)
-- [ ] Implement automated benchmarking
-- [ ] Add cross-platform testing
-
-2. **Code quality tools**
-
-- [ ] Configure clippy with strict lints
-- [ ] Add rustfmt configuration (with project style)
-- [ ] Set up pre-commit hooks
-- [ ] Add commit message linting
-
-3. **Release process**
-- [ ] Automated version bumping
-- [ ] Changelog generation
-- [ ] Binary distribution for multiple platforms
-- [ ] Set up crates.io publishing
-- [ ] Create Homebrew formula
-- [ ] Create npm package wrapper
-
-### 2.3. Nice-to-Have Features
-
-1. **SVG validation**
-- [ ] Add SVG validation before optimization
-2. **SVG diff tool**
-- [ ] Implement SVG diff tool
-3. **Batch processing**
-- [ ] Add batch processing with glob patterns
-4. **GUI wrapper**
-- [ ] Create GUI wrapper
-5. **Plugin marketplace integration**
-- [ ] Add plugin marketplace integration
-6. **Custom plugin loader**
-- [ ] Implement custom plugin loader
-7. **Telemetry/analytics**
-- [ ] Add telemetry/analytics (opt-in)
-8. **VS Code extension**
-- [ ] Create VS Code extension
-9. **Docker image**
-- [ ] Add Docker image
-10. **Watch mode**
-- [ ] Implement watch mode for development
-
-## 3. Project Status Summary
-
-### 3.1. Major Achievements (2025-07-13)
-
-- ✓ **Zero-warning codebase** - All 49 compiler warnings resolved
-- ✓ **Version 1.0.27 released** - Stable production release
-- ✓ **Complete plugin system** - 50+ plugins with comprehensive testing
-- ✓ **Modern documentation** - MkDocs system with automated deployment
-- ✓ **Parallel processing** - Fully functional multi-threading support
-- ✓ **Error handling** - Complete typed error system throughout
-- ✓ **Build automation** - Enhanced release scripts and CI/CD
-
-### 3.2. Current Focus
-
-The project has transitioned from fixing critical issues to enhancing documentation and performance optimization. The core functionality is complete and stable.
+**Detailed Steps:**
+1.  **Node.js example:** Create a simple Node.js project in `examples/nodejs-integration` that uses the WASM build of `vexy-svgo` to optimize an SVG file.
+2.  **Python example:** Create a Python script in `examples/python-integration` that uses the FFI bindings to call `vexy-svgo` from Python.

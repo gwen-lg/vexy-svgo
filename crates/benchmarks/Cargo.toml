@@ -17,6 +17,11 @@ harness = false
 name = "stringifier"
 harness = false
 
+[[bench]]
+name = "svgo_comparison"
+harness = false
+
 [dependencies]
 vexy-svgo-core = { workspace = true }
 criterion = { version = "0.5", features = ["html_reports"] }
+tempfile = "3"

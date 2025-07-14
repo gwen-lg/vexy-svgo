@@ -10,20 +10,9 @@
 
 use crate::ast::{Document, Element, Node};
 use std::fmt::Write;
-use thiserror::Error;
+use crate::error::VexyError;
 
-/// Stringify errors
-#[derive(Error, Debug)]
-pub enum StringifyError {
-    #[error("Failed to stringify: {0}")]
-    StringifyFailed(String),
-    
-    #[error("IO error during stringification: {0}")]
-    IoError(#[from] std::io::Error),
-    
-    #[error("Formatting error: {0}")]
-    FmtError(#[from] std::fmt::Error),
-}
+
 
 /// Configuration options for stringification
 #[derive(Debug, Clone)]
@@ -72,12 +61,12 @@ impl StringifyConfig {
 }
 
 /// Convert a Document to an SVG string with default settings
-pub fn stringify(document: &Document) -> Result<String, StringifyError> {
+pub fn stringify(document: &Document) -> Result<String, VexyError> {
     stringify_with_config(document, &StringifyConfig::default())
 }
 
 /// Convert a Document to an SVG string with custom configuration
-pub fn stringify_with_config(document: &Document, config: &StringifyConfig) -> Result<String, StringifyError> {
+pub fn stringify_with_config(document: &Document, config: &StringifyConfig) -> Result<String, VexyError> {
     // Pre-allocate string with estimated capacity
     let estimated_size = estimate_document_size(document);
     let mut output = String::with_capacity(estimated_size.max(config.initial_capacity));
@@ -167,7 +156,7 @@ fn stringify_element(
     output: &mut String,
     config: &StringifyConfig,
     depth: usize,
-) -> Result<(), StringifyError> {
+) -> Result<(), VexyError> {
     // Indentation
     if config.pretty && depth > 0 {
         for _ in 0..depth {
@@ -275,7 +264,7 @@ fn stringify_node(
     output: &mut String,
     config: &StringifyConfig,
     depth: usize,
-) -> Result<(), StringifyError> {
+) -> Result<(), VexyError> {
     match node {
         Node::Element(e) => stringify_element(e, output, config, depth),
         Node::Text(t) => {
@@ -384,7 +373,7 @@ impl<W: std::io::Write> StreamingStringifier<W> {
     }
     
     /// Stringify a document to the writer
-    pub fn stringify(&mut self, document: &Document) -> Result<(), StringifyError> {
+    pub fn stringify(&mut self, document: &Document) -> Result<(), VexyError> {
         // Write XML declaration
         if let Some(ref version) = document.metadata.version {
             write!(self.writer, "<?xml version=\"{version}\"")?;
@@ -423,7 +412,7 @@ impl<W: std::io::Write> StreamingStringifier<W> {
         Ok(())
     }
     
-    fn stringify_element(&mut self, element: &Element, depth: usize) -> Result<(), StringifyError> {
+    fn stringify_element(&mut self, element: &Element, depth: usize) -> Result<(), VexyError> {
         // Similar to stringify_element but writes to self.writer
         // Implementation omitted for brevity but follows same pattern
         // using write! and write_all instead of push_str
@@ -433,7 +422,7 @@ impl<W: std::io::Write> StreamingStringifier<W> {
         Ok(())
     }
     
-    fn stringify_node(&mut self, node: &Node, depth: usize) -> Result<(), StringifyError> {
+    fn stringify_node(&mut self, node: &Node, depth: usize) -> Result<(), VexyError> {
         // Similar to stringify_node but writes to self.writer
         // Implementation omitted for brevity
         

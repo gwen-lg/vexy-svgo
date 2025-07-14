@@ -11,7 +11,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use std::fs;
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
-use vexy_svgo_core::{optimize_with_config, Config, VERSION, error::VexySvgoError};
+use vexy_svgo_core::{optimize_with_config, Config, VERSION, error::VexyError};
 
 #[derive(Debug)]
 enum InputMode {
@@ -215,7 +215,7 @@ fn main() {
     }
 }
 
-fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
+fn run_cli(matches: clap::ArgMatches) -> Result<(), VexyError> {
     let quiet = matches.get_flag("quiet");
     let verbose = matches.get_flag("verbose");
     let dry_run = matches.get_flag("dry-run");
@@ -347,7 +347,7 @@ fn run_cli(matches: clap::ArgMatches) -> Result<(), VexySvgoError> {
     Ok(())
 }
 
-fn parse_cli_args(matches: &ArgMatches) -> Result<(InputMode, OutputMode), VexySvgoError> {
+fn parse_cli_args(matches: &ArgMatches) -> Result<(InputMode, OutputMode), VexyError> {
     // Determine input mode
     let input_mode = if matches.contains_id("string") {
         InputMode::String(matches.get_one::<String>("string").unwrap().clone())
@@ -404,7 +404,7 @@ fn process_string(
     quiet: bool,
     verbose: bool,
     dry_run: bool,
-) -> Result<(), VexySvgoError> {
+) -> Result<(), VexyError> {
     if verbose {
         println!("{} Optimizing SVG content ({} bytes)", "🔧".bright_cyan(), content.len().to_string().bright_white());
     }
@@ -461,7 +461,7 @@ fn process_files(
     verbose: bool,
     dry_run: bool,
     _no_color: bool,
-) -> Result<(), VexySvgoError> {
+) -> Result<(), VexyError> {
     if verbose {
         println!("{} Processing {} file(s)", "📁".bright_cyan(), files.len().to_string().bright_white());
         for file in files {
@@ -593,7 +593,7 @@ fn process_folder(
     dry_run: bool,
     recursive: bool,
     exclude_patterns: &[&str],
-) -> Result<(), VexySvgoError> {
+) -> Result<(), VexyError> {
     if verbose {
         println!("{} Scanning folder: {}", "📂".bright_cyan(), folder.bright_blue());
         println!("  {} Recursive: {}", "🔍".cyan(), recursive.to_string().bright_white());
@@ -741,7 +741,7 @@ fn process_folder(
 fn find_svg_files(
     dir: &Path,
     exclude_patterns: &[&str],
-) -> Result<Vec<PathBuf>, VexySvgoError> {
+) -> Result<Vec<PathBuf>, VexyError> {
     let mut svg_files = Vec::new();
 
     for entry in fs::read_dir(dir)? {
@@ -759,7 +759,7 @@ fn find_svg_files(
 fn find_svg_files_recursive(
     dir: &Path,
     exclude_patterns: &[&str],
-) -> Result<Vec<PathBuf>, VexySvgoError> {
+) -> Result<Vec<PathBuf>, VexyError> {
     let mut svg_files = Vec::new();
     let mut dirs_to_process = vec![dir.to_path_buf()];
 
@@ -788,7 +788,7 @@ fn is_svg_file(path: &Path) -> bool {
         .unwrap_or(false)
 }
 
-fn is_excluded(path: &Path, patterns: &[&str]) -> Result<bool, VexySvgoError> {
+fn is_excluded(path: &Path, patterns: &[&str]) -> Result<bool, VexyError> {
     if patterns.is_empty() {
         return Ok(false);
     }

@@ -156,7 +156,7 @@ pub mod wasm_impl {
 
     /// Main optimization function exposed to JavaScript
     #[wasm_bindgen]
-    pub fn optimize(svg: &str, config: Option<JsConfig>) -> Result<JsOptimizationResult, JsError> {
+    pub fn optimize(svg: &str, config: Option<JsConfig>) -> Result<JsOptimizationResult, VexyError> {
         let config = config.unwrap_or_default();
         let original_size = svg.len();
 
@@ -208,7 +208,7 @@ pub mod wasm_impl {
 
     /// Optimize SVG with default configuration
     #[wasm_bindgen(js_name = optimizeDefault)]
-    pub fn optimize_default(svg: &str) -> Result<JsOptimizationResult, JsError> {
+    pub fn optimize_default(svg: &str) -> Result<JsOptimizationResult, VexyError> {
         optimize(svg, None)
     }
 
@@ -220,7 +220,7 @@ pub mod wasm_impl {
 
     /// Get list of available plugins
     #[wasm_bindgen(js_name = getPlugins)]
-    pub fn get_plugins() -> Result<String, JsError> {
+    pub fn get_plugins() -> Result<String, VexyError> {
         let config = Config::with_default_preset();
         let plugins: Vec<String> = config.plugins.iter().map(|p| p.name().to_string()).collect();
         serde_json::to_string(&plugins).map_err(|e| JsError::new(&e.to_string()))
@@ -228,7 +228,7 @@ pub mod wasm_impl {
 
     /// Get default preset configuration
     #[wasm_bindgen(js_name = getDefaultPreset)]
-    pub fn get_default_preset() -> Result<String, JsError> {
+    pub fn get_default_preset() -> Result<String, VexyError> {
         let config = Config::with_default_preset();
         serde_json::to_string(&config).map_err(|e| JsError::new(&e.to_string()))
     }
@@ -239,7 +239,7 @@ pub mod wasm_impl {
         svg: &str,
         config: Option<JsConfig>,
         chunk_size: usize,
-    ) -> Result<JsOptimizationResult, JsError> {
+    ) -> Result<JsOptimizationResult, VexyError> {
         // For now, just call the regular optimize function
         // In the future, this could be implemented to process large SVGs in chunks
         let _ = chunk_size; // Suppress unused warning

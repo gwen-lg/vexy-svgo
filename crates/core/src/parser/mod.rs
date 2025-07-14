@@ -11,6 +11,9 @@ pub mod error;
 pub mod streaming;
 pub mod utils;
 
+#[cfg(test)]
+mod tests;
+
 // Re-export main types
 pub use main::{parse_svg, parse_svg_file, parse_svg_streaming, Parser};
 pub use config::load_config_from_directory;

@@ -134,6 +134,10 @@ pub enum DataUriFormat {
     Unenc,
 }
 
+use crate::error::VexyError;
+use jsonschema::JSONSchema;
+use serde_json::Value;
+
 impl Config {
     /// Create a new config with default preset
     pub fn new() -> Self {
@@ -146,10 +150,27 @@ impl Config {
     }
 
     /// Load config from a file
-    pub fn from_file<P: AsRef<std::path::Path>>(path: P) -> Result<Self, std::io::Error> {
-        let content = std::fs::read_to_string(path)?;
-        serde_json::from_str(&content)
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
+    pub fn from_file<P: AsRef<std::path::Path>>(path: P) -> Result<Self, VexyError> {
+        let content = std::fs::read_to_string(path).map_err(VexyError::Io)?;
+        let config: Value = serde_json::from_str(&content)
+            .map_err(|e| VexyError::Config(e.to_string()))?;
+
+        let schema_content = include_str!("../../../../svgo.schema.json");
+        let schema: Value = serde_json::from_str(schema_content)
+            .map_err(|e| VexyError::Config(e.to_string()))?;
+        let compiled_schema = JSONSchema::compile(&schema)
+            .map_err(|e| VexyError::Config(e.to_string()))?;
+
+        let result = compiled_schema.validate(&config);
+        if let Err(errors) = result {
+            for error in errors {
+                eprintln!("Configuration error: {}", error);
+            }
+            return Err(VexyError::Config("Invalid configuration".to_string()));
+        }
+
+        serde_json::from_value(config)
+            .map_err(|e| VexyError::Config(e.to_string()))
     }
 
     /// Get a plugin configuration by name
@@ -234,7 +255,7 @@ impl PluginConfig {
 /// Load configuration from a directory (looks for .vexy_svgorc, vexy_svgo.config.json, etc.)
 pub fn load_config_from_directory<P: AsRef<std::path::Path>>(
     dir: P,
-) -> Result<Config, std::io::Error> {
+) -> Result<Config, VexyError> {
     let dir = dir.as_ref();
 
     // Try various config file names
@@ -250,7 +271,7 @@ pub fn load_config_from_directory<P: AsRef<std::path::Path>>(
     for filename in &config_files {
         let config_path = dir.join(filename);
         if config_path.exists() {
-            return Config::from_file(config_path);
+            return Config::from_file(config_path).map_err(|e| VexyError::Config(e.to_string()));
         }
     }
 

@@ -199,7 +199,7 @@ mod tests {
             Node::Element(e) => e,
             _ => panic!("Expected element"),
         };
-        assert_eq!(g.attr("transform").map(|s| s.as_str()), Some("translate(10,20)"));
+        assert_eq!(g.attr("transform").map(|s| s.as_ref()), Some("translate(10,20)"));
     }
 
     #[test]

@@ -145,7 +145,7 @@ mod unit_tests {
     use super::*;
     use serde_json::json;
     use std::borrow::Cow;
-    use vexy_svgo_core::ast::{Document, Element};
+    use vexy_svgo_core::ast::{Document, Element, Node};
 
     fn create_element(name: &'static str) -> Element<'static> {
         let mut element = Element::new(name);
@@ -153,12 +153,12 @@ mod unit_tests {
         element
     }
 
-    fn create_element_with_attrs(name: &'static str, attrs: &[(&str, &str)]) -> Element<'static> {
+    fn create_element_with_attrs(name: &'static str, attrs: &[(&'static str, &'static str)]) -> Element<'static> {
         let mut element = create_element(name);
         for (key, value) in attrs {
             element
                 .attributes
-                .insert(key.to_string(), value.to_string());
+                .insert(Cow::Borrowed(key), Cow::Borrowed(value));
         }
         element
     }
@@ -277,13 +277,13 @@ mod unit_tests {
         // Set attributes on the root SVG element
         doc.root
             .attributes
-            .insert("viewBox".to_string(), "0 0 100 50".to_string());
+            .insert(Cow::Borrowed("viewBox"), Cow::Borrowed("0 0 100 50"));
         doc.root
             .attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert(Cow::Borrowed("width"), Cow::Borrowed("100"));
         doc.root
             .attributes
-            .insert("height".to_string(), "50".to_string());
+            .insert(Cow::Borrowed("height"), Cow::Borrowed("50"));
 
         plugin.apply(&mut doc).unwrap();
 
@@ -301,13 +301,13 @@ mod unit_tests {
         // Set attributes on the root SVG element with non-removable viewBox
         doc.root
             .attributes
-            .insert("viewBox".to_string(), "10 10 100 50".to_string());
+            .insert(Cow::Borrowed("viewBox"), Cow::Borrowed("10 10 100 50"));
         doc.root
             .attributes
-            .insert("width".to_string(), "100".to_string());
+            .insert(Cow::Borrowed("width"), Cow::Borrowed("100"));
         doc.root
             .attributes
-            .insert("height".to_string(), "50".to_string());
+            .insert(Cow::Borrowed("height"), Cow::Borrowed("50"));
 
         plugin.apply(&mut doc).unwrap();
 
@@ -315,7 +315,7 @@ mod unit_tests {
         assert!(doc.root.attributes.contains_key("viewBox"));
         assert_eq!(
             doc.root.attributes.get("viewBox"),
-            Some(&"10 10 100 50".to_string())
+            Some(&Cow::Borrowed("10 10 100 50"))
         );
     }
 
@@ -327,13 +327,13 @@ mod unit_tests {
         // Set attributes on the root SVG element
         doc.root
             .attributes
-            .insert("viewBox".to_string(), "0 0 200 100".to_string());
+            .insert(Cow::Borrowed("viewBox"), Cow::Borrowed("0 0 200 100"));
         doc.root
             .attributes
-            .insert("width".to_string(), "200".to_string());
+            .insert(Cow::Borrowed("width"), Cow::Borrowed("200"));
         doc.root
             .attributes
-            .insert("height".to_string(), "100".to_string());
+            .insert(Cow::Borrowed("height"), Cow::Borrowed("100"));
 
         // Create nested SVG element
         let nested_svg = create_element_with_attrs(
@@ -356,7 +356,7 @@ mod unit_tests {
             assert!(nested_svg.attributes.contains_key("viewBox"));
             assert_eq!(
                 nested_svg.attributes.get("viewBox"),
-                Some(&"0 0 100 50".to_string())
+                Some(&Cow::Borrowed("0 0 100 50"))
             );
         }
     }

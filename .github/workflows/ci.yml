@@ -154,3 +154,20 @@ jobs:
           # Verify Jekyll site was built
           test -d docs/_site
           test -f docs/_site/index.html
+
+  verify-build:
+    name: Verify Release Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run build verification script
+        run: ./scripts/verify-build.sh

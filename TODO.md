@@ -1,121 +1,43 @@
-# Vexy SVGO TODO List - Active Tasks
+# Vexy SVGO TODO List
 
-## 1. Phase 2: Feature Completion (Active)
+This TODO list is a linearized version of the improvement plan in `PLAN.md`.
 
-### 1.1. Complete parallel processing documentation
+## 1. Enhanced Build & CI Pipeline
 
-- ✅ Document performance benefits - COMPLETED with comprehensive benchmarks in docs_src/developer/benchmarks.md
+- [x] Create `scripts/verify-build.sh` for build verification.
+- [x] Integrate `scripts/verify-build.sh` into `.github/workflows/ci.yml`.
+- [x] Add `cargo-deny` to `.pre-commit-config.yaml`.
+- [x] Add `codespell` to `.pre-commit-config.yaml`.
 
-### 1.2. Plugin system improvements (Completed)
+## 2. Codebase & Module Organization
 
-✓ All plugin system improvements have been completed
+- [ ] Refactor `crates/vexy_svgo/src/lib.rs` to use `pub use` for re-exports.
+  - [x] Refactored `crates/core/src/lib.rs`.
+- [x] Audit all public APIs in `core`, `plugin-sdk`, and `vexy_svgo` crates.
+- [x] Create a unified `VexyError` enum in `crates/vexy_svgo/src/error.rs`.
+- [x] Refactor all crates to use the new unified `VexyError` type.
+  - [x] Refactored `crates/cli/src/main.rs`.
+  - [x] Refactored `crates/cli/src/features_cmd.rs`.
+  - [x] Refactored `crates/core/src/optimizer/mod.rs`.
+  - [x] Refactored `crates/core/src/parser/main.rs`.
+  - [x] Refactored `crates/core/src/parser/streaming.rs`.
+  - [x] Refactored `crates/core/src/stringifier.rs`.
+  - [x] Refactored `crates/core/src/visitor.rs`.
+  - [x] Refactored `crates/plugin-sdk/src/lib.rs`.
+  - [x] Refactored `crates/plugin-sdk/src/enhanced_registry.rs`.
+  - [x] Refactored `crates/ffi/src/lib.rs`.
+  - [x] Refactored `crates/wasm/src/lib.rs`.
+  - [x] Refactored `crates/wasm/src/enhanced.rs`.
+  - [x] Refactored `crates/wasm/src/minimal.rs`.
 
-### 1.3. CLI enhancements (Completed)
+## 3. Configuration Management
 
-✓ All CLI enhancements have been completed
+- [x] Create `svgo.schema.json` in the project root.
+- [x] Implement configuration validation using the JSON schema in `crates/cli/src/config.rs`.
 
-## 2. Phase 3: Testing & Documentation (Medium-term)
+## 4. Documentation & Examples
 
-### 2.1. Comprehensive testing
-
-- [ ] Unit tests for all core functionality (AST, parser, optimizer modules)
-- [ ] Integration tests for CLI
-- [ ] Performance benchmarks
-- [ ] Compatibility tests with SVGO configs
-
-### 2.2. Documentation
-
-- [ ] API documentation for all public types (generate with rustdoc)
-- [ ] Plugin development guide
-- [ ] Migration guide from SVGO
-- [ ] Performance tuning guide
-- [ ] Add inline documentation for all public APIs
-
-### 2.3. Examples
-
-- [ ] CLI usage examples
-- [ ] Plugin development examples
-- [ ] Integration examples (Node.js, Python, etc.)
-- [ ] Create WebAssembly usage examples
-
-## 3. Phase 4: Performance Optimization (Long-term)
-
-### 3.1. Memory optimization
-
-- [ ] Profile memory usage for large SVG files
-- [ ] Implement memory-efficient parsing strategies (including streaming for very large files)
-- [ ] Add memory usage limits and controls
-- [ ] Optimize AST memory layout
-
-### 3.2. Speed optimization
-
-- [ ] Benchmark against SVGO (create comprehensive benchmarks)
-- [ ] Optimize hot paths (profile and optimize)
-- [ ] Implement SIMD optimizations where applicable (for path data)
-- [ ] Add parallel path processing
-
-### 3.3. Streaming improvements
-
-- [ ] Complete streaming parser implementation
-- [ ] Add streaming output support
-- [ ] Implement incremental optimization
-- [ ] Add chunked processing for large files
-
-## 4. Technical Debt Items
-
-### 4.1. Build verification
-
-- [ ] Add build verification steps
-- [ ] Create reproducible builds
-
-### 4.2. Import/Export organization
-
-- [ ] Review and reorganize public API exports
-- [ ] Ensure consistent naming conventions
-- [ ] Clean up module structure
-- [ ] Remove duplicate code
-
-### 4.3. Configuration system
-
-- [ ] Validate configuration loading and merging
-- [ ] Add configuration schema validation
-- [ ] Support for .svgo.config.js compatibility
-- [ ] Add configuration migration tool
-
-## 5. Quality Assurance
-
-### 5.1. Continuous Integration
-
-- [ ] Set up GitHub Actions for automated testing
-- [ ] Add coverage reporting (with codecov/coveralls)
-- [ ] Implement automated benchmarking
-- [ ] Add cross-platform testing
-
-### 5.2. Code quality tools
-
-- [ ] Configure clippy with strict lints
-- [ ] Add rustfmt configuration (with project style)
-- [ ] Set up pre-commit hooks
-- [ ] Add commit message linting
-
-### 5.3. Release process
-
-- [ ] Automated version bumping
-- [ ] Changelog generation
-- [ ] Binary distribution for multiple platforms
-- [ ] Set up crates.io publishing
-- [ ] Create Homebrew formula
-- [ ] Create npm package wrapper
-
-## 6. Nice-to-Have Features
-
-- [ ] Add SVG validation before optimization
-- [ ] Implement SVG diff tool
-- [ ] Add batch processing with glob patterns
-- [ ] Create GUI wrapper
-- [ ] Add plugin marketplace integration
-- [ ] Implement custom plugin loader
-- [ ] Add telemetry/analytics (opt-in)
-- [ ] Create VS Code extension
-- [ ] Add Docker image
-- [ ] Implement watch mode for development
+- [x] Create a new example plugin crate in `examples/example-plugin`.
+- [x] Write a plugin development tutorial in `docs_src/developer/creating-a-plugin.md`.
+- [x] Create a Node.js integration example in `examples/nodejs-integration`.
+- [x] Create a Python integration example in `examples/python-integration`.

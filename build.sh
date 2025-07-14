@@ -58,7 +58,7 @@ build_release() {
 
         echo "Build and verification complete."
         echo "To run the optimized binary, use: ./target/release/vexy-svgo"
-    } >build.log.txt 2>build.err.txt
+    }
 
     log_info "Release build complete. Log saved to build.log.txt"
 }

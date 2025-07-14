@@ -3,7 +3,7 @@
 use crate::ast::{Document, Element, Node};
 use crate::parser::config::StreamingConfig;
 use crate::parser::entities::{expand_entities_in_text, parse_entities_from_doctype};
-use crate::parser::error::ParseResult;
+use crate::error::VexyError;
 use crate::parser::util::TEXT_ELEMENTS;
 use quick_xml::events::Event;
 use quick_xml::Reader;
@@ -46,7 +46,7 @@ impl<R: BufRead> StreamingParser<R> {
     }
 
     /// Parse the document with streaming optimizations
-    pub fn parse(&mut self) -> ParseResult<Document<'static>> {
+    pub fn parse(&mut self) -> Result<Document<'static>, VexyError> {
         let mut document = Document::new();
         let mut element_stack: Vec<Element<'static>> = Vec::new();
         let mut current_element: Option<Element<'static>> = None;
@@ -60,9 +60,9 @@ impl<R: BufRead> StreamingParser<R> {
 
             // Check depth limit to prevent stack overflow
             if self.current_depth > self.config.max_depth {
-                return Err(crate::parser::error::ParseError::StructureError(
+                return Err(VexyError::Parse(crate::parser::error::ParseError::StructureError(
                     format!("Maximum parsing depth exceeded: {}", self.config.max_depth),
-                ));
+                )));
             }
 
             match self.reader.read_event_into(&mut buf) {
@@ -225,9 +225,9 @@ impl<R: BufRead> StreamingParser<R> {
                     // In streaming mode, we're more tolerant of errors
                     // but still track position for debugging
                     let byte_pos = self.reader.buffer_position();
-                    return Err(crate::parser::error::ParseError::StructureError(
+                    return Err(VexyError::Parse(crate::parser::error::ParseError::StructureError(
                         format!("Streaming parse error at byte {byte_pos}: {e}"),
-                    ));
+                    )));
                 }
             }
 
@@ -236,9 +236,9 @@ impl<R: BufRead> StreamingParser<R> {
         }
 
         if current_element.is_none() && document.root.name.is_empty() {
-            return Err(crate::parser::error::ParseError::StructureError(
+            return Err(VexyError::Parse(crate::parser::error::ParseError::StructureError(
                 "No root element found in document".to_string(),
-            ));
+            )));
         }
 
         // Optimize memory usage after parsing
@@ -264,7 +264,7 @@ impl<R: BufRead> StreamingParser<R> {
         &self,
         start: &quick_xml::events::BytesStart<'_>,
         entities: &HashMap<String, String>,
-    ) -> ParseResult<Element<'static>> {
+    ) -> Result<Element<'static>, VexyError> {
         let name = match std::str::from_utf8(start.name().as_ref()) {
             Ok(n) => n.to_string(),
             Err(_) => "unknown".to_string(), // More tolerant in streaming mode

@@ -12,7 +12,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
-use anyhow::{anyhow, Result};
+use crate::error::VexyError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -153,13 +153,13 @@ impl PluginStats {
 /// Plugin factory with enhanced capabilities
 pub trait PluginFactory: Send + Sync {
     /// Create a new plugin instance
-    fn create(&self) -> Result<Box<dyn Plugin>>;
+    fn create(&self) -> Result<Box<dyn Plugin>, VexyError>;
     
     /// Get plugin metadata
     fn metadata(&self) -> &PluginMetadata;
     
     /// Validate that this factory can create plugins
-    fn validate(&self) -> Result<()>;
+    fn validate(&self) -> Result<(), VexyError>;
     
     /// Get factory-specific configuration schema
     fn config_schema(&self) -> Option<Value> {
@@ -221,7 +221,7 @@ impl EnhancedPluginRegistry {
     }
 
     /// Register a plugin factory
-    pub fn register_factory(&self, factory: Arc<dyn PluginFactory>) -> Result<()> {
+    pub fn register_factory(&self, factory: Arc<dyn PluginFactory>) -> Result<(), VexyError> {
         let metadata = factory.metadata();
         let plugin_name = metadata.name.clone();
         let is_experimental = metadata.experimental;
@@ -258,7 +258,7 @@ impl EnhancedPluginRegistry {
     }
 
     /// Create a plugin instance with enhanced features
-    pub fn create_plugin(&self, name: &str) -> Result<Box<dyn Plugin>> {
+    pub fn create_plugin(&self, name: &str) -> Result<Box<dyn Plugin>, VexyError> {
         let resolved_name = self.resolve_name(name);
         
         // Check cache first
@@ -301,14 +301,14 @@ impl EnhancedPluginRegistry {
     }
 
     /// Create a configured plugin instance
-    pub fn create_configured_plugin(&self, name: &str, _config: Value) -> Result<Box<dyn Plugin>> {
+    pub fn create_configured_plugin(&self, name: &str, _config: Value) -> Result<Box<dyn Plugin>, VexyError> {
         // For now, just create the plugin without configuration
         // since the Plugin trait doesn't have a configure method
         self.create_plugin(name)
     }
 
     /// Register an alias for a plugin
-    pub fn register_alias(&self, alias: &str, plugin_name: &str) -> Result<()> {
+    pub fn register_alias(&self, alias: &str, plugin_name: &str) -> Result<(), VexyError> {
         {
             let factories = self.factories.read().unwrap();
             if !factories.contains_key(plugin_name) {
@@ -352,7 +352,7 @@ impl EnhancedPluginRegistry {
     }
 
     /// Check plugin dependencies
-    pub fn check_dependencies(&self, plugin_name: &str) -> Result<Vec<String>> {
+    pub fn check_dependencies(&self, plugin_name: &str) -> Result<Vec<String>, VexyError> {
         let metadata = self.get_metadata(plugin_name)
             .ok_or_else(|| anyhow!("Plugin '{}' not found", plugin_name))?;
         
@@ -372,7 +372,7 @@ impl EnhancedPluginRegistry {
     }
 
     /// Resolve plugin execution order based on dependencies
-    pub fn resolve_execution_order(&self, plugin_names: &[String]) -> Result<Vec<String>> {
+    pub fn resolve_execution_order(&self, plugin_names: &[String]) -> Result<Vec<String>, VexyError> {
         let mut ordered = Vec::new();
         let mut visited = std::collections::HashSet::new();
         let mut visiting = std::collections::HashSet::new();
@@ -419,7 +419,7 @@ impl EnhancedPluginRegistry {
     }
 
     /// Discover and load plugins from search paths
-    pub fn discover_plugins(&self) -> Result<usize> {
+    pub fn discover_plugins(&self) -> Result<usize, VexyError> {
         let mut loaded_count = 0;
         
         for search_path in &self.config.search_paths {
@@ -430,7 +430,7 @@ impl EnhancedPluginRegistry {
     }
 
     /// Validate all registered plugins
-    pub fn validate_all(&self) -> Result<Vec<String>> {
+    pub fn validate_all(&self) -> Result<Vec<String>, VexyError> {
         let mut invalid_plugins = Vec::new();
         let factories = self.factories.read().unwrap();
         
@@ -465,7 +465,7 @@ impl EnhancedPluginRegistry {
         ordered: &mut Vec<String>,
         visited: &mut std::collections::HashSet<String>,
         visiting: &mut std::collections::HashSet<String>,
-    ) -> Result<()> {
+    ) -> Result<(), VexyError> {
         if visited.contains(name) {
             return Ok(());
         }
@@ -491,7 +491,7 @@ impl EnhancedPluginRegistry {
         Ok(())
     }
 
-    fn load_plugins_from_path(&self, _path: &str) -> Result<usize> {
+    fn load_plugins_from_path(&self, _path: &str) -> Result<usize, VexyError> {
         // Implementation for dynamic plugin loading
         // This would typically involve:
         // 1. Scanning the directory for plugin files
@@ -562,7 +562,7 @@ impl EnhancedRegistryBuilder {
     }
 
     /// Build the registry
-    pub fn build(self) -> Result<EnhancedPluginRegistry> {
+    pub fn build(self) -> Result<EnhancedPluginRegistry, VexyError> {
         let registry = EnhancedPluginRegistry::new(self.config);
         
         // Register all factories

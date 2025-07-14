@@ -158,7 +158,7 @@ mod tests {
 
     fn create_element_with_id(name: &'static str, id: &str) -> Element<'static> {
         let mut element = create_element(name);
-        element.attributes.insert("id".to_string(), id.to_string());
+        element.attributes.insert(Cow::Borrowed("id"), Cow::Owned(id.to_string()));
         element
     }
 

@@ -1,43 +1,8 @@
 [package]
-name = "vexy_svgo-plugin-example"
+name = "example-plugin"
 version = "0.1.0"
 edition = "2021"
-authors = [ "Your Name <you@example.com>" ]
-description = "Example Vexy SVGO plugin demonstrating best practices"
-license = "MIT"
-repository = "https://github.com/yourusername/vexy_svgo-plugin-example"
-keywords = [ "svg", "optimization", "vexy_svgo", "plugin" ]
-categories = [ "multimedia::images", "web-programming" ]
-
 
 [dependencies]
-anyhow = "1.0"
-serde_json = "1.0"
-regex = "1.10"
-
-
-[dependencies.vexy_svgo-plugin-sdk]
-path = "../../crates/plugin-sdk"
-
-
-[dependencies.vexy_svgo-core]
-path = "../../crates/core"
-
-
-[dependencies.serde]
-version = "1.0"
-features = [ "derive" ]
-
-
-[dev-dependencies]
-criterion = "0.5"
-pretty_assertions = "1.4"
-
-
-[dev-dependencies.vexy_svgo-test-utils]
-path = "../../crates/test-utils"
-
-
-[[bench]]
-name = "plugin_bench"
-harness = false
+vexy-svgo-core = { path = "../../crates/core" }
+vexy-svgo-plugin-sdk = { path = "../../crates/plugin-sdk" }

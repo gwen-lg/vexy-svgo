@@ -227,24 +227,24 @@ fn create_complex_test_document() -> Document<'static> {
         .insert(Cow::Borrowed("transform"), Cow::Borrowed(""));
     group
         .attributes
-        .insert("opacity".to_string(), "".to_string());
+        .insert(Cow::Borrowed("opacity"), Cow::Borrowed(""));
 
     group
         .children
         .push(Node::Comment("Nested comment".to_string()));
 
     let mut rect = Element::new("rect");
-    rect.attributes.insert("x".to_string(), "10".to_string());
-    rect.attributes.insert("y".to_string(), "10".to_string());
+    rect.attributes.insert(Cow::Borrowed("x"), Cow::Borrowed("10"));
+    rect.attributes.insert(Cow::Borrowed("y"), Cow::Borrowed("10"));
     rect.attributes
-        .insert("width".to_string(), "50".to_string());
+        .insert(Cow::Borrowed("width"), Cow::Borrowed("50"));
     rect.attributes
-        .insert("height".to_string(), "50".to_string());
+        .insert(Cow::Borrowed("height"), Cow::Borrowed("50"));
     rect.attributes
-        .insert("fill".to_string(), "blue".to_string());
-    rect.attributes.insert("stroke".to_string(), "".to_string());
+        .insert(Cow::Borrowed("fill"), Cow::Borrowed("blue"));
+    rect.attributes.insert(Cow::Borrowed("stroke"), Cow::Borrowed(""));
     rect.attributes
-        .insert("data-test".to_string(), "   ".to_string());
+        .insert(Cow::Borrowed("data-test"), Cow::Borrowed("   "));
 
     group.children.push(Node::Element(rect));
     doc.root.children.push(Node::Element(group));

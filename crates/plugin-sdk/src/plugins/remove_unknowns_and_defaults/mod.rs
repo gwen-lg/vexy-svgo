@@ -191,7 +191,7 @@ mod tests {
         for (key, value) in attrs {
             element
                 .attributes
-                .insert(key.to_string(), value.to_string());
+                .insert(Cow::Borrowed(key), Cow::Borrowed(value));
         }
         element
     }

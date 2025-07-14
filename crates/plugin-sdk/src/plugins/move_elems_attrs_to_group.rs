@@ -274,7 +274,7 @@ mod tests {
 
     #[test]
     fn test_move_common_fill_attribute() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
+        let plugin = MoveElemsAttrsToGroupPlugin::new();
 
         let mut group = create_test_element("g", vec![]);
         group.children = vec![
@@ -309,7 +309,7 @@ mod tests {
 
     #[test]
     fn test_no_change_when_attributes_differ() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
+        let plugin = MoveElemsAttrsToGroupPlugin::new();
 
         let mut group = create_test_element("g", vec![]);
         group.children = vec![
@@ -339,7 +339,7 @@ mod tests {
 
     #[test]
     fn test_multiple_common_attributes() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
+        let plugin = MoveElemsAttrsToGroupPlugin::new();
 
         let mut group = create_test_element("g", vec![]);
         group.children = vec![
@@ -378,7 +378,7 @@ mod tests {
 
     #[test]
     fn test_group_already_has_attribute() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
+        let plugin = MoveElemsAttrsToGroupPlugin::new();
 
         let mut group = create_test_element("g", vec![("fill", "green")]);
         group.children = vec![
@@ -407,7 +407,7 @@ mod tests {
 
     #[test]
     fn test_single_child_no_change() {
-        let mut plugin = MoveElemsAttrsToGroupPlugin::new();
+        let plugin = MoveElemsAttrsToGroupPlugin::new();
 
         let mut group = create_test_element("g", vec![]);
         group.children = vec![Node::Element(create_test_element(

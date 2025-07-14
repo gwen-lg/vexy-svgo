@@ -258,3 +258,204 @@ vexy-svgo input.svg -o output.svg --quiet
 # Continue on errors when processing multiple files
 vexy-svgo *.svg --continue-on-error
 ```
+
+## Advanced Usage
+
+### Memory and Performance Options
+
+```bash
+# Enable parallel processing with 8 threads
+vexy_svgo large-file.svg --parallel 8
+
+# Set memory limit (useful for very large files)
+vexy_svgo huge-file.svg --memory-limit 500MB
+
+# Enable streaming mode for huge files
+vexy_svgo massive-file.svg --streaming
+
+# Batch processing with custom batch size
+vexy_svgo -f ./svg-folder --batch-size 10
+```
+
+### Output Formats
+
+```bash
+# Generate data URI (base64)
+vexy_svgo icon.svg --datauri base64
+
+# Generate data URI (URL encoded)
+vexy_svgo icon.svg --datauri enc
+
+# Generate data URI (unencoded)
+vexy_svgo icon.svg --datauri unenc
+
+# JSON output with optimization stats
+vexy_svgo input.svg --output-format json
+
+# Output to stdout
+vexy_svgo input.svg -o -
+```
+
+### Benchmarking and Analysis
+
+```bash
+# Show optimization statistics
+vexy_svgo input.svg --stats
+
+# Benchmark mode (shows timing information)
+vexy_svgo input.svg --benchmark
+
+# Show detailed timing for each plugin
+vexy_svgo input.svg --timing
+
+# Show progress indicator for batch processing
+vexy_svgo -f ./large-folder --progress
+```
+
+### Integration Examples
+
+```bash
+# Process SVG from URL (via curl)
+curl https://example.com/image.svg | vexy_svgo > optimized.svg
+
+# Optimize all SVG files and save with .min.svg suffix
+for file in *.svg; do
+    vexy_svgo "$file" -o "${file%.svg}.min.svg"
+done
+
+# Find and optimize all SVG files recursively
+find . -name "*.svg" -exec vexy_svgo {} \;
+
+# Optimize and copy to different directory
+vexy_svgo src/*.svg --output-dir dist/
+
+# Watch mode (requires external tool like entr)
+ls *.svg | entr -c vexy_svgo /_
+```
+
+## Real-World Scenarios
+
+### Web Development Workflow
+
+```bash
+# Optimize all icons in a project
+vexy_svgo src/assets/icons/*.svg --output-dir public/icons/
+
+# Optimize with specific settings for web
+vexy_svgo logo.svg \
+  --enable removeViewBox=false \
+  --enable removeTitle=false \
+  --precision 2 \
+  -o public/logo.svg
+
+# Generate optimized sprites
+cat icons/*.svg | vexy_svgo --multipass > sprite.svg
+```
+
+### Build System Integration
+
+```bash
+# npm scripts in package.json
+{
+  "scripts": {
+    "optimize:svg": "vexy_svgo src/**/*.svg --quiet",
+    "build:icons": "vexy_svgo src/icons/*.svg --output-dir dist/icons/ --stats",
+    "watch:svg": "chokidar 'src/**/*.svg' -c 'npm run optimize:svg'"
+  }
+}
+
+# Makefile integration
+optimize-svg:
+	@echo "Optimizing SVG files..."
+	@vexy_svgo assets/*.svg --quiet --stats
+
+# GitHub Actions
+- name: Optimize SVG files
+  run: |
+    vexy_svgo **/*.svg --stats --continue-on-error
+```
+
+### Debugging and Troubleshooting
+
+```bash
+# Debug plugin execution order
+vexy_svgo input.svg --show-plugins
+
+# Test with specific plugins only
+vexy_svgo input.svg \
+  --disable '*' \
+  --enable removeComments \
+  --enable removeMetadata \
+  --verbose
+
+# Compare before and after
+vexy_svgo input.svg -o output.svg --stats
+diff -u input.svg output.svg
+
+# Validate SVG after optimization
+vexy_svgo input.svg | xmllint --noout -
+```
+
+### Batch Processing Patterns
+
+```bash
+# Process files in parallel with progress
+vexy_svgo -f ./images --parallel 4 --progress
+
+# Process with error handling and logging
+vexy_svgo *.svg \
+  --continue-on-error \
+  --stats \
+  2> errors.log \
+  | tee optimization.log
+
+# Conditional optimization based on file size
+for file in *.svg; do
+    size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
+    if [ $size -gt 10000 ]; then
+        echo "Optimizing large file: $file"
+        vexy_svgo "$file" --multipass --parallel
+    else
+        vexy_svgo "$file"
+    fi
+done
+```
+
+## Platform-Specific Examples
+
+### macOS
+
+```bash
+# Using with Homebrew
+brew install vexy-svgo
+vexy_svgo ~/Desktop/*.svg
+
+# Quick Look integration
+vexy_svgo input.svg -o - | qlmanage -p -
+```
+
+### Windows
+
+```batch
+REM Batch file for Windows
+@echo off
+for %%f in (*.svg) do (
+    vexy_svgo "%%f" -o "optimized_%%f"
+)
+
+REM PowerShell
+Get-ChildItem -Filter *.svg | ForEach-Object {
+    vexy_svgo $_.FullName -o "optimized_$($_.Name)"
+}
+```
+
+### Linux
+
+```bash
+# System-wide installation
+sudo cp vexy_svgo /usr/local/bin/
+sudo chmod +x /usr/local/bin/vexy_svgo
+
+# Desktop file association
+xdg-mime default vexy-svgo.desktop image/svg+xml
+```

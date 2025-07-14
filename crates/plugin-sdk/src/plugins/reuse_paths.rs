@@ -465,7 +465,7 @@ mod tests {
                     elem.children.iter().any(|defs_child| {
                         if let Node::Element(defs_elem) = defs_child {
                             defs_elem.name == "circle"
-                                && defs_elem.attr("id").map(|s| s.as_str()) == Some("myCircle")
+                                && defs_elem.attr("id").map(|s| s.as_ref()) == Some("myCircle")
                         } else {
                             false
                         }

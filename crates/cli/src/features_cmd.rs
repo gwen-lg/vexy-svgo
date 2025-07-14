@@ -4,7 +4,7 @@
 
 use clap::{Args, Subcommand};
 use vexy_svgo_core::features::{Feature, enable_feature, disable_feature, enabled_features};
-use vexy_svgo_core::error::VexySvgoError;
+use vexy_svgo_core::error::VexyError;
 
 #[derive(Debug, Args)]
 pub struct FeaturesCommand {
@@ -31,7 +31,7 @@ pub enum FeaturesSubcommand {
 }
 
 impl FeaturesCommand {
-    pub fn execute(&self) -> Result<(), VexySvgoError> {
+    pub fn execute(&self) -> Result<(), VexyError> {
         match &self.command {
             FeaturesSubcommand::List => list_features(),
             FeaturesSubcommand::Enable { feature } => enable_feature_cmd(feature),
@@ -41,7 +41,7 @@ impl FeaturesCommand {
     }
 }
 
-fn list_features() -> Result<(), VexySvgoError> {
+fn list_features() -> Result<(), VexyError> {
     println!("Available features:");
     println!();
     
@@ -66,7 +66,7 @@ fn list_features() -> Result<(), VexySvgoError> {
     Ok(())
 }
 
-fn enable_feature_cmd(feature_name: &str) -> Result<(), VexySvgoError> {
+fn enable_feature_cmd(feature_name: &str) -> Result<(), VexyError> {
     let feature = parse_feature(feature_name)?;
     
     match enable_feature(feature) {
@@ -81,14 +81,14 @@ fn enable_feature_cmd(feature_name: &str) -> Result<(), VexySvgoError> {
     }
 }
 
-fn disable_feature_cmd(feature_name: &str) -> Result<(), VexySvgoError> {
+fn disable_feature_cmd(feature_name: &str) -> Result<(), VexyError> {
     let feature = parse_feature(feature_name)?;
     disable_feature(feature);
     println!("Feature '{}' disabled", feature_name);
     Ok(())
 }
 
-fn show_features() -> Result<(), VexySvgoError> {
+fn show_features() -> Result<(), VexyError> {
     let enabled = enabled_features();
     
     if enabled.is_empty() {
@@ -119,7 +119,7 @@ fn show_features() -> Result<(), VexySvgoError> {
     Ok(())
 }
 
-fn parse_feature(name: &str) -> Result<Feature, VexySvgoError> {
+fn parse_feature(name: &str) -> Result<Feature, VexyError> {
     match name.to_lowercase().as_str() {
         "parallel" => Ok(Feature::ParallelProcessing),
         "streaming" => Ok(Feature::StreamingParser),

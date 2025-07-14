@@ -8,11 +8,9 @@ use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_int};
 use std::ptr;
 
-use vexy_svgo_core::{optimize_with_config, Config};
-
 /// Error codes for FFI operations
 #[repr(C)]
-pub enum VexySvgoErrorCode {
+pub enum VexyErrorCode {
     Success = 0,
     InvalidInput = 1,
     ParseError = 2,
@@ -23,8 +21,8 @@ pub enum VexySvgoErrorCode {
 
 /// FFI-compatible optimization result
 #[repr(C)]
-pub struct VexySvgoResult {
-    pub error_code: VexySvgoErrorCode,
+pub struct VexyResult {
+    pub error_code: VexyErrorCode,
     pub data: *mut c_char,
     pub data_length: usize,
     pub original_size: usize,
@@ -32,10 +30,10 @@ pub struct VexySvgoResult {
     pub error_message: *mut c_char,
 }
 
-impl Default for VexySvgoResult {
+impl Default for VexyResult {
     fn default() -> Self {
         Self {
-            error_code: VexySvgoErrorCode::Success,
+            error_code: VexyErrorCode::Success,
             data: ptr::null_mut(),
             data_length: 0,
             original_size: 0,
@@ -45,8 +43,10 @@ impl Default for VexySvgoResult {
     }
 }
 
+
+
 /// Create a new FFI result with error
-fn create_error_result(code: VexySvgoErrorCode, message: &str) -> VexySvgoResult {
+fn create_error_result(code: VexyErrorCode, message: &str) -> VexyResult {
     let error_message = match CString::new(message) {
         Ok(s) => s.into_raw(),
         Err(_) => ptr::null_mut(),
@@ -63,7 +63,7 @@ fn create_error_result(code: VexySvgoErrorCode, message: &str) -> VexySvgoResult
 }
 
 /// Create a success result with optimized data
-fn create_success_result(data: String, original_size: usize) -> VexySvgoResult {
+fn create_success_result(data: String, original_size: usize) -> VexyResult {
     let optimized_size = data.len();
     match CString::new(data) {
         Ok(c_string) => {
@@ -91,7 +91,7 @@ fn create_success_result(data: String, original_size: usize) -> VexySvgoResult {
 /// The `svg_input` pointer must be valid and point to a null-terminated string.
 /// The caller is responsible for freeing the returned result using `vexy_svgo_free_result`.
 #[no_mangle]
-pub unsafe extern "C" fn vexy_svgo_optimize_default(svg_input: *const c_char) -> VexySvgoResult {
+pub unsafe extern "C" fn vexy_svgo_optimize_default(svg_input: *const c_char) -> VexyResult {
     if svg_input.is_null() {
         return create_error_result(VexySvgoErrorCode::InvalidInput, "Input SVG is null");
     }
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn vexy_svgo_optimize_default(svg_input: *const c_char) ->
 pub unsafe extern "C" fn vexy_svgo_optimize_with_config(
     svg_input: *const c_char,
     config_json: *const c_char,
-) -> VexySvgoResult {
+) -> VexyResult {
     if svg_input.is_null() {
         return create_error_result(VexySvgoErrorCode::InvalidInput, "Input SVG is null");
     }
@@ -211,7 +211,7 @@ pub unsafe extern "C" fn vexy_svgo_get_default_config() -> *mut c_char {
 /// This function must only be called with results returned from Vexy SVGO functions.
 /// The result should not be used after calling this function.
 #[no_mangle]
-pub unsafe extern "C" fn vexy_svgo_free_result(result: VexySvgoResult) {
+pub unsafe extern "C" fn vexy_svgo_free_result(result: VexyResult) {
     if !result.data.is_null() {
         let _ = CString::from_raw(result.data);
     }

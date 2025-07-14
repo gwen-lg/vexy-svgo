@@ -7,7 +7,7 @@
 //! transformation logic in a structured way.
 
 use crate::ast::{Document, Element, Node};
-use anyhow::Result;
+use crate::error::VexyError;
 
 /// Visitor trait for AST traversal
 ///
@@ -16,25 +16,25 @@ use anyhow::Result;
 /// processing different node types.
 pub trait Visitor<'a> {
     /// Called when entering an element (before processing children)
-    fn visit_element_enter(&mut self, element: &mut Element<'a>) -> Result<()> {
+    fn visit_element_enter(&mut self, element: &mut Element<'a>) -> Result<(), VexyError> {
         let _ = element;
         Ok(())
     }
 
     /// Called when exiting an element (after processing children)
-    fn visit_element_exit(&mut self, element: &mut Element<'a>) -> Result<()> {
+    fn visit_element_exit(&mut self, element: &mut Element<'a>) -> Result<(), VexyError> {
         let _ = element;
         Ok(())
     }
 
     /// Called when visiting text content
-    fn visit_text(&mut self, text: &mut String) -> Result<()> {
+    fn visit_text(&mut self, text: &mut String) -> Result<(), VexyError> {
         let _ = text;
         Ok(())
     }
 
     /// Called when visiting a comment
-    fn visit_comment(&mut self, comment: &mut String) -> Result<()> {
+    fn visit_comment(&mut self, comment: &mut String) -> Result<(), VexyError> {
         let _ = comment;
         Ok(())
     }
@@ -44,25 +44,25 @@ pub trait Visitor<'a> {
         &mut self,
         target: &mut String,
         data: &mut String,
-    ) -> Result<()> {
+    ) -> Result<(), VexyError> {
         let _ = (target, data);
         Ok(())
     }
 
     /// Called when visiting CDATA
-    fn visit_cdata(&mut self, cdata: &mut String) -> Result<()> {
+    fn visit_cdata(&mut self, cdata: &mut String) -> Result<(), VexyError> {
         let _ = cdata;
         Ok(())
     }
 
     /// Called when visiting DOCTYPE
-    fn visit_doctype(&mut self, doctype: &mut String) -> Result<()> {
+    fn visit_doctype(&mut self, doctype: &mut String) -> Result<(), VexyError> {
         let _ = doctype;
         Ok(())
     }
 
     /// Called when visiting the document root
-    fn visit_document(&mut self, document: &mut Document<'a>) -> Result<()>
+    fn visit_document(&mut self, document: &mut Document<'a>) -> Result<(), VexyError>
     where
         Self: Sized,
     {
@@ -74,7 +74,7 @@ pub trait Visitor<'a> {
 pub fn walk_document<'a, V: Visitor<'a> + ?Sized>(
     visitor: &mut V,
     document: &mut Document<'a>,
-) -> Result<()> {
+) -> Result<(), VexyError> {
     // Visit prologue nodes
     for node in &mut document.prologue {
         walk_node(visitor, node)?;
@@ -95,7 +95,7 @@ pub fn walk_document<'a, V: Visitor<'a> + ?Sized>(
 pub fn walk_element<'a, V: Visitor<'a> + ?Sized>(
     visitor: &mut V,
     element: &mut Element<'a>,
-) -> Result<()> {
+) -> Result<(), VexyError> {
     // Enter element
     visitor.visit_element_enter(element)?;
 
@@ -112,7 +112,7 @@ pub fn walk_element<'a, V: Visitor<'a> + ?Sized>(
 }
 
 /// Walk through a node and call appropriate visitor methods
-pub fn walk_node<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, node: &mut Node<'a>) -> Result<()> {
+pub fn walk_node<'a, V: Visitor<'a> + ?Sized>(visitor: &mut V, node: &mut Node<'a>) -> Result<(), VexyError> {
     match node {
         Node::Element(element) => walk_element(visitor, element),
         Node::Text(text) => visitor.visit_text(text),
@@ -207,7 +207,7 @@ impl<V, F: ElementFilter> FilteredVisitor<V, F> {
 }
 
 impl<'a, V: Visitor<'a>, F: ElementFilter> Visitor<'a> for FilteredVisitor<V, F> {
-    fn visit_element_enter(&mut self, element: &mut Element<'a>) -> Result<()> {
+    fn visit_element_enter(&mut self, element: &mut Element<'a>) -> Result<(), VexyError> {
         if self.filter.should_visit(element) {
             self.visitor.visit_element_enter(element)
         } else {
@@ -215,7 +215,7 @@ impl<'a, V: Visitor<'a>, F: ElementFilter> Visitor<'a> for FilteredVisitor<V, F>
         }
     }
 
-    fn visit_element_exit(&mut self, element: &mut Element<'a>) -> Result<()> {
+    fn visit_element_exit(&mut self, element: &mut Element<'a>) -> Result<(), VexyError> {
         if self.filter.should_visit(element) {
             self.visitor.visit_element_exit(element)
         } else {
@@ -223,11 +223,11 @@ impl<'a, V: Visitor<'a>, F: ElementFilter> Visitor<'a> for FilteredVisitor<V, F>
         }
     }
 
-    fn visit_text(&mut self, text: &mut String) -> Result<()> {
+    fn visit_text(&mut self, text: &mut String) -> Result<(), VexyError> {
         self.visitor.visit_text(text)
     }
 
-    fn visit_comment(&mut self, comment: &mut String) -> Result<()> {
+    fn visit_comment(&mut self, comment: &mut String) -> Result<(), VexyError> {
         self.visitor.visit_comment(comment)
     }
 
@@ -235,15 +235,15 @@ impl<'a, V: Visitor<'a>, F: ElementFilter> Visitor<'a> for FilteredVisitor<V, F>
         &mut self,
         target: &mut String,
         data: &mut String,
-    ) -> Result<()> {
+    ) -> Result<(), VexyError> {
         self.visitor.visit_processing_instruction(target, data)
     }
 
-    fn visit_cdata(&mut self, cdata: &mut String) -> Result<()> {
+    fn visit_cdata(&mut self, cdata: &mut String) -> Result<(), VexyError> {
         self.visitor.visit_cdata(cdata)
     }
 
-    fn visit_doctype(&mut self, doctype: &mut String) -> Result<()> {
+    fn visit_doctype(&mut self, doctype: &mut String) -> Result<(), VexyError> {
         self.visitor.visit_doctype(doctype)
     }
 }
@@ -268,12 +268,12 @@ mod tests {
     }
 
     impl<'a> Visitor<'a> for TestVisitor {
-        fn visit_element_enter(&mut self, element: &mut Element<'a>) -> Result<()> {
+        fn visit_element_enter(&mut self, element: &mut Element<'a>) -> Result<(), VexyError> {
             self.elements_visited.push(element.name.to_string());
             Ok(())
         }
 
-        fn visit_text(&mut self, text: &mut String) -> Result<()> {
+        fn visit_text(&mut self, text: &mut String) -> Result<(), VexyError> {
             self.texts_visited.push(text.clone());
             Ok(())
         }

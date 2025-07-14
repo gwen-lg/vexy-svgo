@@ -19,59 +19,18 @@ pub mod plugins;
 pub mod registry;
 pub mod enhanced_registry;
 
-#[macro_use] pub mod plugin_test_macros;
-
-
-
-
+#[macro_use]
+#[doc(hidden)]
+pub mod plugin_test_macros;
 
 #[cfg(test)]
+#[doc(hidden)]
 pub mod property_tests;
 
 /// Result type for plugin operations
-pub type PluginResult<T> = Result<T, PluginError>;
+pub type PluginResult<T> = Result<T, VexyError>;
 
-/// Error type for plugin operations
-#[derive(Debug)]
-pub enum PluginError {
-    /// Invalid configuration parameter
-    InvalidConfig(String),
-    /// Processing error
-    ProcessingError(String),
-    /// I/O error
-    IoError(std::io::Error),
-}
 
-impl fmt::Display for PluginError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            PluginError::InvalidConfig(msg) => write!(f, "Invalid plugin configuration: {}", msg),
-            PluginError::ProcessingError(msg) => write!(f, "Plugin processing error: {}", msg),
-            PluginError::IoError(err) => write!(f, "Plugin I/O error: {}", err),
-        }
-    }
-}
-
-impl Error for PluginError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            PluginError::IoError(err) => Some(err),
-            _ => None,
-        }
-    }
-}
-
-impl From<std::io::Error> for PluginError {
-    fn from(err: std::io::Error) -> Self {
-        PluginError::IoError(err)
-    }
-}
-
-impl From<anyhow::Error> for PluginError {
-    fn from(err: anyhow::Error) -> Self {
-        PluginError::ProcessingError(err.to_string())
-    }
-}
 
 // PluginInfo is no longer needed with the simplified core Plugin trait
 
@@ -173,7 +132,7 @@ impl PluginRegistry {
         &self,
         document: &mut Document,
         configs: &[PluginDescriptor],
-    ) -> PluginResult<()> {
+    ) -> Result<(), VexyError> {
         for config in configs {
             if !config.enabled {
                 continue;
@@ -274,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_apply_unknown_plugin() {
-        let mut registry = PluginRegistry::new();
+        let registry = PluginRegistry::new();
         let mut document = vexy_svgo_core::ast::Document::new();
         let configs = vec![PluginDescriptor::new("unknown".to_string())];
 

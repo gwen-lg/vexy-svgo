@@ -63,7 +63,7 @@ impl EnhancedConfig {
 
     /// Create configuration from JSON
     #[wasm_bindgen(js_name = fromJson)]
-    pub fn from_json(json: &str) -> Result<EnhancedConfig, JsError> {
+    pub fn from_json(json: &str) -> Result<EnhancedConfig, VexyError> {
         let inner: Config = serde_json::from_str(json)
             .map_err(|e| JsError::new(&format!("Invalid config JSON: {}", e)))?;
         
@@ -77,7 +77,7 @@ impl EnhancedConfig {
 
     /// Export configuration to JSON
     #[wasm_bindgen(js_name = toJson)]
-    pub fn to_json(&self) -> Result<String, JsError> {
+    pub fn to_json(&self) -> Result<String, VexyError> {
         serde_json::to_string_pretty(&self.inner)
             .map_err(|e| JsError::new(&format!("Failed to serialize config: {}", e)))
     }
@@ -116,7 +116,7 @@ impl EnhancedConfig {
 
     /// Configure a plugin with parameters
     #[wasm_bindgen(js_name = configurePlugin)]
-    pub fn configure_plugin(&mut self, name: &str, params_json: &str) -> Result<(), JsError> {
+    pub fn configure_plugin(&mut self, name: &str, params_json: &str) -> Result<(), VexyError> {
         let params: serde_json::Value = serde_json::from_str(params_json)
             .map_err(|e| JsError::new(&format!("Invalid plugin params: {}", e)))?;
         
@@ -276,7 +276,7 @@ impl PluginInfo {
 
 /// Enhanced optimization with detailed metrics
 #[wasm_bindgen(js_name = optimizeEnhanced)]
-pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedResult, JsError> {
+pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedResult, VexyError> {
     let start_time = web_sys::window()
         .and_then(|w| w.performance())
         .map(|p| p.now())
@@ -382,7 +382,7 @@ pub fn optimize_enhanced(svg: &str, config: EnhancedConfig) -> Result<EnhancedRe
 
 /// Get list of available plugins with metadata
 #[wasm_bindgen(js_name = getPluginsWithMetadata)]
-pub fn get_plugins() -> Result<Vec<JsValue>, JsError> {
+pub fn get_plugins() -> Result<Vec<JsValue>, VexyError> {
     let registry = create_default_registry();
     let plugins: Vec<JsValue> = registry
         .plugin_names()
@@ -433,7 +433,7 @@ impl StreamingOptimizer {
 
     /// Add a chunk of SVG data
     #[wasm_bindgen(js_name = addChunk)]
-    pub fn add_chunk(&mut self, chunk: &str) -> Result<(), JsError> {
+    pub fn add_chunk(&mut self, chunk: &str) -> Result<(), VexyError> {
         match &self.state {
             StreamingState::Ready | StreamingState::Processing => {
                 self.buffer.push_str(chunk);
@@ -451,7 +451,7 @@ impl StreamingOptimizer {
 
     /// Finalize and get the optimized result
     #[wasm_bindgen(js_name = finalize)]
-    pub fn finalize(&mut self) -> Result<EnhancedResult, JsError> {
+    pub fn finalize(&mut self) -> Result<EnhancedResult, VexyError> {
         match &self.state {
             StreamingState::Processing => {
                 match optimize_enhanced(&self.buffer, self.config.clone()) {
@@ -495,7 +495,7 @@ impl StreamingOptimizer {
 
 /// Feature management
 #[wasm_bindgen(js_name = enableFeature)]
-pub fn enable_wasm_feature(feature_name: &str) -> Result<(), JsError> {
+pub fn enable_wasm_feature(feature_name: &str) -> Result<(), VexyError> {
     let feature = match feature_name {
         "parallel" => Feature::ParallelProcessing,
         "streaming" => Feature::StreamingParser,
@@ -547,7 +547,7 @@ pub fn get_available_features() -> Vec<JsValue> {
 
 /// Validate SVG without optimization
 #[wasm_bindgen(js_name = validateSvg)]
-pub fn validate_svg(svg: &str) -> Result<ValidationResult, JsError> {
+pub fn validate_svg(svg: &str) -> Result<ValidationResult, VexyError> {
     match parse_svg(svg) {
         Ok(_doc) => {
             let mut issues = Vec::new();

@@ -11,11 +11,11 @@ pub mod parallel;
 use crate::parser::config::{Config, DataUriFormat};
 use crate::parser::Parser;
 use crate::plugin_registry::PluginRegistry;
-use crate::error::VexySvgoError;
+use crate::error::VexyError;
 use serde::{Deserialize, Serialize};
 
 /// Optimization result type
-pub type OptimizeResult<T> = Result<T, VexySvgoError>;
+pub type OptimizeResult<T> = Result<T, VexyError>;
 
 /// Options for the optimize function
 pub struct OptimizeOptions {
@@ -125,7 +125,28 @@ impl OptimizationInfo {
 ///
 /// This is the primary entry point for SVG optimization, equivalent to SVGO's `optimize` function.
 /// It parses the SVG, applies a series of plugins, and then stringifies the result.
-pub fn optimize(input: &str, options: OptimizeOptions) -> OptimizeResult<OptimizationResult> {
+///
+/// # Arguments
+///
+/// * `input` - The SVG string to optimize
+/// * `options` - Configuration options including plugins and output settings
+///
+/// # Returns
+///
+/// An `OptimizationResult` containing the optimized SVG and metadata about the optimization
+///
+/// # Examples
+///
+/// ```rust
+/// use vexy_svgo_core::{optimize, OptimizeOptions, Config};
+///
+/// let svg = r#"<svg><rect width="100" height="100"/></svg>"#;
+/// let options = OptimizeOptions::new(Config::default());
+/// let result = optimize(svg, options).unwrap();
+/// println!("Optimized SVG: {}", result.data);
+/// println!("Compression: {:.1}%", result.info.compression_percentage());
+/// ```
+pub fn optimize(input: &str, options: OptimizeOptions) -> Result<OptimizationResult, VexyError> {
     let original_size = input.len();
     let config = options.config;
     let registry = options.registry.unwrap_or_default();
@@ -166,18 +187,18 @@ pub fn optimize(input: &str, options: OptimizeOptions) -> OptimizeResult<Optimiz
             if let Some(num_threads) = config.parallel {
                 registry
                     .apply_plugins_parallel(&mut document, registry_plugins, num_threads)
-                    .map_err(VexySvgoError::from)?;
+                    .map_err(VexyError::from)?;
             } else {
                 registry
                     .apply_plugins(&mut document, registry_plugins)
-                    .map_err(VexySvgoError::from)?;
+                    .map_err(VexyError::from)?;
             }
         }
         #[cfg(not(feature = "parallel"))]
         {
             registry
                 .apply_plugins(&mut document, registry_plugins)
-                .map_err(VexySvgoError::from)?;
+                .map_err(VexyError::from)?;
         }
         plugins_applied += config.plugins.len();
 
@@ -209,12 +230,61 @@ pub fn optimize(input: &str, options: OptimizeOptions) -> OptimizeResult<Optimiz
 }
 
 /// Convenience function with default options
-pub fn optimize_default(input: &str) -> OptimizeResult<OptimizationResult> {
+///
+/// This is a convenience function that optimizes an SVG using the default
+/// configuration with all standard plugins enabled.
+///
+/// # Arguments
+///
+/// * `input` - The SVG string to optimize
+///
+/// # Returns
+///
+/// An `OptimizationResult` containing the optimized SVG
+///
+/// # Examples
+///
+/// ```rust
+/// use vexy_svgo_core::optimize_default;
+///
+/// let svg = r#"<svg><!-- comment --><rect width="100" height="100"/></svg>"#;
+/// let result = optimize_default(svg).unwrap();
+/// assert!(!result.data.contains("<!-- comment")); // Comments removed by default
+/// ```
+pub fn optimize_default(input: &str) -> Result<OptimizationResult, VexyError> {
     optimize(input, OptimizeOptions::default())
 }
 
 /// Optimize with a custom configuration
-pub fn optimize_with_config(input: &str, config: Config) -> OptimizeResult<OptimizationResult> {
+///
+/// This function allows you to specify a custom configuration for the optimization process.
+/// Use this when you need fine-grained control over which plugins to run and their parameters.
+///
+/// # Arguments
+///
+/// * `input` - The SVG string to optimize
+/// * `config` - Custom configuration specifying plugins and their settings
+///
+/// # Returns
+///
+/// An `OptimizationResult` containing the optimized SVG
+///
+/// # Examples
+///
+/// ```rust
+/// use vexy_svgo_core::{optimize_with_config, Config, PluginConfig};
+///
+/// let mut config = Config::default();
+/// config.multipass = true;
+/// config.plugins = vec![
+///     PluginConfig::Name("removeComments".to_string()),
+///     PluginConfig::Name("removeDoctype".to_string()),
+/// ];
+///
+/// let svg = r#"<!DOCTYPE svg><!-- test --><svg><rect/></svg>"#;
+/// let result = optimize_with_config(svg, config).unwrap();
+/// ```
+pub fn optimize_with_config(input: &str, config: Config) -> Result<OptimizationResult, VexyError> {
     optimize(input, OptimizeOptions::new(config))
 }
 
