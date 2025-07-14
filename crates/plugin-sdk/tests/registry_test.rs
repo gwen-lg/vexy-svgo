@@ -18,10 +18,10 @@ fn test_registry_with_multiple_plugins() {
     registry.register("collapseGroups", || CollapseGroupsPlugin::new());
 
     // Verify plugins are registered
-    assert!(registry.get_plugin("removeComments").is_some());
-    assert!(registry.get_plugin("removeEmptyAttrs").is_some());
-    assert!(registry.get_plugin("collapseGroups").is_some());
-    assert!(registry.get_plugin("nonexistent").is_none());
+    assert!(registry.create_plugin("removeComments").is_some());
+    assert!(registry.create_plugin("removeEmptyAttrs").is_some());
+    assert!(registry.create_plugin("collapseGroups").is_some());
+    assert!(registry.create_plugin("nonexistent").is_none());
 
     let plugin_names = registry.plugin_names();
     assert!(plugin_names.contains(&"removeComments"));
@@ -35,7 +35,7 @@ fn test_plugin_pipeline_execution() {
     let mut registry = PluginRegistry::new();
     registry.register("removeComments", || RemoveCommentsPlugin::new());
     registry.register("removeEmptyAttrs", || RemoveEmptyAttrsPlugin::new());
-    registry.register(CollapseGroupsPlugin::new());
+    registry.register("collapseGroups", || CollapseGroupsPlugin::new());
 
     // Create test document
     let mut doc = create_complex_test_document();
@@ -192,19 +192,19 @@ fn create_complex_test_document() -> Document<'static> {
     doc.root.name = Cow::Borrowed("svg");
     doc.root
         .attributes
-        .insert("width".to_string(), "100".to_string());
+        .insert(Cow::Borrowed("width"), Cow::Borrowed("100"));
     doc.root
         .attributes
-        .insert("height".to_string(), "100".to_string());
+        .insert(Cow::Borrowed("height"), Cow::Borrowed("100"));
     doc.root
         .attributes
-        .insert("fill".to_string(), "".to_string());
+        .insert(Cow::Borrowed("fill"), Cow::Borrowed(""));
     doc.root
         .attributes
-        .insert("stroke".to_string(), "  ".to_string());
+        .insert(Cow::Borrowed("stroke"), Cow::Borrowed("  "));
     doc.root
         .attributes
-        .insert("class".to_string(), "".to_string());
+        .insert(Cow::Borrowed("class"), Cow::Borrowed(""));
 
     // Add various comments
     doc.root
@@ -221,10 +221,10 @@ fn create_complex_test_document() -> Document<'static> {
     let mut group = Element::new("g");
     group
         .attributes
-        .insert("id".to_string(), "group1".to_string());
+        .insert(Cow::Borrowed("id"), Cow::Borrowed("group1"));
     group
         .attributes
-        .insert("transform".to_string(), "".to_string());
+        .insert(Cow::Borrowed("transform"), Cow::Borrowed(""));
     group
         .attributes
         .insert("opacity".to_string(), "".to_string());

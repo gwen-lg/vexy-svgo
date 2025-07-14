@@ -105,7 +105,7 @@ impl Plugin for RemoveStyleElementPlugin {
 }
 
 #[cfg(test)]
-mod tests {
+mod unit_tests {
     use super::*;
     use serde_json::json;
     use std::borrow::Cow;

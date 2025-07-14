@@ -5,7 +5,7 @@
 //! This module provides property-based testing infrastructure using proptest
 //! to generate random valid SVGs and test optimization invariants.
 
-use crate::Plugin;
+use vexy_svgo_plugin_sdk::Plugin;
 use anyhow::Result;
 use proptest::prelude::*;
 use proptest::strategy::ValueTree;
@@ -212,7 +212,7 @@ pub fn test_optimization_invariants<P: Plugin + Clone>(plugin: P, test_cases: u3
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::plugins::RemoveCommentsPlugin;
+    use vexy_svgo_plugin_sdk::plugins::RemoveCommentsPlugin;
 
     #[test]
     fn test_simple_svg_generation() {

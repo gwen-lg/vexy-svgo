@@ -1,3 +1,0 @@
-[0;34m[INFO][0m Auto-incrementing version from v1.0.30 to 1.0.31
-[0;34m[INFO][0m Starting Vexy SVGO release process for version 1.0.31
-[0;31m[ERROR][0m Working directory is not clean. Please commit all changes first.

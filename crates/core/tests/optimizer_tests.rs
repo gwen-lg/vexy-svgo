@@ -194,7 +194,7 @@ mod tests {
         let mut config = Config::default();
         config.pretty = true;
         config.indent = "    ".to_string(); // 4 spaces
-        let pretty_enabled = config.pretty;
+        let _pretty_enabled = config.pretty;
         
         let result = optimize_with_config(svg, config);
         assert!(result.is_ok());

@@ -412,7 +412,7 @@ impl ConvertShapeToPathPlugin {
 }
 
 #[cfg(test)]
-mod tests {
+mod unit_tests {
     use super::*;
     use vexy_svgo_core::ast::Element;
 

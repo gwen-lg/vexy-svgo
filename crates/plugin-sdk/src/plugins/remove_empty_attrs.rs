@@ -114,7 +114,7 @@ impl Visitor<'_> for EmptyAttrRemovalVisitor {
 }
 
 #[cfg(test)]
-mod tests {
+mod unit_tests {
     use super::*;
     use serde_json::json;
     use std::collections::HashMap;

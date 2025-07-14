@@ -59,19 +59,19 @@ fn create_test_document() -> Document<'static> {
     doc.root.name = Cow::Borrowed("svg");
     doc.root
         .attributes
-        .insert("width".to_string(), "100".to_string());
+        .insert(Cow::Borrowed("width"), Cow::Borrowed("100"));
     doc.root
         .attributes
-        .insert("height".to_string(), "100".to_string());
+        .insert(Cow::Borrowed("height"), Cow::Borrowed("100"));
     doc.root
         .attributes
-        .insert("fill".to_string(), "".to_string()); // Empty attribute
+        .insert(Cow::Borrowed("fill"), Cow::Borrowed("")); // Empty attribute
     doc.root
         .attributes
-        .insert("stroke".to_string(), "  ".to_string()); // Whitespace-only
+        .insert(Cow::Borrowed("stroke"), Cow::Borrowed("  ")); // Whitespace-only
     doc.root
         .attributes
-        .insert("class".to_string(), "".to_string()); // Empty class
+        .insert(Cow::Borrowed("class"), Cow::Borrowed("")); // Empty class
 
     // Add children with comments and empty attributes
     doc.root
