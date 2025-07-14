@@ -8,22 +8,28 @@
       
       
       
+        <link rel="canonical" href="https://vexyart.github.io/vexy-svgo/developer/creating-a-plugin/">
       
       
+        <link rel="prev" href="../benchmarks/">
       
-      <link rel="icon" href="/vexy-svgo/assets/favicon.ico">
+      
+        <link rel="next" href="../migration/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
-        <title>Vexy SVGO</title>
+        <title>Creating a Plugin - Vexy SVGO</title>
       
     
     
-      <link rel="stylesheet" href="/vexy-svgo/assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
         
-        <link rel="stylesheet" href="/vexy-svgo/assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -42,9 +48,9 @@
       
     
     
-      <link rel="stylesheet" href="/vexy-svgo/assets/css/main.css">
+      <link rel="stylesheet" href="../../assets/css/main.css">
     
-    <script>__md_scope=new URL("/vexy-svgo/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -67,6 +73,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#creating-a-plugin" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -79,9 +90,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/vexy-svgo/." title="Vexy SVGO" class="md-header__button md-logo" aria-label="Vexy SVGO" data-md-component="logo">
+    <a href="../.." title="Vexy SVGO" class="md-header__button md-logo" aria-label="Vexy SVGO" data-md-component="logo">
       
-  <img src="/vexy-svgo/assets/favicon.ico" alt="logo">
+  <img src="../../assets/favicon.ico" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -98,7 +109,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Creating a Plugin
             
           </span>
         </div>
@@ -188,9 +199,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/vexy-svgo/." title="Vexy SVGO" class="md-nav__button md-logo" aria-label="Vexy SVGO" data-md-component="logo">
+    <a href="../.." title="Vexy SVGO" class="md-nav__button md-logo" aria-label="Vexy SVGO" data-md-component="logo">
       
-  <img src="/vexy-svgo/assets/favicon.ico" alt="logo">
+  <img src="../../assets/favicon.ico" alt="logo">
 
     </a>
     Vexy SVGO
@@ -217,7 +228,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -236,8 +247,10 @@
       
   
   
+    
   
   
+  
     
     
     
@@ -248,13 +261,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -270,7 +281,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Developer
@@ -284,7 +295,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -307,7 +318,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/architecture/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -330,7 +341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/benchmarks/" class="md-nav__link">
+      <a href="../benchmarks/" class="md-nav__link">
         
   
   
@@ -350,10 +361,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/creating-a-plugin/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Creating a Plugin
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -364,6 +397,53 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-scaffolding-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Scaffolding the Plugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-writing-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Writing the Plugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-using-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Using the Plugin
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -376,7 +456,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/migration/" class="md-nav__link">
+      <a href="../migration/" class="md-nav__link">
         
   
   
@@ -399,7 +479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/performance-tuning/" class="md-nav__link">
+      <a href="../performance-tuning/" class="md-nav__link">
         
   
   
@@ -422,7 +502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/plugin-development/" class="md-nav__link">
+      <a href="../plugin-development/" class="md-nav__link">
         
   
   
@@ -445,7 +525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/plugin-migration/" class="md-nav__link">
+      <a href="../plugin-migration/" class="md-nav__link">
         
   
   
@@ -468,7 +548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/developer/plugin-reference/" class="md-nav__link">
+      <a href="../plugin-reference/" class="md-nav__link">
         
   
   
@@ -543,7 +623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/user/" class="md-nav__link">
+      <a href="../../user/" class="md-nav__link">
         
   
   
@@ -566,7 +646,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/user/cli-usage/" class="md-nav__link">
+      <a href="../../user/cli-usage/" class="md-nav__link">
         
   
   
@@ -589,7 +669,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/user/configuration/" class="md-nav__link">
+      <a href="../../user/configuration/" class="md-nav__link">
         
   
   
@@ -612,7 +692,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/user/demo/" class="md-nav__link">
+      <a href="../../user/demo/" class="md-nav__link">
         
   
   
@@ -635,7 +715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/user/installation/" class="md-nav__link">
+      <a href="../../user/installation/" class="md-nav__link">
         
   
   
@@ -658,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/vexy-svgo/user/plugins/" class="md-nav__link">
+      <a href="../../user/plugins/" class="md-nav__link">
         
   
   
@@ -698,6 +778,43 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-scaffolding-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Scaffolding the Plugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-writing-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Writing the Plugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-using-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Using the Plugin
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -709,8 +826,71 @@
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+  
+
+
+<h1 id="creating-a-plugin">Creating a Plugin<a class="headerlink" href="#creating-a-plugin" title="Permanent link">&para;</a></h1>
+<p>This tutorial will guide you through the process of creating a simple Vexy SVGO plugin.</p>
+<h2 id="1-scaffolding-the-plugin">1. Scaffolding the Plugin<a class="headerlink" href="#1-scaffolding-the-plugin" title="Permanent link">&para;</a></h2>
+<p>First, create a new directory for your plugin in the <code>examples</code> directory:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>examples/example-plugin/src
+</code></pre></div>
+<p>Next, create a <code>Cargo.toml</code> file for your plugin:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[package]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;example-plugin&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
+<span class="n">edition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;2021&quot;</span>
+
+<span class="k">[dependencies]</span>
+<span class="n">vexy-svgo-core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;../../crates/core&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="n">vexy-svgo-plugin-sdk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;../../crates/plugin-sdk&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h2 id="2-writing-the-plugin">2. Writing the Plugin<a class="headerlink" href="#2-writing-the-plugin" title="Permanent link">&para;</a></h2>
+<p>Now, let's write the plugin code in <code>examples/example-plugin/src/lib.rs</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">vexy_svgo_core</span><span class="p">::</span><span class="n">ast</span><span class="p">::{</span><span class="n">Document</span><span class="p">,</span><span class="w"> </span><span class="n">Element</span><span class="p">,</span><span class="w"> </span><span class="n">Node</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">vexy_svgo_core</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">VexyError</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">vexy_svgo_core</span><span class="p">::</span><span class="n">plugin_registry</span><span class="p">::</span><span class="n">Plugin</span><span class="p">;</span>
+
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">RemoveGElementPlugin</span><span class="p">;</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">Plugin</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">RemoveGElementPlugin</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kp">&amp;</span><span class="o">&#39;</span><span class="nb">static</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s">&quot;removeGElement&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kp">&amp;</span><span class="o">&#39;</span><span class="nb">static</span><span class="w"> </span><span class="kt">str</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s">&quot;Removes all &lt;g&gt; elements from an SVG.&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">document</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Document</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">VexyError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">document</span><span class="p">.</span><span class="n">root</span><span class="p">.</span><span class="n">children</span><span class="p">.</span><span class="n">retain</span><span class="p">(</span><span class="o">|</span><span class="n">node</span><span class="o">|</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Node</span><span class="p">::</span><span class="n">Element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">element</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s">&quot;g&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">_</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This plugin, <code>RemoveGElementPlugin</code>, removes all <code>&lt;g&gt;</code> elements from the SVG.</p>
+<h2 id="3-using-the-plugin">3. Using the Plugin<a class="headerlink" href="#3-using-the-plugin" title="Permanent link">&para;</a></h2>
+<p>To use this plugin, you would need to load it into the plugin registry. This is typically done in the application layer. For example, in the CLI, you would modify the <code>main.rs</code> file to register the plugin.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -769,14 +949,14 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "/vexy-svgo/", "features": ["navigation.expand", "navigation.sections", "navigation.top", "content.code.copy", "content.tabs.link"], "search": "/vexy-svgo/assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.expand", "navigation.sections", "navigation.top", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="/vexy-svgo/assets/javascripts/bundle.56ea9cef.min.js"></script>
+      <script src="../../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
-        <script src="/vexy-svgo/assets/js/svgo-optimizer.js"></script>
+        <script src="../../assets/js/svgo-optimizer.js"></script>
       
-        <script src="/vexy-svgo/assets/js/theme.js"></script>
+        <script src="../../assets/js/theme.js"></script>
       
     
   </body>
