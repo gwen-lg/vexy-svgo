@@ -322,4 +322,90 @@ mod tests {
         assert!(output.contains("<svg"));
         assert!(output.contains("<rect"));
     }
+    
+    #[test]
+    fn test_stringify_with_config_pretty() {
+        let svg = r#"<svg><g><rect/></g></svg>"#;
+        let document = vexy_svgo_core::parse_svg(svg).unwrap();
+        
+        let config = vexy_svgo_core::StringifyConfig {
+            pretty: true,
+            indent: "  ".to_string(),
+            newlines: true,
+            quote_attrs: true,
+            self_close: true,
+            initial_capacity: 1024,
+        };
+        
+        let result = vexy_svgo_core::stringify_with_config(&document, &config);
+        assert!(result.is_ok());
+        
+        let output = result.unwrap();
+        assert!(!output.is_empty());
+        assert!(output.contains("<svg"));
+        assert!(output.contains("<g"));
+        assert!(output.contains("<rect"));
+    }
+    
+    #[test]
+    fn test_stringify_with_config_compact() {
+        let svg = r#"<svg><g><rect/></g></svg>"#;
+        let document = vexy_svgo_core::parse_svg(svg).unwrap();
+        
+        let config = vexy_svgo_core::StringifyConfig {
+            pretty: false,
+            indent: "".to_string(),
+            newlines: false,
+            quote_attrs: true,
+            self_close: true,
+            initial_capacity: 512,
+        };
+        
+        let result = vexy_svgo_core::stringify_with_config(&document, &config);
+        assert!(result.is_ok());
+        
+        let output = result.unwrap();
+        assert!(!output.is_empty());
+        assert!(output.contains("<svg"));
+        // Should be more compact without extra whitespace
+        assert!(!output.contains("\n\n"));
+    }
+    
+    #[test]
+    fn test_stringify_large_document() {
+        let mut svg = String::from("<svg>");
+        for i in 0..100 {
+            svg.push_str(&format!("<rect id=\"rect{}\" x=\"{}\" y=\"{}\" width=\"10\" height=\"10\"/>", i, i, i));
+        }
+        svg.push_str("</svg>");
+        
+        let document = vexy_svgo_core::parse_svg(&svg).unwrap();
+        let result = stringify(&document);
+        assert!(result.is_ok());
+        
+        let output = result.unwrap();
+        assert!(!output.is_empty());
+        assert!(output.contains("<svg"));
+        assert!(output.contains("rect0"));
+        assert!(output.contains("rect99"));
+    }
+    
+    #[test]
+    fn test_stringify_round_trip_fidelity() {
+        // Test that parse -> stringify -> parse produces equivalent documents
+        let original_svg = r#"<svg width="100" height="100">
+            <rect x="10" y="10" width="50" height="50" fill="red"/>
+            <circle cx="75" cy="75" r="20" fill="blue"/>
+        </svg>"#;
+        
+        let document1 = vexy_svgo_core::parse_svg(original_svg).unwrap();
+        let stringified = stringify(&document1).unwrap();
+        let document2 = vexy_svgo_core::parse_svg(&stringified).unwrap();
+        
+        // Both stringified versions should be identical
+        let stringified1 = stringify(&document1).unwrap();
+        let stringified2 = stringify(&document2).unwrap();
+        
+        assert_eq!(stringified1, stringified2);
+    }
 }

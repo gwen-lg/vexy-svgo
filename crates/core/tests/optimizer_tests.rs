@@ -1,7 +1,16 @@
 //! Comprehensive unit tests for the optimizer module
 
+use vexy_svgo_core::{
+    optimize, optimize_with_config, optimize_default, 
+    Config, PluginConfig, OptimizeOptions, OptimizationInfo, OptimizationResult,
+    VexyError, PluginRegistry, Plugin
+};
+use vexy_svgo_core::ast::{Document, Node};
+use serde_json::json;
+
 #[cfg(test)]
 mod tests {
+    use super::*;
     use vexy_svgo_core::{
         optimize_with_config, optimize_default, Config, PluginConfig,
     };
@@ -280,5 +289,189 @@ mod tests {
         let optimized = result.unwrap();
         assert!(optimized.data.contains("<svg"));
         assert!(optimized.data.contains("<rect"));
+    }
+    
+    #[test]
+    fn test_optimization_result_structure() {
+        let svg = r#"<svg><rect width="100" height="100"/></svg>"#;
+        let result = optimize_default(svg).unwrap();
+        
+        // Test OptimizationResult structure
+        assert!(!result.data.is_empty());
+        assert!(result.info.original_size > 0);
+        assert!(result.info.optimized_size > 0);
+        assert!(result.info.compression_ratio >= 0.0);
+        assert!(result.info.compression_ratio <= 1.0);
+        assert!(result.info.passes > 0);
+        assert!(result.error.is_none());
+        assert!(result.modern);
+    }
+    
+    #[test]
+    fn test_optimization_info_calculations() {
+        let info = OptimizationInfo::new(1000, 800, 5, 2);
+        
+        assert_eq!(info.original_size, 1000);
+        assert_eq!(info.optimized_size, 800);
+        assert_eq!(info.size_reduction(), 200);
+        assert_eq!(info.compression_ratio, 0.2);
+        assert_eq!(info.compression_percentage(), 20.0);
+        assert_eq!(info.plugins_applied, 5);
+        assert_eq!(info.passes, 2);
+        
+        // Test edge case: no compression
+        let info2 = OptimizationInfo::new(1000, 1000, 0, 1);
+        assert_eq!(info2.compression_ratio, 0.0);
+        assert_eq!(info2.size_reduction(), 0);
+        
+        // Test edge case: zero original size
+        let info3 = OptimizationInfo::new(0, 0, 0, 1);
+        assert_eq!(info3.compression_ratio, 0.0);
+    }
+    
+    #[test]
+    fn test_optimize_options_builder() {
+        let config = Config::default();
+        let registry = PluginRegistry::new();
+        
+        let options = OptimizeOptions::new(config.clone());
+        assert!(options.registry.is_none());
+        
+        let options_with_registry = OptimizeOptions::new(config.clone())
+            .with_registry(registry);
+        assert!(options_with_registry.registry.is_some());
+        
+        #[cfg(feature = "parallel")]
+        {
+            use vexy_svgo_core::optimizer::parallel::ParallelConfig;
+            let parallel_config = ParallelConfig::default();
+            let options_with_parallel = OptimizeOptions::new(config)
+                .with_parallel(parallel_config);
+            assert!(options_with_parallel.parallel.is_some());
+        }
+    }
+    
+    #[test]
+    fn test_multipass_convergence() {
+        let svg = r#"<svg><g><g><g><rect/></g></g></g></svg>"#;
+        let mut config = Config::default();
+        config.multipass = true;
+        
+        let result = optimize_with_config(svg, config).unwrap();
+        
+        // Multipass should converge and not run indefinitely
+        assert!(result.info.passes <= 10); // Should not exceed max passes
+        assert!(result.info.passes >= 1);
+    }
+    
+    #[test]
+    fn test_empty_document_optimization() {
+        let svg = r#"<svg/>"#;
+        let result = optimize_default(svg).unwrap();
+        
+        assert!(result.data.contains("<svg"));
+        assert!(result.info.original_size > 0);
+        assert!(result.info.optimized_size > 0);
+    }
+    
+    #[test]
+    fn test_optimization_with_custom_registry() {
+        struct TestPlugin;
+        impl Plugin for TestPlugin {
+            fn name(&self) -> &'static str { "test_plugin" }
+            fn description(&self) -> &'static str { "Test plugin" }
+            fn apply(&self, _document: &mut Document) -> anyhow::Result<()> { Ok(()) }
+        }
+        
+        let mut registry = PluginRegistry::new();
+        registry.register("test_plugin", || TestPlugin);
+        
+        let mut config = Config::default();
+        config.plugins = vec![PluginConfig::Name("test_plugin".to_string())];
+        
+        let options = OptimizeOptions::new(config).with_registry(registry);
+        let svg = r#"<svg><rect/></svg>"#;
+        
+        let result = optimize(svg, options).unwrap();
+        assert!(!result.data.is_empty());
+    }
+    
+    #[test]
+    fn test_optimization_error_handling() {
+        // Test with invalid SVG
+        let invalid_svg = "<svg><rect><invalid-nesting></svg>";
+        let result = optimize_default(invalid_svg);
+        
+        // Should either parse successfully or return a proper error
+        match result {
+            Ok(_) => {}, // Parser may handle this gracefully
+            Err(VexyError::Parse(_)) => {}, // Expected parse error
+            Err(other) => panic!("Unexpected error type: {:?}", other),
+        }
+    }
+    
+    #[test]
+    fn test_optimization_with_doctype() {
+        let svg = r#"<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg><rect/></svg>"#;
+        let result = optimize_default(svg);
+        
+        assert!(result.is_ok());
+    }
+    
+    #[test]
+    fn test_optimization_with_xml_declaration() {
+        let svg = r#"<?xml version="1.0" encoding="UTF-8"?><svg><rect/></svg>"#;
+        let result = optimize_default(svg);
+        
+        assert!(result.is_ok());
+    }
+    
+    #[test]
+    fn test_optimization_with_cdata() {
+        let svg = r#"<svg><style><![CDATA[
+            .cls1 { fill: red; }
+        ]]></style><rect class="cls1"/></svg>"#;
+        let result = optimize_default(svg);
+        
+        assert!(result.is_ok());
+    }
+    
+    #[test]
+    fn test_optimization_preserves_functional_content() {
+        let svg = r#"<svg viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="gradient">
+                    <stop offset="0%" stop-color="red"/>
+                    <stop offset="100%" stop-color="blue"/>
+                </linearGradient>
+            </defs>
+            <rect fill="url(#gradient)" width="100" height="100"/>
+        </svg>"#;
+        
+        let result = optimize_default(svg).unwrap();
+        
+        // Important functional elements should be preserved
+        assert!(result.data.contains("viewBox"));
+        assert!(result.data.contains("gradient"));
+        assert!(result.data.contains("url(#"));
+    }
+    
+    #[test]
+    fn test_optimization_statistics() {
+        let svg = r#"<svg><!-- comment --><rect width="100" height="100"/></svg>"#;
+        let result = optimize_default(svg).unwrap();
+        
+        // Statistics should be meaningful
+        assert!(result.info.original_size > 0);
+        assert!(result.info.optimized_size > 0);
+        assert!(result.info.original_size >= result.info.optimized_size); // Should not grow
+        
+        // Size reduction should be non-negative
+        assert!(result.info.size_reduction() >= 0);
+        
+        // Compression ratio should be valid
+        assert!(result.info.compression_ratio >= 0.0);
+        assert!(result.info.compression_ratio <= 1.0);
     }
 }
