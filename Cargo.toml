@@ -11,7 +11,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "1.0.34"
+version = "1.0.35"
 authors = ["Adam Twardoch <adam+github@twardoch.com>"]
 edition = "2021"
 license = "MIT"
@@ -23,9 +23,9 @@ categories = ["command-line-utilities", "multimedia::images", "template-engine",
 rust-version = "1.58.0"
 
 [workspace.dependencies]
-vexy-svgo-core = { path = "./crates/core", version = "1.0.34" }
-vexy-svgo-plugin-sdk = { path = "./crates/plugin-sdk", version = "1.0.34" }
-vexy-svgo-test-utils = { path = "./crates/test-utils", version = "1.0.34" }
+vexy-svgo-core = { path = "./crates/core", version = "1.0.35" }
+vexy-svgo-plugin-sdk = { path = "./crates/plugin-sdk", version = "1.0.35" }
+vexy-svgo-test-utils = { path = "./crates/test-utils", version = "1.0.35" }
 anyhow = "1.0"
 assert_cmd = "2.0"
 camino = "1.1"

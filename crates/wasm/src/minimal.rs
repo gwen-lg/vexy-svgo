@@ -5,6 +5,7 @@
 //! This module provides a bare-bones API that trades features for size.
 
 use wasm_bindgen::prelude::*;
+use vexy_svgo_core::{Config, PluginConfig, optimize_with_config};
 
 #[cfg(feature = "size-optimization")]
 #[wasm_bindgen]
@@ -33,12 +34,12 @@ impl MinimalOptimizer {
         
         // Use the most common plugins only
         config.plugins = vec![
-            vexy_svgo_core::config::PluginConfig::Name("removeComments".to_string()),
-            vexy_svgo_core::config::PluginConfig::Name("removeEmptyAttrs".to_string()),
-            vexy_svgo_core::config::PluginConfig::Name("removeEmptyContainers".to_string()),
-            vexy_svgo_core::config::PluginConfig::Name("collapseGroups".to_string()),
-            vexy_svgo_core::config::PluginConfig::Name("convertColors".to_string()),
-            vexy_svgo_core::config::PluginConfig::Name("removeUselessDefs".to_string()),
+            PluginConfig::Name("removeComments".to_string()),
+            PluginConfig::Name("removeEmptyAttrs".to_string()),
+            PluginConfig::Name("removeEmptyContainers".to_string()),
+            PluginConfig::Name("collapseGroups".to_string()),
+            PluginConfig::Name("convertColors".to_string()),
+            PluginConfig::Name("removeUselessDefs".to_string()),
         ];
         
         match optimize_with_config(svg, config) {
@@ -62,13 +63,13 @@ impl MinimalOptimizer {
 #[cfg(feature = "size-optimization")]
 #[wasm_bindgen]
 pub fn optimize_minimal(svg: &str) -> String {
-    use vexy_svgo_core::{Config, optimize_with_config};
+    use vexy_svgo_core::{Config, PluginConfig, optimize_with_config};
     
     // Use only the most impactful plugins
     let mut config = Config::default();
     config.plugins = vec![
-        vexy_svgo_core::config::PluginConfig::Name("removeComments".to_string()),
-        vexy_svgo_core::config::PluginConfig::Name("collapseGroups".to_string()),
+        PluginConfig::Name("removeComments".to_string()),
+        PluginConfig::Name("collapseGroups".to_string()),
     ];
     
     match optimize_with_config(svg, config) {

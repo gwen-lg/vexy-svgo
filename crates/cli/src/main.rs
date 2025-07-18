@@ -604,9 +604,12 @@ fn process_folder(
     
     let folder_path = Path::new(folder);
     if !folder_path.is_dir() {
-        return Err(vexy_svgo_core::error::CliError::InvalidDirectory { 
-            path: folder.to_string() 
-        }.into());
+        return Err(vexy_svgo_core::error::VexyError::Io(
+            std::io::Error::new(
+                std::io::ErrorKind::NotFound, 
+                format!("Directory not found: {}", folder)
+            )
+        ));
     }
 
     let svg_files = if recursive {
@@ -793,7 +796,7 @@ fn is_excluded(path: &Path, patterns: &[&str]) -> Result<bool, VexyError> {
         return Ok(false);
     }
 
-    let path_str = path.to_str().ok_or(VexySvgoError::General("Invalid path".to_string()))?;
+    let path_str = path.to_str().ok_or(VexyError::General("Invalid path".to_string()))?;
     
     for pattern in patterns {
         let regex = regex::Regex::new(pattern)?;

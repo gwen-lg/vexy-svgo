@@ -1,6 +1,6 @@
 [package]
 name = "vexy-svgo-core"
-version = "1.0.34"
+version = "1.0.35"
 description = "Core library for vexy-svgo SVG optimizer"
 
 [package.authors]
@@ -44,6 +44,7 @@ indexmap = { workspace = true }
 regex = { workspace = true }
 quick-xml = { workspace = true }
 parking_lot = { workspace = true }
+jsonschema = { workspace = true }
 base64 = "0.22.1"
 urlencoding = "2.1.3"
 

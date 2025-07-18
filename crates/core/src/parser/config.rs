@@ -169,7 +169,7 @@ impl Config {
             return Err(VexyError::Config("Invalid configuration".to_string()));
         }
 
-        serde_json::from_value(config)
+        serde_json::from_value(config.clone())
             .map_err(|e| VexyError::Config(e.to_string()))
     }
 
