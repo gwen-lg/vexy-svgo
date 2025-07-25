@@ -838,7 +838,7 @@ fn apply_precision_override(config: &mut Config, precision: u8) {
 fn show_plugins() {
     use vexy_svgo_core::PluginConfig;
     
-    let config = Config::default();
+    let config = Config::with_default_preset();
     println!("Available plugins:");
     for plugin in &config.plugins {
         let name = plugin.name();

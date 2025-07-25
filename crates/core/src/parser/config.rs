@@ -146,7 +146,46 @@ impl Config {
     
     /// Create a new config with default preset
     pub fn with_default_preset() -> Self {
-        Self::default()
+        let mut config = Self::default();
+        
+        // Add SVGO default plugins in the correct order
+        config.plugins = vec![
+            PluginConfig::Name("removeDoctype".to_string()),
+            PluginConfig::Name("removeXMLProcInst".to_string()),
+            PluginConfig::Name("removeComments".to_string()),
+            PluginConfig::Name("removeMetadata".to_string()),
+            PluginConfig::Name("removeEditorsNSData".to_string()),
+            // Note: cleanupAttrs not implemented yet
+            PluginConfig::Name("mergeStyles".to_string()),
+            PluginConfig::Name("inlineStyles".to_string()),
+            PluginConfig::Name("minifyStyles".to_string()),
+            PluginConfig::Name("cleanupIds".to_string()),
+            PluginConfig::Name("removeUselessDefs".to_string()),
+            // Note: cleanupNumericValues not implemented yet
+            PluginConfig::Name("convertColors".to_string()),
+            PluginConfig::Name("removeUnknownsAndDefaults".to_string()),
+            PluginConfig::Name("removeNonInheritableGroupAttrs".to_string()),
+            PluginConfig::Name("removeUselessStrokeAndFill".to_string()),
+            // Note: cleanupEnableBackground not implemented yet
+            PluginConfig::Name("removeHiddenElems".to_string()),
+            PluginConfig::Name("removeEmptyText".to_string()),
+            PluginConfig::Name("convertShapeToPath".to_string()),
+            PluginConfig::Name("convertEllipseToCircle".to_string()),
+            PluginConfig::Name("moveElemsAttrsToGroup".to_string()),
+            PluginConfig::Name("moveGroupAttrsToElems".to_string()),
+            PluginConfig::Name("collapseGroups".to_string()),
+            PluginConfig::Name("convertPathData".to_string()),
+            PluginConfig::Name("convertTransform".to_string()),
+            PluginConfig::Name("removeEmptyAttrs".to_string()),
+            PluginConfig::Name("removeEmptyContainers".to_string()),
+            PluginConfig::Name("removeUnusedNS".to_string()),
+            PluginConfig::Name("mergePaths".to_string()),
+            PluginConfig::Name("sortAttrs".to_string()),
+            PluginConfig::Name("sortDefsChildren".to_string()),
+            PluginConfig::Name("removeDesc".to_string()),
+        ];
+        
+        config
     }
 
     /// Load config from a file

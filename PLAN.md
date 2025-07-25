@@ -1,153 +1,157 @@
-# Vexy SVGO Improvement Plan
+# Issue #201: SVGO Default Plugin Parity and Optimization Results
 
-This document outlines a series of proposed improvements for the Vexy SVGO codebase. These changes focus on enhancing robustness, efficiency, and maintainability through targeted, quality-of-life upgrades rather than new features.
+## Project Overview
+This plan addresses Issue #201, which requires ensuring that Vexy SVGO maintains compatibility with the original SVGO tool in terms of:
+1. Default plugin configuration parity
+2. Optimization result similarity (within 1% difference)
 
-## 1. Enhanced Build & CI Pipeline
+## Technical Architecture Decisions
+- Use the existing `ref/svgo` submodule as the authoritative reference for default plugin configuration
+- Implement automated testing to validate optimization parity across a diverse set of SVG files
+- Create benchmarking tools to measure and compare optimization effectiveness
 
-### 1.1. Introduce Build Verification & Reproducibility
-**Goal:** Ensure that builds are consistent and verifiable, reducing the risk of environment-specific errors.
+## Phase 1: Default Plugin Configuration Analysis
 
-**Detailed Steps:**
-1.  **Add a build verification script:** Create a new script `scripts/verify-build.sh` that performs a clean build and then runs tests against the release artifacts. This script will be crucial for ensuring that what gets published is what was tested.
-    ```bash
-    #!/bin/bash
-    set -euo pipefail
-    
-    echo "--- Verifying clean release build ---"
-    cargo clean
-    cargo build --release
-    
-    echo "--- Running tests against release build ---"
-    cargo test --release
-    
-    echo "--- Build verification successful ---"
-    ```
-2.  **Integrate into CI:** Update the `.github/workflows/ci.yml` to include a new job that runs this verification script. This ensures that every pull request and push to `main` is verified.
-    ```yaml
-    jobs:
-      verify-build:
-        name: Verify Release Build
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-          - uses: actions/cache@v4
-            with:
-              path: |
-                ~/.cargo/bin/
-                ~/.cargo/registry/index/
-                ~/.cargo/registry/cache/
-                ~/.cargo/git/db/
-                target/
-              key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          - name: Run build verification script
-            run: ./scripts/verify-build.sh
-    ```
+### 1.1 Analyze Current Vexy SVGO Default Plugins
+- **Objective:** Document the current default plugin configuration in Vexy SVGO
+- **Implementation Steps:**
+  1. Examine `crates/plugin-sdk/src/plugins/mod.rs` for default plugin registration
+  2. Check `crates/core/src/config.rs` for default configuration values
+  3. Review CLI default behavior in `crates/cli/src/main.rs`
+  4. Document current plugin list and their default states
 
-### 1.2. Refine Pre-Commit Hooks
-**Goal:** Catch more issues locally before they ever reach CI, speeding up the development cycle.
+### 1.2 Analyze Reference SVGO Default Plugins
+- **Objective:** Extract and document the default plugin configuration from the reference SVGO
+- **Implementation Steps:**
+  1. Examine `ref/svgo/lib/svgo.js` for default plugin configuration
+  2. Check `ref/svgo/plugins/` directory for available plugins and their defaults
+  3. Run `npx svgo --show-plugins` to get current plugin status
+  4. Create a comprehensive mapping of SVGO default plugins
 
-**Detailed Steps:**
-1.  **Add `cargo-deny` to pre-commit:** Integrate `cargo-deny` to check for duplicate dependencies, security advisories, and license compatibility on every commit.
-    ```yaml
-    -   repo: https://github.com/EmbarkStudios/cargo-deny
-        rev: 0.14.0
-        hooks:
-          - id: cargo-deny
-            args: [ "check" ]
-    ```
-2.  **Add `codespell` for typo checking:** Integrate `codespell` to automatically fix common misspellings in the codebase.
-    ```yaml
-    -   repo: https://github.com/codespell-project/codespell
-        rev: v2.2.6
-        hooks:
-          - id: codespell
-            args: ["-w"]
-    ```
+### 1.3 Configuration Parity Analysis
+- **Objective:** Compare and identify discrepancies between Vexy SVGO and SVGO defaults
+- **Implementation Steps:**
+  1. Create a side-by-side comparison table of default plugins
+  2. Identify missing plugins in Vexy SVGO
+  3. Identify plugins with different default states
+  4. Document any plugin parameter differences
 
-## 2. Codebase & Module Organization
+## Phase 2: Plugin Implementation and Configuration Fixes
 
-### 2.1. Standardize Module Exports
-**Goal:** Create a more consistent and predictable public API by standardizing how modules export their functionality.
+### 2.1 Implement Missing Default Plugins
+- **Objective:** Ensure all SVGO default plugins are implemented in Vexy SVGO
+- **Implementation Steps:**
+  1. For each missing plugin, implement the Rust equivalent
+  2. Add proper plugin registration to the default plugin set
+  3. Ensure plugin parameters match SVGO defaults
+  4. Add unit tests for each new plugin
 
-**Detailed Steps:**
-1.  **Adopt `pub use` for re-exports:** In `crates/vexy_svgo/src/lib.rs`, refactor all public-facing modules to use `pub use` for re-exporting types and functions. This will create a flatter, more accessible API for consumers of the crate.
-    
-    *Example (before):*
-    ```rust
-    // In crates/vexy_svgo/src/lib.rs
-    pub mod config;
-    pub mod error;
-    pub mod optimizer;
-    ```
-    
-    *Example (after):*
-    ```rust
-    // In crates/vexy_svgo/src/lib.rs
-    pub use crate::config::{Config, OptimizerConfig};
-    pub use crate::error::VexyError;
-    pub use crate::optimizer::optimize;
-    ```
-2.  **Audit public APIs:** Systematically review every `pub` item in the library crates (`core`, `plugin-sdk`, `vexy_svgo`) to ensure that only intentionally public items are exposed. Add `#[doc(hidden)]` to items that are public for technical reasons but not part of the stable API.
+### 2.2 Fix Plugin Default States
+- **Objective:** Align plugin default enabled/disabled states with SVGO
+- **Implementation Steps:**
+  1. Update plugin registration in `crates/plugin-sdk/src/plugins/mod.rs`
+  2. Modify default configuration in `crates/core/src/config.rs`
+  3. Ensure CLI behavior matches SVGO CLI behavior
+  4. Update plugin parameter defaults
 
-### 2.2. Centralize Error Handling
-**Goal:** Improve error handling by creating a single, unified error type for the entire application.
+### 2.3 Configuration System Enhancement
+- **Objective:** Improve configuration system to better match SVGO behavior
+- **Implementation Steps:**
+  1. Enhance configuration loading to match SVGO's precedence rules
+  2. Implement SVGO-compatible configuration file format support
+  3. Add `--show-plugins` CLI option for debugging
+  4. Ensure preset handling matches SVGO behavior
 
-**Detailed Steps:**
-1.  **Create a top-level `Error` enum:** In `crates/vexy_svgo/src/error.rs`, define a comprehensive `Error` enum that encapsulates all possible failure modes, from I/O errors to parsing and optimization failures.
-    ```rust
-    use thiserror::Error;
-    
-    #[derive(Debug, Error)]
-    pub enum VexyError {
-        #[error("I/O error: {0}")]
-        Io(#[from] std::io::Error),
-    
-        #[error("XML parsing error: {0}")]
-        Parsing(#[from] roxmltree::Error),
-    
-        #[error("Plugin '{0}' failed: {1}")]
-        Plugin(String, String),
-    
-        #[error("Invalid configuration: {0}")]
-        Config(String),
-    }
-    ```
-2.  **Refactor crates to use the unified error type:** Replace all instances of custom error types in other crates with `VexyError`. Use `Result<T, VexyError>` as the standard return type for fallible operations.
+## Phase 3: Optimization Parity Testing
 
-## 3. Configuration Management
+### 3.1 Create Comprehensive Test Suite
+- **Objective:** Build automated testing to validate optimization parity
+- **Implementation Steps:**
+  1. Create a diverse set of test SVG files covering:
+     - Simple geometric shapes
+     - Complex illustrations with gradients
+     - Icons with various path complexities
+     - SVGs with embedded content and metadata
+     - Large SVGs with many elements
+  2. Add test files from the `ref/svgo/test/fixtures` directory
+  3. Create test harness to run both tools on the same inputs
+  4. Implement statistical analysis of optimization results
 
-### 3.1. Implement Configuration Schema Validation
-**Goal:** Provide users with clear, immediate feedback on invalid configuration files.
+### 3.2 Optimization Effectiveness Measurement
+- **Objective:** Develop tools to measure and compare optimization effectiveness
+- **Implementation Steps:**
+  1. Create benchmarking script that measures:
+     - File size reduction percentage
+     - Processing time comparison
+     - Output validity (well-formed SVG)
+     - Visual similarity (when possible)
+  2. Implement statistical analysis to identify:
+     - Mean optimization difference
+     - Standard deviation of results
+     - Outliers requiring investigation
+  3. Set up automated reporting of parity metrics
 
-**Detailed Steps:**
-1.  **Introduce JSON Schema:** Create a `svgo.schema.json` file in the root of the project. This file will define the structure, types, and allowed values for `svgo.config.js`.
-2.  **Add validation logic:** In `crates/cli/src/config.rs`, use a library like `jsonschema` to validate loaded configurations against the schema. If validation fails, print a user-friendly error message that explains what is wrong and points to the documentation.
-    ```rust
-    // Example validation logic
-    let schema = load_schema("svgo.schema.json")?;
-    let instance = serde_json::to_value(config)?;
-    let result = jsonschema::validate(&instance, &schema);
-    
-    if let Err(errors) = result {
-        for error in errors {
-            eprintln!("Configuration error: {}", error);
-        }
-        return Err(VexyError::Config("Invalid configuration".to_string()));
-    }
-    ```
+### 3.3 Regression Testing Framework
+- **Objective:** Prevent future regressions in optimization parity
+- **Implementation Steps:**
+  1. Integrate parity tests into CI/CD pipeline
+  2. Create performance regression detection
+  3. Add alerts for significant parity degradation
+  4. Document acceptable variance thresholds
 
-## 4. Documentation & Examples
+## Phase 4: Performance and Quality Optimization
 
-### 4.1. Create a Plugin Development Example
-**Goal:** Lower the barrier to entry for new plugin developers by providing a clear, working example.
+### 4.1 Plugin Performance Optimization
+- **Objective:** Ensure Vexy SVGO plugins perform comparably to SVGO
+- **Implementation Steps:**
+  1. Profile plugin execution times
+  2. Optimize algorithms where performance gaps exist
+  3. Implement caching where appropriate
+  4. Add memory usage optimization
 
-**Detailed Steps:**
-1.  **Create a new example crate:** Add a new crate under `examples/example-plugin`. This crate will demonstrate how to create a simple plugin that removes all `<g>` elements from an SVG.
-2.  **Write a tutorial:** Add a new page to the documentation (`docs_src/developer/creating-a-plugin.md`) that walks through the process of creating, testing, and using the example plugin.
+### 4.2 Output Quality Validation
+- **Objective:** Ensure optimization doesn't compromise SVG quality
+- **Implementation Steps:**
+  1. Implement SVG validation after optimization
+  2. Add visual regression testing where feasible
+  3. Create quality metrics for optimization results
+  4. Document known differences and their acceptability
 
-### 4.2. Add Integration Examples
-**Goal:** Show users how to integrate `vexy-svgo` into their projects.
+## Phase 5: Documentation and Validation
 
-**Detailed Steps:**
-1.  **Node.js example:** Create a simple Node.js project in `examples/nodejs-integration` that uses the WASM build of `vexy-svgo` to optimize an SVG file.
-2.  **Python example:** Create a Python script in `examples/python-integration` that uses the FFI bindings to call `vexy-svgo` from Python.
+### 5.1 Parity Documentation
+- **Objective:** Document the parity status and any known differences
+- **Implementation Steps:**
+  1. Create comprehensive plugin parity documentation
+  2. Document any intentional differences from SVGO
+  3. Add troubleshooting guide for parity issues
+  4. Update user documentation with parity guarantees
+
+### 5.2 Final Validation and Testing
+- **Objective:** Comprehensive validation of parity achievement
+- **Implementation Steps:**
+  1. Run full test suite on diverse SVG corpus
+  2. Validate optimization difference is within 1% threshold
+  3. Perform stress testing with large and complex SVGs
+  4. Document final parity status and metrics
+
+## Success Criteria
+1. **Plugin Parity:** All default plugins from SVGO are implemented and enabled by default in Vexy SVGO
+2. **Configuration Parity:** Default plugin configurations match SVGO exactly
+3. **Optimization Parity:** File size optimization results differ by no more than 1% on average
+4. **Performance:** Vexy SVGO performs comparably or better than SVGO
+5. **Quality:** Optimized SVGs maintain visual and functional equivalence
+6. **Testing:** Automated tests prevent future parity regressions
+
+## Risk Assessment and Mitigation
+- **Risk:** Complex SVGO plugins may be difficult to port
+  - **Mitigation:** Prioritize most impactful plugins first, document any temporary limitations
+- **Risk:** Performance optimization may compromise parity
+  - **Mitigation:** Comprehensive testing at each optimization step
+- **Risk:** SVGO updates may break parity
+  - **Mitigation:** Regular synchronization with SVGO updates, automated parity monitoring
+
+## Future Considerations
+- Establish process for maintaining parity with future SVGO updates
+- Consider contributing improvements back to SVGO where appropriate
+- Plan for extending parity to non-default plugin configurations
