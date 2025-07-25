@@ -30,8 +30,8 @@ pub fn create_migrated_plugin_registry() -> PluginRegistry {
     registry.register("removeEditorsNSData", || RemoveEditorsNSDataPlugin::new());
     registry.register("removeElementsByAttr", || RemoveElementsByAttrPlugin::new());
     registry.register("removeUnusedNS", || RemoveUnusedNSPlugin::new());
-    // registry.register("cleanupAttrs", || CleanupAttrsPlugin::new()); // Not implemented yet
-    // registry.register("cleanupEnableBackground", || CleanupEnableBackgroundPlugin::new()); // Not implemented yet
+    registry.register("cleanupAttrs", || CleanupAttrsPlugin::new());
+    registry.register("cleanupEnableBackground", || CleanupEnableBackgroundPlugin::new());
     // registry.register("cleanupListOfValues", || CleanupListOfValuesPlugin::new()); // Not implemented yet
     registry.register("mergeStyles", || MergeStylesPlugin::new());
     registry.register("removeDoctype", || RemoveDoctypePlugin::new());
@@ -45,7 +45,7 @@ pub fn create_migrated_plugin_registry() -> PluginRegistry {
     registry.register("convertPathData", || ConvertPathDataPlugin::new());
     registry.register("convertTransform", || ConvertTransformPlugin::new());
     registry.register("applyTransforms", || ApplyTransformsPlugin::new());
-    // registry.register("cleanupNumericValues", || CleanupNumericValuesPlugin::new()); // Not implemented yet
+    registry.register("cleanupNumericValues", || CleanupNumericValuesPlugin::new());
     registry.register("minifyStyles", || MinifyStylesPlugin::new());
     registry.register("removeNonInheritableGroupAttrs", || RemoveNonInheritableGroupAttrsPlugin::new());
     registry.register("sortAttrs", || SortAttrsPlugin::new());
