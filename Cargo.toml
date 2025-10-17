@@ -1,0 +1,25 @@
+[workspace]
+members = ["vexy-svgo"]
+
+[workspace.package]
+edition = "2024"
+authors = ["Gwen Lg <me@gwenlg.fr>"]
+license = "GPL-3.0-only"
+repository = "https://github.com/gwen-lg/vexy-svgo"
+keywords = ["svg", "svgo", "optimizer", "vector", "graphics"]
+description = "This crate is empty and occupies the space to avoid malicious occupation as Vexyart doesn't publish their project"
+
+
+[package]
+name = "vexy-svgo-cli"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+description.workspace = true
+categories = ["command-line-utilities", "multimedia::images"]
+
+[dependencies]
+vexy-svgo = { version = "0.1.0", path = "vexy-svgo" }

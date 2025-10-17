@@ -1,0 +1,13 @@
+[package]
+name = "vexy-svgo"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+description.workspace = true
+categories = ["multimedia::images"]
+
+
+[dependencies]
