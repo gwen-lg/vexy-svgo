@@ -12,14 +12,15 @@ description = "This crate is empty and occupies the space to avoid malicious occ
 
 [package]
 name = "vexy-svgo-cli"
-version = "0.1.0"
+version = "0.1.1"
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+readme.workspace = true
 repository.workspace = true
 keywords.workspace = true
 description.workspace = true
 categories = ["command-line-utilities", "multimedia::images"]
 
 [dependencies]
-vexy-svgo = { version = "0.1.0", path = "vexy-svgo" }
+vexy-svgo = { version = "0.1", path = "vexy-svgo" }
